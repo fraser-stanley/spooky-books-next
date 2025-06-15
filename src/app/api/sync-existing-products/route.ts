@@ -1,9 +1,9 @@
-import { NextRequest, NextResponse } from 'next/server'
+import { NextResponse } from 'next/server'
 import Stripe from 'stripe'
 import { createClient } from '@sanity/client'
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
-  apiVersion: '2024-11-20.acacia',
+  apiVersion: '2025-05-28.basil',
 })
 
 const sanityClient = createClient({
@@ -14,7 +14,7 @@ const sanityClient = createClient({
   useCdn: false,
 })
 
-export async function POST(request: NextRequest) {
+export async function POST() {
   try {
     // Get all products without stripePriceId
     const products = await sanityClient.fetch(`

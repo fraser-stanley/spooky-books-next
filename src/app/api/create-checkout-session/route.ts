@@ -3,7 +3,7 @@ import Stripe from 'stripe'
 import { createClient } from '@sanity/client'
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
-  apiVersion: '2024-11-20.acacia',
+  apiVersion: '2025-05-28.basil',
 })
 
 const sanityClient = createClient({
@@ -55,7 +55,7 @@ export async function POST(request: NextRequest) {
     const lineItems: Stripe.Checkout.SessionCreateParams.LineItem[] = []
 
     for (const cartItem of items) {
-      const product = products.find((p: any) => p.id === cartItem.id)
+      const product = products.find((p: {id: string}) => p.id === cartItem.id)
       
       if (!product) {
         return NextResponse.json(
@@ -70,7 +70,7 @@ export async function POST(request: NextRequest) {
 
       // Handle apparel with size variants
       if (cartItem.size && product.variants && product.variants.length > 0) {
-        const variant = product.variants.find((v: any) => v.size === cartItem.size)
+        const variant = product.variants.find((v: {size: string}) => v.size === cartItem.size)
         
         if (!variant) {
           return NextResponse.json(

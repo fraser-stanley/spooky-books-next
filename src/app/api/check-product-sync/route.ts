@@ -21,20 +21,20 @@ export async function GET() {
       }
     `)
 
-    const synced = products.filter((p: any) => p.stripePriceId)
-    const unsynced = products.filter((p: any) => !p.stripePriceId)
+    const synced = products.filter((p: {stripePriceId?: string}) => p.stripePriceId)
+    const unsynced = products.filter((p: {stripePriceId?: string}) => !p.stripePriceId)
 
     return NextResponse.json({
       total: products.length,
       synced: synced.length,
       unsynced: unsynced.length,
       products: {
-        synced: synced.map((p: any) => ({
+        synced: synced.map((p: {title: string, slug: string, stripePriceId: string}) => ({
           title: p.title,
           slug: p.slug,
           stripePriceId: p.stripePriceId
         })),
-        unsynced: unsynced.map((p: any) => ({
+        unsynced: unsynced.map((p: {title: string, slug: string, price: number}) => ({
           title: p.title,
           slug: p.slug,
           price: p.price
@@ -42,7 +42,7 @@ export async function GET() {
       }
     })
 
-  } catch (error) {
+  } catch {
     return NextResponse.json(
       { error: 'Failed to check sync status' },
       { status: 500 }

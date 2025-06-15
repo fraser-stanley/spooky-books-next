@@ -27,6 +27,7 @@ export const products: Product[] = [
     title: "Niijima Gardens",
     slug: "niijima-gardens",
     price: 45,
+    stockQuantity: 10,
     currency: "USD",
     category: "Fiction",
     images: [
@@ -34,13 +35,13 @@ export const products: Product[] = [
       { url: "/images/niijima-gardens-excerpt.jpg", alt: "Image from Niijima Gardens by Charlie Hillhouse" }
     ],
     description: "A photobook by Charlie Hillhouse",
-    vendor: "Spooky Books"
   },
   {
     id: "prod_002",
     title: "Courier",
     slug: "courier",
     price: 35,
+    stockQuantity: 8,
     currency: "USD",
     category: "Fiction",
     images: [
@@ -48,13 +49,13 @@ export const products: Product[] = [
       { url: "/images/courier-excerpt.jpg", alt: "Image from Courier by Julian Hutton" }
     ],
     description: "A novel by Julian Hutton",
-    vendor: "Spooky Books"
   },
   {
     id: "prod_003",
     title: "Let's Get Together",
     slug: "lets-get-together",
     price: 40,
+    stockQuantity: 12,
     currency: "USD",
     category: "Poetry",
     images: [
@@ -62,26 +63,26 @@ export const products: Product[] = [
       { url: "/images/lgt-excerpt.jpg", alt: "Image from Let's Get Together by Lynette Letic" }
     ],
     description: "Poetry collection by Lynette Letic",
-    vendor: "Spooky Books"
   },
   {
     id: "prod_004",
     title: "Ink Drawings",
     slug: "ink-drawings",
     price: 50,
+    stockQuantity: 5,
     currency: "USD",
     category: "Horror",
     images: [
       { url: "/images/sk-spread.jpg", alt: "Photograph of person looking at book spread" }
     ],
     description: "Ink drawings by Scott Keim",
-    vendor: "Spooky Books"
   },
   {
     id: "prod_005",
     title: "Tote Bag in Black",
     slug: "tote-bag-black",
     price: 25,
+    stockQuantity: 0,
     currency: "USD",
     category: "Apparel",
     images: [
@@ -89,7 +90,6 @@ export const products: Product[] = [
       { url: "/images/sb-tote-blk.jpg", alt: "Black tote bag with white text" }
     ],
     description: "Black canvas tote bag with Spooky Books branding",
-    vendor: "Spooky Books"
   }
 ]
 

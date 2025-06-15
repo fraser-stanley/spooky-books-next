@@ -15,7 +15,7 @@ export function ProductPageClient({ product }: ProductPageClientProps) {
   
   const isApparel = product.category.toLowerCase() === 'apparel' && product.variants && product.variants.length > 0
   const hasStock = isApparel 
-    ? selectedVariant && selectedVariant.stockQuantity > 0
+    ? Boolean(selectedVariant && selectedVariant.stockQuantity > 0)
     : product.stockQuantity > 0
 
   const handleSizeChange = (size: string, variant: ProductVariant) => {

@@ -4,7 +4,7 @@ import { createClient } from '@sanity/client'
 
 // Initialize Stripe
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
-  apiVersion: '2024-11-20.acacia',
+  apiVersion: '2025-05-28.basil',
 })
 
 // Initialize Sanity client with write permissions
@@ -61,7 +61,7 @@ export async function POST(request: NextRequest) {
     })
 
     const stripePriceInCents = Math.round(product.price * 100)
-    const updateData: any = { stripeProductId: stripeProduct.id }
+    const updateData: {stripeProductId: string, stripePriceId?: string, variants?: unknown[]} = { stripeProductId: stripeProduct.id }
 
     // Handle variants (apparel with sizes) vs simple products
     const isApparel = product.category?.title === 'Apparel'

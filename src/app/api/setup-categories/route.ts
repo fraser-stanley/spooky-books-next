@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from 'next/server'
+import { NextResponse } from 'next/server'
 import { createClient } from '@sanity/client'
 
 const sanityClient = createClient({
@@ -9,7 +9,7 @@ const sanityClient = createClient({
   useCdn: false,
 })
 
-export async function POST(request: NextRequest) {
+export async function POST() {
   try {
     // Check existing categories
     const existingCategories = await sanityClient.fetch(`
@@ -42,7 +42,7 @@ export async function POST(request: NextRequest) {
 
     for (const category of requiredCategories) {
       // Check if category already exists
-      const existing = existingCategories.find(cat => cat.title === category.title)
+      const existing = existingCategories.find((cat: {title: string}) => cat.title === category.title)
       
       if (!existing) {
         console.log(`Creating category: ${category.title}`)
@@ -103,7 +103,7 @@ export async function GET() {
       categories,
       count: categories.length
     })
-  } catch (error) {
+  } catch {
     return NextResponse.json(
       { error: 'Failed to fetch categories' },
       { status: 500 }
