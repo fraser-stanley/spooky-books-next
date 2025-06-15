@@ -1,0 +1,39 @@
+/* navigation.module.css */
+
+.navStyle {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  overflow-x: auto;
+  white-space: nowrap;
+  font-weight: 500;
+  gap: 0.5rem;
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* IE 10+ */
+}
+
+.navStyle::-webkit-scrollbar {
+  display: none; /* Chrome, Safari */
+}
+
+.navLink {
+  cursor: pointer;
+  text-decoration: none;
+  /* height: 2.5rem; */
+  margin-top: 0.5rem;
+  display: flex;
+  align-items: center;
+  color: inherit;
+  border-bottom: 1px solid transparent;
+  transition: border-color 0.2s ease;
+  padding-bottom: 0 0.2rem;
+}
+
+.navLink:hover {
+  border-bottom-color: currentColor;
+}
+
+.activeLink,
+.navLink[aria-current="page"] {
+  border-bottom-color: currentColor;
+}

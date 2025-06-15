@@ -1,0 +1,12 @@
+.cartButton {
+  color: inherit;
+  white-space: nowrap;
+}
+
+.cartButton:hover {
+  color: inherit;
+}
+
+.cartButton[aria-current="page"] {
+  color: inherit;
+}
