@@ -11,12 +11,26 @@ export default async function HomePage() {
   const categories = await getCategories()
   const homepage = await getHomepage(isEnabled)
   
+  // Debug logging
+  console.log('Homepage data:', homepage)
+  console.log('Hero sections count:', homepage?.heroSections?.length)
+  
   return (
     <Layout categories={categories}>
       <section className="text-md sm:text-sm grid grid-cols-12 gap-2 mb-12 xl:mb-24 mt-8 sm:mt-24">
-        {homepage?.heroSections?.map((section, index) => (
-          <HeroSection key={index} section={section} />
-        ))}
+        {!homepage?.heroSections ? (
+          <div className="col-span-12 text-center py-12">
+            <p>No homepage content found. Please create homepage content in Sanity Studio.</p>
+          </div>
+        ) : homepage.heroSections.length === 0 ? (
+          <div className="col-span-12 text-center py-12">
+            <p>No hero sections configured. Please add content in Sanity Studio.</p>
+          </div>
+        ) : (
+          homepage.heroSections.map((section, index) => (
+            <HeroSection key={index} section={section} />
+          ))
+        )}
       </section>
     </Layout>
   )
@@ -37,7 +51,8 @@ function HeroSection({ section }: { section: SanityHeroSection }) {
 
 // Updated HeroPair component with Sanity data
 function HeroPair({ section }: { section: SanityHeroPair }) {
-  const productUrl = `/products/${section.linkedProduct.category.slug}/${section.linkedProduct.slug}/`
+  const categorySlug = section.linkedProduct.category.slug.toLowerCase()
+  const productUrl = `/products/${categorySlug}/${section.linkedProduct.slug}/`
   
   return (
     <>
@@ -88,7 +103,8 @@ function HeroPair({ section }: { section: SanityHeroPair }) {
 
 // New HeroSingle component for full-width content
 function HeroSingle({ section }: { section: SanityHeroSingle }) {
-  const productUrl = `/products/${section.linkedProduct.category.slug}/${section.linkedProduct.slug}/`
+  const categorySlug = section.linkedProduct.category.slug.toLowerCase()
+  const productUrl = `/products/${categorySlug}/${section.linkedProduct.slug}/`
   
   return (
     <>
