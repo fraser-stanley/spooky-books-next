@@ -42,28 +42,40 @@ function HeroPair({ section }: { section: SanityHeroPair }) {
   return (
     <>
       <div className="col-span-12 sm:col-span-6">
-        <Link href={productUrl}>
-          <Image
-            src={section.leftImage.asset.url}
-            alt={section.leftImage.alt || section.title}
-            width={section.leftImage.asset.metadata.dimensions.width}
-            height={section.leftImage.asset.metadata.dimensions.height}
-            className="w-full"
-            priority
-          />
-        </Link>
+        {section.leftImage?.asset?.url ? (
+          <Link href={productUrl}>
+            <Image
+              src={section.leftImage.asset.url}
+              alt={section.leftImage.alt || section.title}
+              width={section.leftImage.asset.metadata.dimensions.width}
+              height={section.leftImage.asset.metadata.dimensions.height}
+              className="w-full"
+              priority
+            />
+          </Link>
+        ) : (
+          <div className="w-full h-64 bg-gray-100 flex items-center justify-center">
+            <span className="text-gray-500 text-sm">Add image in Sanity Studio</span>
+          </div>
+        )}
       </div>
       <div className="col-span-12 sm:col-span-6">
-        <Link href={productUrl}>
-          <Image
-            src={section.rightImage.asset.url}
-            alt={section.rightImage.alt || section.title}
-            width={section.rightImage.asset.metadata.dimensions.width}
-            height={section.rightImage.asset.metadata.dimensions.height}
-            className="w-full"
-            priority
-          />
-        </Link>
+        {section.rightImage?.asset?.url ? (
+          <Link href={productUrl}>
+            <Image
+              src={section.rightImage.asset.url}
+              alt={section.rightImage.alt || section.title}
+              width={section.rightImage.asset.metadata.dimensions.width}
+              height={section.rightImage.asset.metadata.dimensions.height}
+              className="w-full"
+              priority
+            />
+          </Link>
+        ) : (
+          <div className="w-full h-64 bg-gray-100 flex items-center justify-center">
+            <span className="text-gray-500 text-sm">Add image in Sanity Studio</span>
+          </div>
+        )}
       </div>
       <TitleLink 
         href={productUrl} 
@@ -81,17 +93,23 @@ function HeroSingle({ section }: { section: SanityHeroSingle }) {
   return (
     <>
       <div className="col-span-12">
-        <Link href={productUrl}>
-          <Image
-            src={section.image.asset.url}
-            alt={section.image.alt || section.title}
-            width={section.image.asset.metadata.dimensions.width}
-            height={section.image.asset.metadata.dimensions.height}
-            className="w-full"
-            quality={100}
-            priority
-          />
-        </Link>
+        {section.image?.asset?.url ? (
+          <Link href={productUrl}>
+            <Image
+              src={section.image.asset.url}
+              alt={section.image.alt || section.title}
+              width={section.image.asset.metadata.dimensions.width}
+              height={section.image.asset.metadata.dimensions.height}
+              className="w-full"
+              quality={100}
+              priority
+            />
+          </Link>
+        ) : (
+          <div className="w-full h-96 bg-gray-100 flex items-center justify-center">
+            <span className="text-gray-500 text-sm">Add image in Sanity Studio</span>
+          </div>
+        )}
       </div>
       <TitleLink 
         href={productUrl} 
