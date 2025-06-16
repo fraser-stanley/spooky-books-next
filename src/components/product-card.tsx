@@ -12,14 +12,24 @@ export type ProductCardProps = {
 }
 
 export function ProductCard({ product, eager }: ProductCardProps) {
-  const { title, slug, price, stockQuantity, images, variants, category } = product
+  const { title, slug, price, images, variants, category } = product
   const image = images[0] // Use first image
+  
+  // Helper function to get available stock for the basic Product type
+  // Note: This assumes reservedQuantity is 0 for the mock data Product type
+  const getAvailableStockForProduct = (size?: string) => {
+    if (size && variants) {
+      const variant = variants.find(v => v.size === size)
+      return variant ? variant.stockQuantity : 0
+    }
+    return product.stockQuantity
+  }
   
   // For apparel, check if any variant has stock; for publications, check main stock
   const isApparel = category.toLowerCase() === 'apparel'
   const isOutOfStock = isApparel 
-    ? !variants || variants.length === 0 || variants.every(v => v.stockQuantity <= 0)
-    : stockQuantity <= 0
+    ? !variants || variants.length === 0 || variants.every(v => getAvailableStockForProduct(v.size) <= 0)
+    : getAvailableStockForProduct() <= 0
 
   return (
     <Link
@@ -45,10 +55,16 @@ export function ProductCard({ product, eager }: ProductCardProps) {
         <h2 className="">
           {title}
           {isOutOfStock && " (SOLD OUT)"}
-          {!isOutOfStock && !isApparel && stockQuantity > 0 && stockQuantity <= 5 && ` (ONLY ${stockQuantity} LEFT)`}
+          {!isOutOfStock && !isApparel && (() => {
+            const availableStock = getAvailableStockForProduct();
+            return availableStock > 0 && availableStock <= 5 ? ` (ONLY ${availableStock} LEFT)` : '';
+          })()}
           {!isOutOfStock && isApparel && variants && (() => {
-            const lowStockVariants = variants.filter(v => v.stockQuantity > 0 && v.stockQuantity <= 5);
-            const totalLowStock = lowStockVariants.reduce((sum, v) => sum + v.stockQuantity, 0);
+            const lowStockVariants = variants.filter(v => {
+              const availableStock = getAvailableStockForProduct(v.size);
+              return availableStock > 0 && availableStock <= 5;
+            });
+            const totalLowStock = lowStockVariants.reduce((sum, v) => sum + getAvailableStockForProduct(v.size), 0);
             return totalLowStock > 0 ? ` (ONLY ${totalLowStock} LEFT)` : '';
           })()}
         </h2>

@@ -75,13 +75,13 @@ if (typeof window !== 'undefined') {
 }
 
 // Debounced fetch function
-export function createDebouncedFetch<T extends (...args: any[]) => Promise<any>>(
+export function createDebouncedFetch<T extends (...args: unknown[]) => Promise<unknown>>(
   fn: T,
   delay: number = 300
 ): T {
   let timeoutId: NodeJS.Timeout | null = null
-  let latestResolve: ((value: any) => void) | null = null
-  let latestReject: ((reason: any) => void) | null = null
+  let latestResolve: ((value: unknown) => void) | null = null
+  let latestReject: ((reason: unknown) => void) | null = null
 
   return ((...args: Parameters<T>) => {
     return new Promise((resolve, reject) => {

@@ -35,6 +35,8 @@ This is a **Next.js 15 e-commerce site** for Spooky Books, migrated from Gatsby 
 - ✅ **Homepage CMS**: Sanity-powered homepage with visual editing capabilities  
 - ✅ **Visual Editing**: Complete draft mode and presentation tool setup with Live Content API
 - ✅ **Production Ready**: Deployed to Vercel with visual editing fully functional
+- ✅ **Advanced Inventory Management**: Sophisticated stock reservation system with race condition prevention
+- ✅ **Real-time Stock Validation**: Atomic transactions and reserved quantity tracking
 
 ## Data Management
 
@@ -52,9 +54,19 @@ This is a **Next.js 15 e-commerce site** for Spooky Books, migrated from Gatsby 
 ### Product Data Structure
 - **Source**: Sanity CMS via GROQ queries (replaces mock data)
 - **Core Fields**: id, title, slug, price, category, images[], description, stockQuantity
+- **Inventory Fields**: stockQuantity, reservedQuantity (for tracking available vs reserved stock)
 - **Stripe Fields**: stripePriceId, stripeProductId (auto-populated)
-- **Variants**: Optional array for apparel with size-specific stock tracking
+- **Variants**: Optional array for apparel with size-specific stock tracking and individual reservedQuantity
 - **Categories**: Publications (books, magazines) or Apparel (t-shirts, totes)
+
+### Advanced Inventory Management System
+- **Stock Reservations**: 30-minute session-based inventory locking during checkout process
+- **Atomic Transactions**: Race condition prevention using Sanity transactions for concurrent operations
+- **Reserved Quantity Tracking**: Separate fields for total stock vs available stock calculations
+- **Automatic Cleanup**: Expired reservation release with background cleanup routines
+- **Variant-Level Reservations**: Individual stock tracking for each apparel size
+- **Real-time Validation**: Live stock checking with cart quantity consideration
+- **Overselling Prevention**: Comprehensive validation before checkout session creation
 
 ### Cart Context
 - **Location**: `src/components/cart-contex.tsx`
@@ -79,12 +91,20 @@ This is a **Next.js 15 e-commerce site** for Spooky Books, migrated from Gatsby 
 - **Accessibility**: Proper ARIA labels and semantic HTML structure
 
 ### E-commerce Components
-- **ProductCard**: Grid-compatible with Next.js Image optimization, stock status, and "sold out" styling
-- **ProductListing**: Category filtering with Sanity CMS integration
-- **AddToCart**: Enhanced button with size support, stock validation, and disabled states for sold out items
-- **SizeSelector**: Apparel size selection component with stock visibility and consistent parentheses styling
+- **ProductCard**: Grid-compatible with Next.js Image optimization, real-time stock status, and accurate "sold out" styling
+- **ProductListing**: Category filtering with Sanity CMS integration and live stock updates
+- **AddToCart**: Enhanced button with size support, real-time stock validation, and disabled states for sold out items
+- **SizeSelector**: Apparel size selection with individual size stock counts and color-coded availability
 - **CartButton**: Simplified inline text component showing "Cart" or "Cart (X)" format
-- **CartPage**: Clean, minimal design with gray background, size variant support, and refined checkout flow
+- **CartPage**: Clean, minimal design with real-time stock validation and optimized checkout flow
+- **CartItemEnhanced**: Advanced cart items with stock warnings, quantity controls, and availability checks
+- **SkeletonLoaders**: Loading states for cart validation and checkout processing
+
+### Stock Management Components
+- **Stock Validation**: Real-time available stock calculation (stockQuantity - reservedQuantity)
+- **Inventory Monitoring**: Overselling detection and race condition prevention
+- **Error Handling**: Comprehensive logging and retry mechanisms with exponential backoff
+- **Cache Management**: In-memory stock caching with TTL and automatic cleanup
 
 ### Toast System
 - **Library**: Sonner (v2.0.5) for rich toast notifications
@@ -104,10 +124,25 @@ This is a **Next.js 15 e-commerce site** for Spooky Books, migrated from Gatsby 
 - **Static Generation**: `generateStaticParams` for build optimization
 
 ### API Routes
+
+#### Core E-commerce APIs
 - **Sanity Webhook**: `/api/sanity-stripe` - Auto-creates Stripe products when Sanity content is published
-- **Checkout Session**: `/api/create-checkout-session` - Enhanced with variant stock validation
+- **Checkout Session**: `/api/create-checkout-session` - Enhanced with comprehensive stock validation and reservation
+- **Stripe Webhook**: `/api/stripe-webhook` - Payment event processing with automatic stock deduction
 - **Product Sync**: `/api/sync-existing-products` - Bulk migration utility for existing products
 - **Setup Categories**: `/api/setup-categories` - Automated category creation
+
+#### Advanced Inventory Management APIs
+- **Stock Reservation**: `/api/reserve-stock` - Atomic stock locking during checkout with session expiration
+- **Stock Release**: `/api/release-stock` - Release reserved inventory on payment failure or timeout
+- **Stock Status**: `/api/stock-status` - Real-time stock checking with GET/POST endpoints
+- **Inventory Health**: `/api/inventory-health` - System health monitoring with cleanup triggers
+- **Inventory Monitor**: `/api/inventory-monitor` - Advanced monitoring with overselling detection
+- **Products Optimized**: `/api/products-optimized` - Cached, essential-fields-only product endpoint
+
+#### System Administration APIs
+- **Init Reserved Quantity**: `/api/init-reserved-quantity` - Initialize reservedQuantity fields for existing products
+- **Cleanup Products**: `/api/cleanup-products` - Remove legacy fields from product documents
 - **Sync Status**: `/api/check-product-sync` - Monitor sync status between Sanity and Stripe
 - **Draft Mode**: `/api/draft-mode/enable` & `/api/draft-mode/disable` - Visual editing draft mode control
 - **Debug**: `/debug` - Sanity data debugging endpoint for development
