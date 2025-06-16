@@ -1,0 +1,491 @@
+[
+  {
+    "fields": [
+      {
+        "options": {
+          "list": [
+            {
+              "title": "Publications",
+              "value": "Publications"
+            },
+            {
+              "title": "Apparel",
+              "value": "Apparel"
+            }
+          ]
+        },
+        "validation": [
+          {
+            "rules": [
+              {
+                "flag": "valid",
+                "constraint": [
+                  "Publications",
+                  "Apparel"
+                ]
+              },
+              {
+                "flag": "presence",
+                "constraint": "required"
+              }
+            ],
+            "level": "error"
+          }
+        ],
+        "name": "title",
+        "type": "string",
+        "title": "Category Name"
+      },
+      {
+        "options": {
+          "source": "title",
+          "maxLength": 96
+        },
+        "validation": [
+          {
+            "rules": [
+              {
+                "flag": "custom"
+              },
+              {
+                "flag": "presence",
+                "constraint": "required"
+              }
+            ],
+            "level": "error"
+          }
+        ],
+        "name": "slug",
+        "type": "slug"
+      },
+      {
+        "description": "Brief description of this category",
+        "name": "description",
+        "type": "text"
+      },
+      {
+        "initialValue": 0,
+        "description": "Lower numbers appear first in navigation",
+        "name": "sortOrder",
+        "type": "number"
+      }
+    ],
+    "name": "category",
+    "type": "document"
+  },
+  {
+    "fields": [
+      {
+        "validation": [
+          {
+            "rules": [
+              {
+                "flag": "presence",
+                "constraint": "required"
+              }
+            ],
+            "level": "error"
+          }
+        ],
+        "name": "title",
+        "type": "string"
+      },
+      {
+        "name": "author",
+        "type": "string"
+      },
+      {
+        "options": {
+          "source": "title",
+          "maxLength": 96
+        },
+        "validation": [
+          {
+            "rules": [
+              {
+                "flag": "custom"
+              },
+              {
+                "flag": "presence",
+                "constraint": "required"
+              }
+            ],
+            "level": "error"
+          }
+        ],
+        "name": "slug",
+        "type": "slug"
+      },
+      {
+        "name": "description",
+        "type": "text"
+      },
+      {
+        "validation": [
+          {
+            "rules": [
+              {
+                "flag": "presence",
+                "constraint": "required"
+              },
+              {
+                "flag": "min",
+                "constraint": 0
+              }
+            ],
+            "level": "error"
+          }
+        ],
+        "name": "price",
+        "type": "number",
+        "title": "Price (in major units)"
+      },
+      {
+        "validation": [
+          {
+            "rules": [
+              {
+                "flag": "presence",
+                "constraint": "required"
+              }
+            ],
+            "level": "error"
+          }
+        ],
+        "to": [
+          {
+            "type": "category"
+          }
+        ],
+        "name": "category",
+        "type": "reference"
+      },
+      {
+        "initialValue": 0,
+        "validation": [
+          {
+            "rules": [
+              {
+                "flag": "presence",
+                "constraint": "required"
+              },
+              {
+                "flag": "min",
+                "constraint": 0
+              }
+            ],
+            "level": "error"
+          }
+        ],
+        "description": "Available inventory for publications (books, magazines). For apparel, use Size Variants below.",
+        "hidden": "conditional",
+        "name": "stockQuantity",
+        "type": "number"
+      },
+      {
+        "description": "Add different sizes with individual stock levels. Only shown when category is Apparel.",
+        "of": [
+          {
+            "fields": [
+              {
+                "options": {
+                  "list": [
+                    {
+                      "title": "XS",
+                      "value": "xs"
+                    },
+                    {
+                      "title": "S",
+                      "value": "s"
+                    },
+                    {
+                      "title": "M",
+                      "value": "m"
+                    },
+                    {
+                      "title": "L",
+                      "value": "l"
+                    },
+                    {
+                      "title": "XL",
+                      "value": "xl"
+                    },
+                    {
+                      "title": "XXL",
+                      "value": "xxl"
+                    },
+                    {
+                      "title": "XXXL",
+                      "value": "xxxl"
+                    }
+                  ]
+                },
+                "validation": [
+                  {
+                    "rules": [
+                      {
+                        "flag": "valid",
+                        "constraint": [
+                          "xs",
+                          "s",
+                          "m",
+                          "l",
+                          "xl",
+                          "xxl",
+                          "xxxl"
+                        ]
+                      },
+                      {
+                        "flag": "presence",
+                        "constraint": "required"
+                      }
+                    ],
+                    "level": "error"
+                  }
+                ],
+                "name": "size",
+                "type": "string"
+              },
+              {
+                "initialValue": 0,
+                "validation": [
+                  {
+                    "rules": [
+                      {
+                        "flag": "presence",
+                        "constraint": "required"
+                      },
+                      {
+                        "flag": "min",
+                        "constraint": 0
+                      }
+                    ],
+                    "level": "error"
+                  }
+                ],
+                "name": "stockQuantity",
+                "type": "number",
+                "title": "Stock for this size"
+              },
+              {
+                "readOnly": true,
+                "hidden": true,
+                "name": "stripePriceId",
+                "type": "string",
+                "title": "Stripe Price ID"
+              }
+            ],
+            "type": "object",
+            "title": "Size Variant"
+          }
+        ],
+        "hidden": "conditional",
+        "name": "variants",
+        "type": "array",
+        "title": "Size Variants (for Apparel only)"
+      },
+      {
+        "options": {
+          "hotspot": true
+        },
+        "validation": [
+          {
+            "rules": [
+              {
+                "flag": "presence",
+                "constraint": "required"
+              }
+            ],
+            "level": "error"
+          }
+        ],
+        "name": "heroImage",
+        "type": "image"
+      },
+      {
+        "of": [
+          {
+            "options": {
+              "hotspot": true
+            },
+            "type": "image"
+          }
+        ],
+        "name": "secondaryImages",
+        "type": "array"
+      },
+      {
+        "readOnly": true,
+        "hidden": true,
+        "name": "stripePriceId",
+        "type": "string",
+        "title": "Stripe Price ID"
+      },
+      {
+        "readOnly": true,
+        "hidden": true,
+        "name": "stripeProductId",
+        "type": "string",
+        "title": "Stripe Product ID"
+      }
+    ],
+    "name": "product",
+    "type": "document"
+  },
+  {
+    "fields": [
+      {
+        "initialValue": "Homepage",
+        "readOnly": true,
+        "name": "title",
+        "type": "string",
+        "title": "Page Title"
+      },
+      {
+        "validation": [
+          {
+            "rules": [
+              {
+                "flag": "min",
+                "constraint": 1
+              }
+            ],
+            "level": "error",
+            "message": "At least one hero section is required"
+          }
+        ],
+        "of": [
+          {
+            "fields": [
+              {
+                "options": {
+                  "hotspot": true
+                },
+                "description": "Add image here",
+                "name": "leftImage",
+                "type": "image"
+              },
+              {
+                "options": {
+                  "hotspot": true
+                },
+                "description": "Add image here",
+                "name": "rightImage",
+                "type": "image"
+              },
+              {
+                "validation": [
+                  {
+                    "rules": [
+                      {
+                        "flag": "presence",
+                        "constraint": "required"
+                      }
+                    ],
+                    "level": "error"
+                  }
+                ],
+                "to": [
+                  {
+                    "type": "product"
+                  }
+                ],
+                "name": "linkedProduct",
+                "type": "reference"
+              },
+              {
+                "validation": [
+                  {
+                    "rules": [
+                      {
+                        "flag": "presence",
+                        "constraint": "required"
+                      }
+                    ],
+                    "level": "error"
+                  }
+                ],
+                "name": "title",
+                "type": "string",
+                "title": "Hero Title"
+              },
+              {
+                "rows": 2,
+                "description": "Optional caption displayed below the title",
+                "name": "caption",
+                "type": "text",
+                "title": "Caption (Optional)"
+              }
+            ],
+            "type": "object",
+            "name": "heroPair",
+            "title": "Hero Pair (2 Images - Side by Side)"
+          },
+          {
+            "fields": [
+              {
+                "options": {
+                  "hotspot": true
+                },
+                "description": "Add image here",
+                "name": "image",
+                "type": "image",
+                "title": "Hero Image"
+              },
+              {
+                "validation": [
+                  {
+                    "rules": [
+                      {
+                        "flag": "presence",
+                        "constraint": "required"
+                      }
+                    ],
+                    "level": "error"
+                  }
+                ],
+                "to": [
+                  {
+                    "type": "product"
+                  }
+                ],
+                "name": "linkedProduct",
+                "type": "reference"
+              },
+              {
+                "validation": [
+                  {
+                    "rules": [
+                      {
+                        "flag": "presence",
+                        "constraint": "required"
+                      }
+                    ],
+                    "level": "error"
+                  }
+                ],
+                "name": "title",
+                "type": "string",
+                "title": "Hero Title"
+              },
+              {
+                "rows": 2,
+                "description": "Optional caption displayed below the title",
+                "name": "caption",
+                "type": "text",
+                "title": "Caption (Optional)"
+              }
+            ],
+            "type": "object",
+            "name": "heroSingle",
+            "title": "Hero Single (Full Width)"
+          }
+        ],
+        "name": "heroSections",
+        "type": "array"
+      }
+    ],
+    "name": "homepage",
+    "type": "document"
+  }
+]

@@ -30,14 +30,14 @@ export default defineType({
               title: 'Left Image',
               type: 'image',
               options: { hotspot: true },
-              validation: Rule => Rule.required(),
+              description: 'Add image here',
             },
             {
               name: 'rightImage',
               title: 'Right Image',
               type: 'image',
               options: { hotspot: true },
-              validation: Rule => Rule.required(),
+              description: 'Add image here',
             },
             {
               name: 'linkedProduct',
@@ -86,7 +86,7 @@ export default defineType({
               title: 'Hero Image',
               type: 'image',
               options: { hotspot: true },
-              validation: Rule => Rule.required(),
+              description: 'Add image here',
             },
             {
               name: 'linkedProduct',
