@@ -21,6 +21,13 @@ A modern e-commerce platform for book and apparel sales, built with Next.js 15, 
 - **Comprehensive monitoring** - Proactive detection of stock issues
 - **Clean team UX** - System fields hidden from Sanity Studio interface
 
+### 💰 Dynamic Pricing (New!)
+- **Single source of truth** - All prices managed in Sanity CMS only
+- **Instant price updates** - Change price in Sanity, checkout immediately reflects it
+- **No Stripe Price ID management** - Eliminates complex Stripe configuration
+- **Foolproof pricing** - Customers always pay exactly what they see
+- **Team-friendly** - Just set price in Sanity, system handles the rest
+
 ### 🔧 Technical Features
 - Server-side rendering with Next.js App Router
 - TypeScript for type safety
@@ -35,9 +42,15 @@ A modern e-commerce platform for book and apparel sales, built with Next.js 15, 
 ### Stock Management Flow
 1. **Frontend Validation** - Real-time stock checks before adding to cart
 2. **Stock Reservation** - Items temporarily reserved during checkout (30 min)
-3. **Payment Processing** - Stripe handles secure payment collection
+3. **Payment Processing** - Stripe handles secure payment collection with dynamic pricing
 4. **Stock Deduction** - Successful payments trigger permanent stock reduction
 5. **Cleanup** - Failed/expired sessions release reserved stock
+
+### Dynamic Pricing Flow
+1. **Price Management** - Team sets prices in Sanity CMS only
+2. **Real-time Sync** - Checkout API fetches current prices from Sanity
+3. **Customer Charged** - Stripe charges exactly what's displayed in frontend
+4. **No Configuration** - No Stripe Price IDs or manual sync required
 
 ### Key Components
 - `src/lib/utils/stock-validation.ts` - Real-time stock calculation and validation

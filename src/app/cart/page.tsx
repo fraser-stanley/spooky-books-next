@@ -9,6 +9,8 @@ import Link from "next/link"
 import { useState, useEffect } from "react"
 import { sanityClient } from "@/lib/sanity/client"
 import type { SanityProduct } from "@/lib/sanity/types"
+import { CartPageSkeleton } from "@/components/skeletons/cart-skeleton"
+import { CheckoutLoadingSkeleton, CheckoutProcessingSkeleton, StockValidationOverlay } from "@/components/skeletons/checkout-skeleton"
 
 // Force dynamic rendering for this page
 export const dynamic = 'force-dynamic'
@@ -18,6 +20,8 @@ export default function CartPage() {
   const [discountCode, setDiscountCode] = useState("")
   const [sanityProducts, setSanityProducts] = useState<SanityProduct[]>([])
   const [loading, setLoading] = useState(true)
+  const [checkoutLoading, setCheckoutLoading] = useState(false)
+  const [checkoutStep, setCheckoutStep] = useState<'idle' | 'validating' | 'creating' | 'redirecting'>('idle')
 
   // Fetch current product data for stock validation
   useEffect(() => {
@@ -62,6 +66,9 @@ export default function CartPage() {
 
   const handleCheckout = async () => {
     try {
+      setCheckoutLoading(true)
+      setCheckoutStep('validating')
+
       // Validate stock before checkout
       const response = await fetch('/api/stock-status', {
         method: 'POST',
@@ -86,8 +93,12 @@ export default function CartPage() {
           .join(', ')
         
         alert(`Some items are no longer available: ${outOfStock}. Please update your cart.`)
+        setCheckoutLoading(false)
+        setCheckoutStep('idle')
         return
       }
+
+      setCheckoutStep('creating')
 
       const checkoutResponse = await fetch('/api/create-checkout-session', {
         method: 'POST',
@@ -102,8 +113,12 @@ export default function CartPage() {
       if (error) {
         console.error('Checkout error:', error)
         alert('Failed to create checkout session. Please try again.')
+        setCheckoutLoading(false)
+        setCheckoutStep('idle')
         return
       }
+
+      setCheckoutStep('redirecting')
 
       // Redirect to Stripe Checkout
       const stripe = await import('@stripe/stripe-js').then(mod => 
@@ -116,20 +131,15 @@ export default function CartPage() {
     } catch (error) {
       console.error('Checkout error:', error)
       alert('Failed to process checkout. Please try again.')
+      setCheckoutLoading(false)
+      setCheckoutStep('idle')
     }
   }
 
   const totalItems = cart.reduce((sum, item) => sum + item.quantity, 0)
 
   if (loading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-center">
-          <div className="text-lg mb-2">Loading cart...</div>
-          <div className="text-sm text-gray-600">Checking stock availability</div>
-        </div>
-      </div>
-    )
+    return <CartPageSkeleton />
   }
 
   if (cart.length === 0) {
@@ -223,14 +233,21 @@ export default function CartPage() {
             </div>
 
             {/* Checkout Button */}
-            <div className="flex justify-end mt-8">
-              <button
-                onClick={handleCheckout}
-                className="px-8 py-2 bg-black text-white hover:bg-gray-800 font-normal text-xs uppercase tracking-wide"
-              >
-                PROCEED TO CHECKOUT
-              </button>
-            </div>
+            {checkoutLoading ? (
+              checkoutStep === 'validating' ? <CheckoutLoadingSkeleton /> :
+              checkoutStep === 'creating' ? <CheckoutProcessingSkeleton /> :
+              <CheckoutProcessingSkeleton />
+            ) : (
+              <div className="flex justify-end mt-8">
+                <button
+                  onClick={handleCheckout}
+                  disabled={checkoutLoading}
+                  className="px-8 py-2 bg-black text-white hover:bg-gray-800 font-normal text-xs uppercase tracking-wide disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  PROCEED TO CHECKOUT
+                </button>
+              </div>
+            )}
 
             {/* Continue Shopping */}
             <div className="flex justify-center mt-6">
@@ -243,6 +260,9 @@ export default function CartPage() {
             </div>
           </div>
         </main>
+        
+        {/* Stock validation overlay */}
+        {checkoutStep === 'validating' && <StockValidationOverlay />}
       </div>
   )
 }
