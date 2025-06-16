@@ -1,16 +1,29 @@
 "use client"
 
+import { useCart } from "./cart-contex"
+import { getAvailableStock } from "@/lib/utils/stock-validation"
 import type { ProductVariant } from "@/data/products"
+import type { SanityProduct } from "@/lib/sanity/types"
 
 interface SizeSelectorProps {
   variants: ProductVariant[]
+  sanityProduct: SanityProduct
   selectedSize?: string
   onSizeChange: (size: string, variant: ProductVariant) => void
 }
 
-export function SizeSelector({ variants, selectedSize, onSizeChange }: SizeSelectorProps) {
+export function SizeSelector({ variants, sanityProduct, selectedSize, onSizeChange }: SizeSelectorProps) {
+  const { getCartItemQuantity } = useCart()
+  
   if (!variants || variants.length === 0) {
     return null
+  }
+
+  // Helper to get real-time available stock for a size
+  const getCurrentAvailableStock = (size: string) => {
+    const availableStock = getAvailableStock(sanityProduct, size)
+    const inCart = getCartItemQuantity(sanityProduct.id, size)
+    return Math.max(0, availableStock - inCart)
   }
 
   return (
@@ -19,7 +32,8 @@ export function SizeSelector({ variants, selectedSize, onSizeChange }: SizeSelec
       <div className="grid grid-cols-4 gap-2">
         {variants.map((variant) => {
           const isSelected = selectedSize === variant.size
-          const isOutOfStock = variant.stockQuantity <= 0
+          const currentAvailableStock = getCurrentAvailableStock(variant.size)
+          const isOutOfStock = currentAvailableStock <= 0
           
           return (
             <button
@@ -48,18 +62,17 @@ export function SizeSelector({ variants, selectedSize, onSizeChange }: SizeSelec
       {selectedSize && (
         <div className="mt-3 text-sm">
           {(() => {
-            const selected = variants.find(v => v.size === selectedSize)
-            if (!selected) return null
+            const currentStock = getCurrentAvailableStock(selectedSize)
             
-            if (selected.stockQuantity <= 0) {
-              return <span>Size {selectedSize.toUpperCase()} (SOLD OUT)</span>
+            if (currentStock <= 0) {
+              return <span className="text-red-600 font-medium">Size {selectedSize.toUpperCase()} (SOLD OUT)</span>
             }
             
-            if (selected.stockQuantity <= 5) {
-              return <span>Size {selectedSize.toUpperCase()} (ONLY {selected.stockQuantity} LEFT)</span>
+            if (currentStock <= 5) {
+              return <span className="text-orange-600 font-medium">Size {selectedSize.toUpperCase()} (ONLY {currentStock} LEFT)</span>
             }
             
-            return <span>Size {selectedSize.toUpperCase()}</span>
+            return <span className="text-green-600 font-medium">Size {selectedSize.toUpperCase()}</span>
           })()}
         </div>
       )}

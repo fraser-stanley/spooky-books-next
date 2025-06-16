@@ -4,10 +4,13 @@
 import { useRouter } from "next/navigation"
 import { useCart } from "./cart-contex"
 import { toast } from "sonner"
+import { validateProductStock, getAvailableStock } from "@/lib/utils/stock-validation"
+import type { SanityProduct } from "@/lib/sanity/types"
 import styles from "./add-to-cart.module.css"
 
 export function AddToCart({
   product,
+  sanityProduct,
   variantId,
   quantity = 1,
   available = true,
@@ -20,17 +23,35 @@ export function AddToCart({
     price: number
     image?: string
   }
+  sanityProduct?: SanityProduct
   variantId?: string
   quantity?: number
   available?: boolean
   selectedSize?: string
   [key: string]: unknown
 }) {
-  const { addItem } = useCart()
+  const { addItem, getCartItemQuantity } = useCart()
   const router = useRouter()
 
   function handleAddToCart(e: React.MouseEvent) {
     e.preventDefault()
+    
+    // If we have Sanity product data, validate stock
+    if (sanityProduct) {
+      const currentInCart = getCartItemQuantity(product.id, selectedSize)
+      const totalRequestedQuantity = currentInCart + quantity
+      
+      const stockValidation = validateProductStock(
+        sanityProduct, 
+        totalRequestedQuantity, 
+        selectedSize
+      )
+      
+      if (!stockValidation.isValid) {
+        toast.error(stockValidation.message || 'Not enough stock available')
+        return
+      }
+    }
     
     // Haptic feedback for mobile devices
     if ('vibrate' in navigator) {
@@ -45,7 +66,9 @@ export function AddToCart({
       image: product.image,
       size: selectedSize,
     })
-    toast.success(`Added ${product.title} to cart`, {
+    
+    const sizeText = selectedSize ? ` (${selectedSize.toUpperCase()})` : ''
+    toast.success(`Added ${product.title}${sizeText} to cart`, {
       action: {
         label: "View Cart",
         onClick: () => router.push("/cart"),
@@ -53,19 +76,28 @@ export function AddToCart({
     })
   }
 
+  // Calculate available stock for display
+  const availableStock = sanityProduct 
+    ? getAvailableStock(sanityProduct, selectedSize)
+    : undefined
+
+  // Determine if item is actually available
+  const isAvailable = available && (availableStock === undefined || availableStock > 0)
+
   return (
     <button
       type="button"
       className={
-        available 
+        isAvailable 
           ? styles.addToCart
           : `${styles.addToCart} opacity-50 cursor-not-allowed bg-gray-300 text-gray-600 !hover:bg-gray-300 !active:transform-none !active:scale-100`
       }
-      onClick={available ? handleAddToCart : undefined}
-      disabled={!available}
+      onClick={isAvailable ? handleAddToCart : undefined}
+      disabled={!isAvailable}
+      title={availableStock !== undefined ? `${availableStock} in stock` : undefined}
       {...props}
     >
-      {available ? "Add to Cart" : "SOLD OUT"}
+      {isAvailable ? "Add to Cart" : "SOLD OUT"}
     </button>
   )
 }

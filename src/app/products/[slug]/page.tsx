@@ -64,7 +64,7 @@ export default async function ProductPage({ params }: ProductPageProps) {
               <p className="text-lg">{product.description}</p>
             </div>
 
-            <ProductPageClient product={product} />
+            <ProductPageClient product={product} sanityProduct={sanityProduct} />
           </div>
         </div>
       </div>

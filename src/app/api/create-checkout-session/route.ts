@@ -1,6 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server'
 import Stripe from 'stripe'
 import { createClient } from '@sanity/client'
+import { reserveStock } from '@/lib/sanity/stock-operations'
+import { validateCartStock } from '@/lib/utils/stock-validation'
+import type { StockOperation } from '@/lib/sanity/stock-operations'
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
   apiVersion: '2025-05-28.basil',
@@ -33,7 +36,7 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // Get stripePriceId and stock for each product from Sanity
+    // Get comprehensive product data from Sanity including reserved stock
     const productIds = items.map(item => item.id)
     const products = await sanityClient.fetch(
       `*[_type == "product" && slug.current in $productIds] {
@@ -42,17 +45,41 @@ export async function POST(request: NextRequest) {
         title,
         price,
         stockQuantity,
+        reservedQuantity,
+        category->{title, "slug": slug.current},
         variants[]{
           size,
           stockQuantity,
+          reservedQuantity,
           stripePriceId
         }
       }`,
       { productIds }
     )
 
-    // Build line items for Stripe and check stock
+    // Validate cart stock before proceeding
+    const stockValidation = validateCartStock(
+      products,
+      items.map(item => ({
+        productId: item.id,
+        quantity: item.quantity,
+        size: item.size
+      }))
+    )
+
+    if (!stockValidation.isValid) {
+      return NextResponse.json(
+        { 
+          error: 'Stock validation failed',
+          details: stockValidation.errors
+        },
+        { status: 409 } // Conflict
+      )
+    }
+
+    // Build line items for Stripe
     const lineItems: Stripe.Checkout.SessionCreateParams.LineItem[] = []
+    const stockOperations: StockOperation[] = []
 
     for (const cartItem of items) {
       const product = products.find((p: {id: string}) => p.id === cartItem.id)
@@ -65,66 +92,43 @@ export async function POST(request: NextRequest) {
       }
 
       let stripePriceId: string
-      let availableStock: number
-      let stockLabel: string
 
       // Handle apparel with size variants
       if (cartItem.size && product.variants && product.variants.length > 0) {
         const variant = product.variants.find((v: {size: string}) => v.size === cartItem.size)
         
-        if (!variant) {
+        if (!variant || !variant.stripePriceId) {
           return NextResponse.json(
-            { error: `Size ${cartItem.size?.toUpperCase()} not found for "${cartItem.title}"` },
-            { status: 400 }
-          )
-        }
-
-        if (!variant.stripePriceId) {
-          return NextResponse.json(
-            { 
-              error: `Size ${cartItem.size?.toUpperCase()} of "${cartItem.title}" is not available for purchase` 
-            },
+            { error: `Size ${cartItem.size?.toUpperCase()} of "${cartItem.title}" is not available for purchase` },
             { status: 400 }
           )
         }
 
         stripePriceId = variant.stripePriceId
-        availableStock = variant.stockQuantity
-        stockLabel = `"${cartItem.title}" in size ${cartItem.size?.toUpperCase()}`
+        
+        // Add to stock operations for reservation
+        stockOperations.push({
+          productId: cartItem.id,
+          quantity: cartItem.quantity,
+          size: cartItem.size
+        })
 
       } else {
         // Handle simple products (publications)
         if (!product.stripePriceId) {
           return NextResponse.json(
-            { 
-              error: `Product "${cartItem.title}" is not available for purchase (no Stripe price ID)` 
-            },
+            { error: `Product "${cartItem.title}" is not available for purchase (no Stripe price ID)` },
             { status: 400 }
           )
         }
 
         stripePriceId = product.stripePriceId
-        availableStock = product.stockQuantity
-        stockLabel = `"${cartItem.title}"`
-      }
-
-      // Check stock availability
-      if (availableStock <= 0) {
-        return NextResponse.json(
-          { 
-            error: `${stockLabel} is out of stock` 
-          },
-          { status: 400 }
-        )
-      }
-
-      if (cartItem.quantity > availableStock) {
-        return NextResponse.json(
-          { 
-            error: `Not enough stock for ${stockLabel}. Only ${availableStock} available, but ${cartItem.quantity} requested.` 
-          },
-          { status: 400 }
-        )
+        
+        // Add to stock operations for reservation
+        stockOperations.push({
+          productId: cartItem.id,
+          quantity: cartItem.quantity
+        })
       }
 
       lineItems.push({
@@ -133,22 +137,47 @@ export async function POST(request: NextRequest) {
       })
     }
 
-    // Create Stripe checkout session
+    // Create Stripe checkout session first (get session ID for reservation)
     const session = await stripe.checkout.sessions.create({
       payment_method_types: ['card'],
       line_items: lineItems,
       mode: 'payment',
       success_url: `${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/cart/success?session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/cart`,
+      expires_at: Math.floor(Date.now() / 1000) + (30 * 60), // 30 minutes
       metadata: {
         cart_items: JSON.stringify(items.map(item => ({
           id: item.id,
-          quantity: item.quantity
+          quantity: item.quantity,
+          size: item.size
         })))
       }
     })
 
-    return NextResponse.json({ sessionId: session.id })
+    // Reserve stock for 30 minutes (same as session expiration)
+    const reservationResult = await reserveStock(stockOperations, session.id, 30)
+    
+    if (!reservationResult.success) {
+      // If stock reservation fails, cancel the Stripe session
+      try {
+        await stripe.checkout.sessions.expire(session.id)
+      } catch (expireError) {
+        console.error('Failed to expire Stripe session after stock reservation failure:', expireError)
+      }
+      
+      return NextResponse.json(
+        { 
+          error: 'Failed to reserve stock for checkout',
+          details: reservationResult.errors
+        },
+        { status: 409 }
+      )
+    }
+
+    return NextResponse.json({ 
+      sessionId: session.id,
+      expiresAt: new Date(Date.now() + 30 * 60 * 1000).toISOString()
+    })
 
   } catch (error) {
     console.error('Error creating checkout session:', error)

@@ -55,6 +55,16 @@ export const product = defineType({
       }
     }),
     defineField({
+      name: 'reservedQuantity',
+      type: 'number',
+      title: 'Reserved Quantity',
+      description: 'Items temporarily reserved during checkout process. Managed automatically by the system.',
+      validation: Rule => Rule.min(0).integer(),
+      initialValue: 0,
+      readOnly: true,
+      hidden: true // Always hidden from Studio UI - system managed field
+    }),
+    defineField({
       name: 'variants',
       title: 'Size Variants (for Apparel only)',
       type: 'array',
@@ -87,6 +97,16 @@ export const product = defineType({
               type: 'number',
               validation: Rule => Rule.required().min(0).integer(),
               initialValue: 0
+            }),
+            defineField({
+              name: 'reservedQuantity',
+              title: 'Reserved for this size',
+              type: 'number',
+              description: 'Items temporarily reserved during checkout. Managed automatically by the system.',
+              validation: Rule => Rule.min(0).integer(),
+              initialValue: 0,
+              readOnly: true,
+              hidden: true // Always hidden from Studio UI - system managed field
             }),
             defineField({
               name: 'stripePriceId',

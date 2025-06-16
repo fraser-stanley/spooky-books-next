@@ -1,9 +1,11 @@
 export const productQuery = `*[_type == "product" && slug.current == $slug][0]{
+  "id": slug.current,
   title,
   author,
   description,
   price,
   stockQuantity,
+  reservedQuantity,
   category->{
     title,
     "slug": slug.current
@@ -14,16 +16,19 @@ export const productQuery = `*[_type == "product" && slug.current == $slug][0]{
   variants[]{
     size,
     stockQuantity,
+    reservedQuantity,
     stripePriceId
   }
 }`
 
 export const productsQuery = `*[_type == "product"]{
+  "id": slug.current,
   title,
   author,
   description,
   price,
   stockQuantity,
+  reservedQuantity,
   category->{
     title,
     "slug": slug.current
@@ -33,16 +38,19 @@ export const productsQuery = `*[_type == "product"]{
   variants[]{
     size,
     stockQuantity,
+    reservedQuantity,
     stripePriceId
   }
 }`
 
 export const productsByCategoryQuery = `*[_type == "product" && category->slug.current == $categorySlug]{
+  "id": slug.current,
   title,
   author,
   description,
   price,
   stockQuantity,
+  reservedQuantity,
   category->{
     title,
     "slug": slug.current
@@ -52,6 +60,7 @@ export const productsByCategoryQuery = `*[_type == "product" && category->slug.c
   variants[]{
     size,
     stockQuantity,
+    reservedQuantity,
     stripePriceId
   }
 }`

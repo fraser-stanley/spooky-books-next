@@ -8,16 +8,19 @@ export interface SanityCategory {
 export interface ProductVariant {
   size: string
   stockQuantity: number
+  reservedQuantity?: number
   stripePriceId?: string
 }
 
 export interface SanityProduct {
+  id: string
   title: string
   author: string
   slug: string
   description: string
   price: number
   stockQuantity: number
+  reservedQuantity?: number
   category: SanityCategory
   heroImage: string
   secondaryImages?: string[]

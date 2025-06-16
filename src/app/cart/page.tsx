@@ -4,17 +4,92 @@
 // Layout is provided by cart/layout.tsx
 import { useCart } from "@/components/cart-contex"
 import { CurrencyPrice } from "@/components/currency-price"
-import Image from "next/image"
+import { CartItem } from "@/components/cart-item"
 import Link from "next/link"
-import { useState } from "react"
+import { useState, useEffect } from "react"
+import { sanityClient } from "@/lib/sanity/client"
+import type { SanityProduct } from "@/lib/sanity/types"
+
+// Force dynamic rendering for this page
+export const dynamic = 'force-dynamic'
 
 export default function CartPage() {
-  const { cart, removeItem, total } = useCart()
+  const { cart, total } = useCart()
   const [discountCode, setDiscountCode] = useState("")
+  const [sanityProducts, setSanityProducts] = useState<SanityProduct[]>([])
+  const [loading, setLoading] = useState(true)
+
+  // Fetch current product data for stock validation
+  useEffect(() => {
+    const fetchProducts = async () => {
+      try {
+        // Use direct Sanity client call without Live functionality for cart page
+        const products = await sanityClient.fetch(`
+          *[_type == "product"] {
+            "id": slug.current,
+            "slug": slug.current,
+            title,
+            author,
+            description,
+            price,
+            stockQuantity,
+            reservedQuantity,
+            category->{title, "slug": slug.current},
+            "heroImage": heroImage.asset->url,
+            "secondaryImages": secondaryImages[].asset->url,
+            variants[]{
+              size,
+              stockQuantity,
+              reservedQuantity,
+              stripePriceId
+            }
+          }
+        `)
+        setSanityProducts(products)
+      } catch (error) {
+        console.error('Failed to fetch products:', error)
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    if (cart.length > 0) {
+      fetchProducts()
+    } else {
+      setLoading(false)
+    }
+  }, [cart.length])
 
   const handleCheckout = async () => {
     try {
-      const response = await fetch('/api/create-checkout-session', {
+      // Validate stock before checkout
+      const response = await fetch('/api/stock-status', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          items: cart.map(item => ({
+            productId: item.id,
+            quantity: item.quantity,
+            size: item.size
+          }))
+        }),
+      })
+
+      const stockValidation = await response.json()
+      
+      if (!stockValidation.allInStock) {
+        const outOfStock = stockValidation.stockChecks
+          .filter((check: Record<string, unknown>) => !check.inStock)
+          .map((check: Record<string, unknown>) => `${check.productTitle}${check.size ? ` (${check.size})` : ''}`)
+          .join(', ')
+        
+        alert(`Some items are no longer available: ${outOfStock}. Please update your cart.`)
+        return
+      }
+
+      const checkoutResponse = await fetch('/api/create-checkout-session', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -22,7 +97,7 @@ export default function CartPage() {
         body: JSON.stringify({ items: cart }),
       })
 
-      const { sessionId, error } = await response.json()
+      const { sessionId, error } = await checkoutResponse.json()
 
       if (error) {
         console.error('Checkout error:', error)
@@ -45,6 +120,17 @@ export default function CartPage() {
   }
 
   const totalItems = cart.reduce((sum, item) => sum + item.quantity, 0)
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-center">
+          <div className="text-lg mb-2">Loading cart...</div>
+          <div className="text-sm text-gray-600">Checking stock availability</div>
+        </div>
+      </div>
+    )
+  }
 
   if (cart.length === 0) {
     return (
@@ -74,47 +160,20 @@ export default function CartPage() {
 
           {/* Cart Items */}
           <div className="space-y-8">
-            {cart.map((item, index) => (
-              <div key={item.id}>
-                <div className="flex gap-6">
-                  <div className="flex-shrink-0">
-                    {item.image ? (
-                      <Image
-                        src={item.image}
-                        alt={item.title}
-                        width={96}
-                        height={128}
-                        className="w-24 h-32 object-cover"
-                      />
-                    ) : (
-                      <div className="w-24 h-32 bg-gray-200 flex items-center justify-center">
-                        <span className="text-gray-400 text-xs">No image</span>
-                      </div>
-                    )}
-                  </div>
-                  <div className="flex-1">
-                    <div className="text-sm mb-1">
-                      {item.title}
-                      {item.size && (
-                        <span className="text-gray-500 ml-2">Size: {item.size.toUpperCase()}</span>
-                      )}
-                    </div>
-                    <div className="text-sm text-gray-600 mb-1"><CurrencyPrice price={item.price} /></div>
-                    <div className="text-sm text-gray-600 mb-4">Quantity: {item.quantity}</div>
-                    <button
-                      onClick={() => removeItem(item.id, item.size)}
-                      className="text-xs px-4 py-1 border border-gray-300 hover:bg-gray-100 font-normal uppercase tracking-wide"
-                    >
-                      REMOVE
-                    </button>
-                  </div>
-                  <div className="text-right">
-                    <div className="text-sm"><CurrencyPrice price={item.price * item.quantity} /></div>
-                  </div>
+            {cart.map((item, index) => {
+              // Find corresponding Sanity product for stock validation
+              const sanityProduct = sanityProducts.find(p => p.slug === item.id)
+              
+              return (
+                <div key={`${item.id}-${item.size || 'no-size'}`}>
+                  <CartItem 
+                    item={item} 
+                    sanityProduct={sanityProduct}
+                  />
+                  {index < cart.length - 1 && <div className="border-b border-gray-200 mt-8"></div>}
                 </div>
-                {index < cart.length - 1 && <div className="border-b border-gray-200 mt-8"></div>}
-              </div>
-            ))}
+              )
+            })}
           </div>
 
           {/* Discount Section */}
