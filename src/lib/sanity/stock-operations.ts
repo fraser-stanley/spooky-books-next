@@ -1,4 +1,12 @@
-import { sanityClient } from './client'
+import { createClient } from '@sanity/client'
+
+const sanityClient = createClient({
+  projectId: process.env.NEXT_PUBLIC_SANITY_PROJECT_ID!,
+  dataset: process.env.NEXT_PUBLIC_SANITY_DATASET!,
+  apiVersion: '2023-05-03',
+  token: process.env.SANITY_API_TOKEN,
+  useCdn: false,
+})
 
 export interface StockReservation {
   productId: string

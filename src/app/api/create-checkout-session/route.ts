@@ -46,7 +46,6 @@ export async function POST(request: NextRequest) {
     const products = await sanityClient.fetch(
       `*[_type == "product" && slug.current in $productIds] {
         "id": slug.current,
-        stripePriceId,
         title,
         price,
         stockQuantity,
@@ -55,8 +54,7 @@ export async function POST(request: NextRequest) {
         variants[]{
           size,
           stockQuantity,
-          reservedQuantity,
-          stripePriceId
+          reservedQuantity
         }
       }`,
       { productIds }
@@ -97,21 +95,17 @@ export async function POST(request: NextRequest) {
         )
       }
 
-      let stripePriceId: string
-
       // Handle apparel with size variants
       if (cartItem.size && product.variants && product.variants.length > 0) {
         const variant = product.variants.find((v: {size: string}) => v.size === cartItem.size)
         
-        if (!variant || !variant.stripePriceId) {
+        if (!variant) {
           return NextResponse.json(
-            { error: `Size ${cartItem.size?.toUpperCase()} of "${cartItem.title}" is not available for purchase` },
+            { error: `Size ${cartItem.size?.toUpperCase()} of "${cartItem.title}" is not available` },
             { status: 400 }
           )
         }
 
-        stripePriceId = variant.stripePriceId
-        
         // Add to stock operations for reservation
         stockOperations.push({
           productId: cartItem.id,
@@ -120,16 +114,6 @@ export async function POST(request: NextRequest) {
         })
 
       } else {
-        // Handle simple products (publications)
-        if (!product.stripePriceId) {
-          return NextResponse.json(
-            { error: `Product "${cartItem.title}" is not available for purchase (no Stripe price ID)` },
-            { status: 400 }
-          )
-        }
-
-        stripePriceId = product.stripePriceId
-        
         // Add to stock operations for reservation
         stockOperations.push({
           productId: cartItem.id,
@@ -137,8 +121,19 @@ export async function POST(request: NextRequest) {
         })
       }
 
+      // Use dynamic pricing with price_data (single source of truth from Sanity)
       lineItems.push({
-        price: stripePriceId,
+        price_data: {
+          currency: 'usd',
+          product_data: {
+            name: cartItem.title,
+            metadata: {
+              product_id: cartItem.id,
+              ...(cartItem.size && { size: cartItem.size })
+            }
+          },
+          unit_amount: Math.round(product.price * 100) // Convert to cents
+        },
         quantity: cartItem.quantity,
       })
     }
