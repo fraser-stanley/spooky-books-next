@@ -32,9 +32,9 @@ This is a **Next.js 15 e-commerce site** for Spooky Books, migrated from Gatsby 
 - ✅ **Backends**: Stripe + Sanity integrations complete with webhook automation
 - ✅ **Product Variants**: Apparel sizing system with individual stock tracking
 - ✅ **Category System**: Unified Publications vs Apparel categories
-- ✅ **Homepage CMS**: Sanity-powered homepage with visual editing capabilities
-- ✅ **Visual Editing**: Complete draft mode and presentation tool setup
-- 🔄 **Production Ready**: Codebase audited and prepared for deployment
+- ✅ **Homepage CMS**: Sanity-powered homepage with visual editing capabilities  
+- ✅ **Visual Editing**: Complete draft mode and presentation tool setup with Live Content API
+- ✅ **Production Ready**: Deployed to Vercel with visual editing fully functional
 
 ## Data Management
 
@@ -45,7 +45,9 @@ This is a **Next.js 15 e-commerce site** for Spooky Books, migrated from Gatsby 
 - **Homepage Schema**: Flexible hero sections with layout variables (pair/single) and caption support
 - **Webhook System**: Auto-creates Stripe products when Sanity content is published
 - **API Routes**: Complete CRUD operations and sync utilities
-- **Visual Editing**: Draft mode API endpoints and presentation tool with live preview
+- **Visual Editing**: Draft mode API endpoints, presentation tool with live preview, and Live Content API
+- **Real-time Updates**: Instant content synchronization between draft and published states
+- **CORS Configuration**: Middleware for cross-origin requests from Sanity Studio
 
 ### Product Data Structure
 - **Source**: Sanity CMS via GROQ queries (replaces mock data)
@@ -108,6 +110,7 @@ This is a **Next.js 15 e-commerce site** for Spooky Books, migrated from Gatsby 
 - **Setup Categories**: `/api/setup-categories` - Automated category creation
 - **Sync Status**: `/api/check-product-sync` - Monitor sync status between Sanity and Stripe
 - **Draft Mode**: `/api/draft-mode/enable` & `/api/draft-mode/disable` - Visual editing draft mode control
+- **Debug**: `/debug` - Sanity data debugging endpoint for development
 
 ### Route Patterns
 ```tsx
@@ -133,7 +136,7 @@ export async function generateStaticParams() {
 - `src/lib/` - Utilities, hooks, and shared logic
   - `src/lib/hooks/` - Custom React hooks (useLocaleCurrency)
   - `src/lib/utils/` - Utility functions (formatPrice)
-  - `src/lib/sanity/` - Sanity client, queries, and type definitions
+  - `src/lib/sanity/` - Sanity client, queries, type definitions, and Live Content API
 - `src/styles/` - Global CSS styles  
 - `studio/` - Sanity Studio configuration and schemas
   - `studio/schemas/` - Product, category, and homepage schema definitions
@@ -262,6 +265,35 @@ function Component() {
 }
 ```
 
+#### Visual Editing Usage
+```tsx
+// Homepage with real-time Sanity data
+import { sanityFetch } from '@/lib/sanity/live'
+import { SanityLive } from '@/lib/sanity/live'
+
+// Live query with tags for selective revalidation  
+const { data } = await sanityFetch({
+  query: homepageQuery,
+  tags: ['homepage']
+})
+
+// Layout with visual editing components
+function RootLayout({ children }) {
+  return (
+    <html>
+      <body>
+        {children}
+        {isEnabled && <VisualEditing />}
+        <SanityLive />
+      </body>
+    </html>
+  )
+}
+
+// Draft mode activation
+const response = await fetch('/api/draft-mode/enable')
+```
+
 #### Size Selector Usage
 ```tsx
 import { SizeSelector } from '@/components/size-selector'
@@ -332,13 +364,16 @@ NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY=pk_...
 
 # Sanity CMS
 SANITY_API_TOKEN=sk...
-SANITY_VIEWER_TOKEN=sk...  # For draft mode
+SANITY_VIEWER_TOKEN=sk...  # For draft mode and Live Content API
 NEXT_PUBLIC_SANITY_PROJECT_ID=...
 NEXT_PUBLIC_SANITY_DATASET=production
 
 # Site Configuration
 NEXT_PUBLIC_SITE_URL=https://your-domain.com
 NEXT_PUBLIC_SANITY_STUDIO_URL=https://your-domain.com/studio
+
+# Visual Editing (Production)
+SANITY_STUDIO_PREVIEW_ORIGIN=https://your-domain.com
 ```
 
 ### Webhook Configuration
@@ -349,14 +384,55 @@ NEXT_PUBLIC_SANITY_STUDIO_URL=https://your-domain.com/studio
 ### Visual Editing Setup
 1. **Draft Mode**: Enabled via `/api/draft-mode/enable` endpoint with SANITY_VIEWER_TOKEN
 2. **Presentation Tool**: Configured in Sanity Studio with live preview URL
-3. **Document Locations**: Homepage and product location mapping for editor navigation
-4. **Studio Structure**: Custom structure with homepage singleton prominently displayed
+3. **Live Content API**: Real-time updates using `defineLive` with `sanityFetch` and `SanityLive`
+4. **Document Locations**: Homepage and product location mapping for editor navigation
+5. **Studio Structure**: Custom structure with homepage singleton prominently displayed
+6. **CORS Configuration**: Middleware handles cross-origin requests from Sanity Studio
+7. **Click-to-Edit**: Visual overlays with stega encoding for instant content editing
 
 ### Stock Management
 - **Publications**: Single `stockQuantity` field for entire product
 - **Apparel**: Individual `stockQuantity` per size variant in `variants` array
 - **Validation**: Real-time stock checking during checkout session creation
 - **UI Indicators**: Consistent parentheses format for low stock and sold out states
+
+## Deployment Guide
+
+### Production Deployment (Vercel)
+1. **GitHub Repository**: https://github.com/fraser-stanley/spooky-books-next
+2. **Live Site**: https://spooky-books-next.vercel.app
+3. **Sanity Studio**: https://spooky-books.sanity.studio
+
+### Environment Variables Setup
+**Required in Vercel Dashboard:**
+```bash
+# Stripe (Production Keys)
+STRIPE_SECRET_KEY=sk_live_...
+NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY=pk_live_...
+
+# Sanity CMS
+SANITY_API_TOKEN=sk...  # Editor permissions
+SANITY_VIEWER_TOKEN=sk... # Read + Visual Editing
+NEXT_PUBLIC_SANITY_PROJECT_ID=0gbx06x6
+NEXT_PUBLIC_SANITY_DATASET=production
+
+# Site URLs
+NEXT_PUBLIC_SITE_URL=https://spooky-books-next.vercel.app
+NEXT_PUBLIC_SANITY_STUDIO_URL=https://spooky-books.sanity.studio
+SANITY_STUDIO_PREVIEW_ORIGIN=https://spooky-books-next.vercel.app
+```
+
+### Visual Editing Access
+1. **Studio Access**: Visit https://spooky-books.sanity.studio
+2. **Presentation Mode**: Click "Presentation" tab in studio
+3. **Homepage Editing**: Select "Homepage" → Live preview opens
+4. **Content Management**: Add/edit hero sections with real-time updates
+
+### Webhook Configuration
+1. **Sanity Webhook URL**: `https://spooky-books-next.vercel.app/api/sanity-stripe`
+2. **Trigger Events**: Document create, update, delete
+3. **Filter**: `_type == "product"`
+4. **Auto-sync**: Creates Stripe products and saves IDs back to Sanity
 
 ## Performance Optimizations
 
