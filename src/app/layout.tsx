@@ -4,6 +4,7 @@ import { CartProvider } from "@/components/cart-contex"
 import { Toaster } from "sonner"
 import { VisualEditing } from "next-sanity"
 import { draftMode } from "next/headers"
+import { SanityLive } from "@/lib/sanity/live"
 
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
   const { isEnabled } = await draftMode()
@@ -15,6 +16,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
           {children}
           <Toaster position="bottom-right" />
           {isEnabled && <VisualEditing />}
+          <SanityLive />
         </CartProvider>
       </body>
     </html>
