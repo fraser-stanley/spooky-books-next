@@ -51,17 +51,24 @@ export async function POST(request: NextRequest) {
         price,
         stockQuantity,
         reservedQuantity,
+        stripePriceId,
         category->{title, "slug": slug.current},
         variants[]{
           size,
           stockQuantity,
-          reservedQuantity
+          reservedQuantity,
+          stripePriceId
         }
       }`,
       { productIds }
     )
     console.log('📋 Found products:', products.length)
-    console.log('📋 Product details:', products.map((p: {id: string, title: string, variants?: unknown[]}) => ({ id: p.id, title: p.title, variants: p.variants?.length || 0 })))
+    console.log('📋 Product details:', products.map((p: {id: string, title: string, variants?: unknown[], stripePriceId?: string}) => ({ 
+      id: p.id, 
+      title: p.title, 
+      stripePriceId: p.stripePriceId,
+      variants: p.variants?.length || 0 
+    })))
     
     // Debug: Check which cart items don't have matching products
     const foundProductIds = products.map((p: {id: string}) => p.id)
@@ -130,21 +137,45 @@ export async function POST(request: NextRequest) {
         })
       }
 
-      // Use dynamic pricing with price_data (single source of truth from Sanity)
-      lineItems.push({
-        price_data: {
-          currency: 'usd',
-          product_data: {
-            name: cartItem.title,
-            metadata: {
-              product_id: cartItem.id,
-              ...(cartItem.size && { size: cartItem.size })
-            }
+      // Use pre-synced Stripe prices for variants, fallback to dynamic pricing
+      let stripePriceId: string | undefined
+      
+      if (cartItem.size && product.variants && product.variants.length > 0) {
+        // For apparel with size variants, use variant-specific Stripe price
+        const variant = product.variants.find((v: {size: string, stripePriceId?: string}) => v.size === cartItem.size)
+        stripePriceId = variant?.stripePriceId
+        console.log(`🔍 Looking for variant price for ${cartItem.title} size ${cartItem.size}:`, stripePriceId)
+      } else {
+        // For publications, use main product Stripe price
+        stripePriceId = product.stripePriceId
+        console.log(`🔍 Using main product price for ${cartItem.title}:`, stripePriceId)
+      }
+      
+      if (stripePriceId) {
+        // Use pre-synced Stripe price
+        console.log(`✅ Using pre-synced Stripe price: ${stripePriceId}`)
+        lineItems.push({
+          price: stripePriceId,
+          quantity: cartItem.quantity,
+        })
+      } else {
+        // Fallback to dynamic pricing if no Stripe price found
+        console.log(`⚠️ No Stripe price found for ${cartItem.title}${cartItem.size ? ` (${cartItem.size})` : ''}, using dynamic pricing`)
+        lineItems.push({
+          price_data: {
+            currency: 'usd',
+            product_data: {
+              name: cartItem.title,
+              metadata: {
+                product_id: cartItem.id,
+                ...(cartItem.size && { size: cartItem.size })
+              }
+            },
+            unit_amount: Math.round(product.price * 100) // Convert to cents
           },
-          unit_amount: Math.round(product.price * 100) // Convert to cents
-        },
-        quantity: cartItem.quantity,
-      })
+          quantity: cartItem.quantity,
+        })
+      }
     }
 
     // Create Stripe checkout session first (get session ID for reservation)
