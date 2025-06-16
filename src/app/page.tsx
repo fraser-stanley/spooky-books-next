@@ -6,6 +6,9 @@ import { Layout } from "@/components/layout"
 import { getCategories, getHomepage } from "@/lib/sanity/queries"
 import type { SanityHeroSection, SanityHeroPair, SanityHeroSingle } from "@/lib/sanity/types"
 
+// Force dynamic rendering to ensure fresh data
+export const dynamic = 'force-dynamic'
+
 export default async function HomePage() {
   const { isEnabled } = await draftMode()
   const categories = await getCategories()
