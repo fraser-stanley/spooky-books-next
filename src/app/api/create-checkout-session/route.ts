@@ -42,6 +42,7 @@ export async function POST(request: NextRequest) {
     // Get comprehensive product data from Sanity including reserved stock
     const productIds = items.map(item => item.id)
     console.log('🔍 Looking up products:', productIds)
+    console.log('📦 Cart items with IDs:', items.map(item => ({ id: item.id, title: item.title, size: item.size })))
     
     const products = await sanityClient.fetch(
       `*[_type == "product" && slug.current in $productIds] {
@@ -60,6 +61,14 @@ export async function POST(request: NextRequest) {
       { productIds }
     )
     console.log('📋 Found products:', products.length)
+    console.log('📋 Product details:', products.map((p: {id: string, title: string, variants?: unknown[]}) => ({ id: p.id, title: p.title, variants: p.variants?.length || 0 })))
+    
+    // Debug: Check which cart items don't have matching products
+    const foundProductIds = products.map((p: {id: string}) => p.id)
+    const missingProducts = productIds.filter(id => !foundProductIds.includes(id))
+    if (missingProducts.length > 0) {
+      console.log('❌ Missing products for cart items:', missingProducts)
+    }
 
     // Validate cart stock before proceeding
     const stockValidation = validateCartStock(

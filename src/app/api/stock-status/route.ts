@@ -1,6 +1,15 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { getProducts } from '@/lib/sanity/queries'
+import { createClient } from '@sanity/client'
 import { getAvailableStock } from '@/lib/utils/stock-validation'
+import type { SanityProduct } from '@/lib/sanity/types'
+
+const sanityClient = createClient({
+  projectId: process.env.NEXT_PUBLIC_SANITY_PROJECT_ID!,
+  dataset: process.env.NEXT_PUBLIC_SANITY_DATASET!,
+  apiVersion: '2023-05-03',
+  token: process.env.SANITY_API_TOKEN,
+  useCdn: false, // Disable CDN for real-time data
+})
 
 export async function GET(request: NextRequest) {
   try {
@@ -14,33 +23,50 @@ export async function GET(request: NextRequest) {
       )
     }
 
-    // Get current product data
-    const products = await getProducts()
-    const filteredProducts = products.filter(p => productIds.includes(p.id))
+    // Get current product data using the same method as checkout API
+    const products = await sanityClient.fetch(
+      `*[_type == "product" && slug.current in $productIds] {
+        "id": slug.current,
+        title,
+        author,
+        description,
+        price,
+        stockQuantity,
+        reservedQuantity,
+        category->{title, "slug": slug.current},
+        variants[]{
+          size,
+          stockQuantity,
+          reservedQuantity,
+          stripePriceId
+        }
+      }`,
+      { productIds }
+    )
 
     // Calculate stock status for each product
-    const stockStatus = filteredProducts.map(product => {
+    const stockStatus = products.map((product: Record<string, unknown>) => {
       const result: Record<string, unknown> = {
         productId: product.id,
         title: product.title,
-        category: product.category.title
+        category: (product.category as {title: string})?.title
       }
 
-      if (product.variants && product.variants.length > 0) {
+      if (product.variants && (product.variants as unknown[]).length > 0) {
         // Apparel with variants
-        result.variants = product.variants.map(variant => ({
+        result.variants = (product.variants as Record<string, unknown>[]).map(variant => ({
           size: variant.size,
           totalStock: variant.stockQuantity,
           reservedStock: variant.reservedQuantity || 0,
-          availableStock: getAvailableStock(product, variant.size),
-          inStock: getAvailableStock(product, variant.size) > 0
+          availableStock: getAvailableStock(product as unknown as SanityProduct, variant.size as string),
+          inStock: getAvailableStock(product as unknown as SanityProduct, variant.size as string) > 0
         }))
       } else {
         // Publications
         result.totalStock = product.stockQuantity
         result.reservedStock = product.reservedQuantity || 0
-        result.availableStock = getAvailableStock(product)
-        result.inStock = getAvailableStock(product) > 0
+        result.availableStock = getAvailableStock(product as unknown as SanityProduct)
+        result.inStock = getAvailableStock(product as unknown as SanityProduct) > 0
       }
 
       return result
@@ -72,25 +98,46 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // Get current product data
-    const products = await getProducts()
+    console.log('🔍 Stock validation for items:', items.map(item => ({ productId: item.productId, size: item.size, quantity: item.quantity })))
+
+    // Get current product data using the same method as checkout API
+    const productIds = items.map(item => item.productId)
+    const products = await sanityClient.fetch(
+      `*[_type == "product" && slug.current in $productIds] {
+        "id": slug.current,
+        title,
+        stockQuantity,
+        reservedQuantity,
+        category->{title, "slug": slug.current},
+        variants[]{
+          size,
+          stockQuantity,
+          reservedQuantity
+        }
+      }`,
+      { productIds }
+    )
+    
+    console.log('📋 Found products for validation:', products.map((p: {id: string, title: string, variants?: unknown[]}) => ({ id: p.id, title: p.title, variants: p.variants?.length || 0 })))
     
     // Check stock for each requested item
     const stockChecks = items.map(item => {
-      const product = products.find(p => p.id === item.productId)
+      const product = products.find((p: Record<string, unknown>) => p.id === item.productId)
       
       if (!product) {
+        console.log(`❌ Product not found for ID: ${item.productId}`)
         return {
           productId: item.productId,
           size: item.size,
           requestedQuantity: item.quantity,
           availableStock: 0,
           inStock: false,
-          error: 'Product not found'
+          error: 'Product not found',
+          productTitle: `Unknown Product (${item.productId})`
         }
       }
 
-      const availableStock = getAvailableStock(product, item.size)
+      const availableStock = getAvailableStock(product as unknown as SanityProduct, item.size)
       
       return {
         productId: item.productId,
