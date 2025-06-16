@@ -14,7 +14,7 @@ export default async function ProductsPage() {
   
   return (
     <Layout categories={categories}>
-      <ProductListing products={products} />
+      <ProductListing products={products} sanityProducts={sanityProducts} />
     </Layout>
   )
 }

@@ -27,7 +27,7 @@ export default async function CategoryPage({ params }: CategoryPageProps) {
   
   return (
     <Layout categories={categories}>
-      <ProductListing products={products} />
+      <ProductListing products={products} sanityProducts={sanityProducts} />
     </Layout>
   )
 }
