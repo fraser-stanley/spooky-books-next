@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { revalidatePath, revalidateTag } from 'next/cache'
 import Stripe from 'stripe'
 import { createClient } from '@sanity/client'
 
@@ -20,10 +21,36 @@ export async function POST(request: NextRequest) {
   try {
     const body = await request.json()
     
-    // Validate webhook payload
-    if (!body || body._type !== 'product') {
+    // Handle different document types
+    if (!body || !body._type) {
       return NextResponse.json(
-        { error: 'Invalid payload - not a product document' },
+        { error: 'Invalid payload - missing document type' },
+        { status: 400 }
+      )
+    }
+
+    // Handle homepage updates
+    if (body._type === 'homepage') {
+      console.log(`🏠 Homepage updated, revalidating homepage...`)
+      
+      // Revalidate homepage
+      revalidatePath('/')
+      revalidateTag('homepage')
+      
+      console.log(`✅ Homepage revalidation complete`)
+      
+      return NextResponse.json({
+        success: true,
+        message: 'Homepage revalidated successfully',
+        documentType: 'homepage',
+        revalidated: ['/']
+      })
+    }
+
+    // Handle product updates (existing logic)
+    if (body._type !== 'product') {
+      return NextResponse.json(
+        { error: 'Invalid payload - unsupported document type' },
         { status: 400 }
       )
     }
@@ -117,12 +144,27 @@ export async function POST(request: NextRequest) {
 
     console.log(`Updated Sanity document ${product._id} with Stripe IDs`)
 
+    // Trigger page revalidation for new product
+    console.log(`🔄 Revalidating pages for new product: ${product.title}`)
+    revalidatePath('/products')
+    revalidatePath('/products/category/Publications')
+    revalidatePath('/products/category/apparel')
+    
+    if (product.slug?.current) {
+      revalidatePath(`/products/${product.slug.current}`)
+    }
+    
+    revalidateTag('products')
+    revalidateTag('categories')
+    console.log(`✅ Page revalidation complete`)
+
     return NextResponse.json({
       success: true,
       message: 'Product synced to Stripe successfully',
       stripeProductId: stripeProduct.id,
       hasVariants: !!(product.variants && product.variants.length > 0),
       variantCount: product.variants?.length || 0,
+      revalidated: true
     })
 
   } catch (error) {
