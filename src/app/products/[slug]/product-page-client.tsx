@@ -35,8 +35,6 @@ export function ProductPageClient({ product, sanityProduct }: ProductPageClientP
     setSelectedVariant(variant)
   }
 
-  // Show size requirement message for apparel without size selection
-  const needsSizeSelection = isApparel && !selectedSize
 
   return (
     <>
@@ -82,11 +80,6 @@ export function ProductPageClient({ product, sanityProduct }: ProductPageClientP
         {selectedSize && (
           <p className="text-sm text-gray-600 mt-2">
             Size {selectedSize.toUpperCase()}
-          </p>
-        )}
-        {!needsSizeSelection && !hasStock && (
-          <p className="text-sm text-red-600 mt-2">
-            {isApparel ? `Size ${selectedSize?.toUpperCase()} is sold out` : 'This item is sold out'}
           </p>
         )}
       </div>
