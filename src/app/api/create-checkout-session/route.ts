@@ -13,7 +13,8 @@ const sanityClient = createClient({
   projectId: process.env.NEXT_PUBLIC_SANITY_PROJECT_ID!,
   dataset: process.env.NEXT_PUBLIC_SANITY_DATASET!,
   apiVersion: '2023-05-03',
-  useCdn: true,
+  token: process.env.SANITY_API_TOKEN, // Add API token for write operations
+  useCdn: false, // Disable CDN for write operations
 })
 
 interface CartItem {
@@ -27,7 +28,9 @@ interface CartItem {
 
 export async function POST(request: NextRequest) {
   try {
+    console.log('🛒 Creating checkout session...')
     const { items }: { items: CartItem[] } = await request.json()
+    console.log('📦 Cart items:', items)
 
     if (!items || items.length === 0) {
       return NextResponse.json(
@@ -38,6 +41,8 @@ export async function POST(request: NextRequest) {
 
     // Get comprehensive product data from Sanity including reserved stock
     const productIds = items.map(item => item.id)
+    console.log('🔍 Looking up products:', productIds)
+    
     const products = await sanityClient.fetch(
       `*[_type == "product" && slug.current in $productIds] {
         "id": slug.current,
@@ -56,6 +61,7 @@ export async function POST(request: NextRequest) {
       }`,
       { productIds }
     )
+    console.log('📋 Found products:', products.length)
 
     // Validate cart stock before proceeding
     const stockValidation = validateCartStock(
@@ -138,6 +144,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Create Stripe checkout session first (get session ID for reservation)
+    console.log('💳 Creating Stripe session with line items:', lineItems.length)
     const session = await stripe.checkout.sessions.create({
       payment_method_types: ['card'],
       line_items: lineItems,
@@ -153,6 +160,7 @@ export async function POST(request: NextRequest) {
         })))
       }
     })
+    console.log('✅ Stripe session created:', session.id)
 
     // Reserve stock for 30 minutes (same as session expiration)
     const reservationResult = await reserveStock(stockOperations, session.id, 30)
