@@ -4,7 +4,7 @@ import { sanityClient, liveClient } from './client'
 export const { sanityFetch, SanityLive } = defineLive({ 
   client: liveClient,
   serverToken: process.env.SANITY_VIEWER_TOKEN,
-  browserToken: process.env.NEXT_PUBLIC_SANITY_VIEWER_TOKEN,
+  browserToken: process.env.SANITY_VIEWER_TOKEN, // Use same token for now
 })
 
 // Fallback fetch for static generation contexts where live queries can't be used

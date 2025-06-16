@@ -54,8 +54,7 @@ function HeroSection({ section }: { section: SanityHeroSection }) {
 
 // Updated HeroPair component with Sanity data
 function HeroPair({ section }: { section: SanityHeroPair }) {
-  const categorySlug = section.linkedProduct.category.slug.toLowerCase()
-  const productUrl = `/products/${categorySlug}/${section.linkedProduct.slug}/`
+  const productUrl = `/products/${section.linkedProduct.slug}/`
   
   return (
     <>
@@ -106,8 +105,7 @@ function HeroPair({ section }: { section: SanityHeroPair }) {
 
 // New HeroSingle component for full-width content
 function HeroSingle({ section }: { section: SanityHeroSingle }) {
-  const categorySlug = section.linkedProduct.category.slug.toLowerCase()
-  const productUrl = `/products/${categorySlug}/${section.linkedProduct.slug}/`
+  const productUrl = `/products/${section.linkedProduct.slug}/`
   
   return (
     <>
