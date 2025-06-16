@@ -15,6 +15,7 @@ export function AddToCart({
   quantity = 1,
   available = true,
   selectedSize,
+  isApparel = false,
   ...props
 }: {
   product: {
@@ -28,6 +29,7 @@ export function AddToCart({
   quantity?: number
   available?: boolean
   selectedSize?: string
+  isApparel?: boolean
   [key: string]: unknown
 }) {
   const { addItem, getCartItemQuantity } = useCart()
@@ -81,8 +83,14 @@ export function AddToCart({
     ? getAvailableStock(sanityProduct, selectedSize)
     : undefined
 
+  // For apparel without size selection, just show disabled state
+  const needsSizeSelection = isApparel && !selectedSize
+  
   // Determine if item is actually available
-  const isAvailable = available && (availableStock === undefined || availableStock > 0)
+  const isAvailable = available && (availableStock === undefined || availableStock > 0) && !needsSizeSelection
+  
+  // Determine if item is sold out (has stock data but no stock)
+  const isSoldOut = availableStock !== undefined && availableStock <= 0 && !needsSizeSelection
 
   return (
     <button
@@ -97,7 +105,7 @@ export function AddToCart({
       title={availableStock !== undefined ? `${availableStock} in stock` : undefined}
       {...props}
     >
-      {isAvailable ? "Add to Cart" : "SOLD OUT"}
+      {isSoldOut ? "SOLD OUT" : "Add to Cart"}
     </button>
   )
 }

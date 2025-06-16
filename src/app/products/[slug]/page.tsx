@@ -56,10 +56,6 @@ export default async function ProductPage({ params }: ProductPageProps) {
               <span className="text-2xl">${product.price} {product.currency}</span>
             </div>
 
-            <div className="mb-6">
-              <span className="text-sm text-gray-600 uppercase">{product.category}</span>
-            </div>
-
             <div className="mb-8">
               <p className="text-lg">{product.description}</p>
             </div>

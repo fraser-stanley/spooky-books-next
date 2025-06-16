@@ -75,12 +75,13 @@ export function ProductPageClient({ product, sanityProduct }: ProductPageClientP
             image: product.images[0]?.url
           }}
           sanityProduct={sanityProduct}
-          available={!needsSizeSelection && hasStock}
+          available={hasStock}
           selectedSize={selectedSize}
+          isApparel={isApparel}
         />
-        {needsSizeSelection && (
+        {selectedSize && (
           <p className="text-sm text-gray-600 mt-2">
-            Please select a size to add to cart
+            Size {selectedSize.toUpperCase()}
           </p>
         )}
         {!needsSizeSelection && !hasStock && (

@@ -28,7 +28,6 @@ export function SizeSelector({ variants, sanityProduct, selectedSize, onSizeChan
 
   return (
     <div className="mb-6">
-      <h3 className="text-sm font-medium mb-3">Size</h3>
       <div className="grid grid-cols-4 gap-2">
         {variants.map((variant) => {
           const isSelected = selectedSize === variant.size
@@ -58,24 +57,6 @@ export function SizeSelector({ variants, sanityProduct, selectedSize, onSizeChan
           )
         })}
       </div>
-      
-      {selectedSize && (
-        <div className="mt-3 text-sm">
-          {(() => {
-            const currentStock = getCurrentAvailableStock(selectedSize)
-            
-            if (currentStock <= 0) {
-              return <span className="text-red-600 font-medium">Size {selectedSize.toUpperCase()} (SOLD OUT)</span>
-            }
-            
-            if (currentStock <= 5) {
-              return <span className="text-orange-600 font-medium">Size {selectedSize.toUpperCase()} (ONLY {currentStock} LEFT)</span>
-            }
-            
-            return <span className="text-green-600 font-medium">Size {selectedSize.toUpperCase()}</span>
-          })()}
-        </div>
-      )}
     </div>
   )
 }
