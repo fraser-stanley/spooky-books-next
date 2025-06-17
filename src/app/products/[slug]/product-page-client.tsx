@@ -18,7 +18,8 @@ export function ProductPageClient({ product, sanityProduct }: ProductPageClientP
   const [, setSelectedVariant] = useState<ProductVariant | null>(null)
   const { getCartItemQuantity } = useCart()
   
-  const isApparel = product.category.toLowerCase() === 'apparel' && product.variants && product.variants.length > 0
+  const isApparel = product.category.toLowerCase() === 'apparel'
+  const hasSizes = isApparel && product.variants && product.variants.length > 0
   
   // Calculate real-time available stock considering cart contents
   const getCurrentAvailableStock = (size?: string) => {
@@ -38,8 +39,8 @@ export function ProductPageClient({ product, sanityProduct }: ProductPageClientP
 
   return (
     <>
-      {/* Size Selector for Apparel */}
-      {isApparel && (
+      {/* Size Selector for Sized Apparel */}
+      {hasSizes && (
         <SizeSelector
           variants={product.variants!}
           sanityProduct={sanityProduct}
@@ -48,8 +49,8 @@ export function ProductPageClient({ product, sanityProduct }: ProductPageClientP
         />
       )}
 
-      {/* Stock Display */}
-      {!isApparel && (
+      {/* Stock Display for Publications and Non-sized Apparel */}
+      {!hasSizes && (
         <div className="mb-4">
           {currentAvailableStock === 1 && (
             <span className="text-red-600">(LAST ONE)</span>
@@ -72,7 +73,7 @@ export function ProductPageClient({ product, sanityProduct }: ProductPageClientP
           sanityProduct={sanityProduct}
           available={hasStock}
           selectedSize={selectedSize}
-          isApparel={isApparel}
+          hasSizes={hasSizes}
         />
       </div>
     </>

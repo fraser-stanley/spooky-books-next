@@ -33,11 +33,13 @@ export function ProductCard({ product, sanityProduct, eager }: ProductCardProps)
     }
   }
   
-  // For apparel, check if any variant has stock; for publications, check main stock
+  // Determine product type and stock checking logic
   const isApparel = category.toLowerCase() === 'apparel'
-  const isOutOfStock = isApparel 
-    ? !variants || variants.length === 0 || variants.every(v => getStockForDisplay(v.size) <= 0)
-    : getStockForDisplay() <= 0
+  const hasSizes = isApparel && variants && variants.length > 0
+  
+  const isOutOfStock = hasSizes 
+    ? variants.every(v => getStockForDisplay(v.size) <= 0) // Sized apparel: check all variants
+    : getStockForDisplay() <= 0 // Publications and non-sized apparel: check main stock
 
   return (
     <Link
@@ -63,13 +65,14 @@ export function ProductCard({ product, sanityProduct, eager }: ProductCardProps)
         <h2 className="">
           {title}
           {isOutOfStock && " (SOLD OUT)"}
-          {!isOutOfStock && !isApparel && (() => {
+          {!isOutOfStock && !hasSizes && (() => {
+            // Publications and non-sized apparel: show main stock status
             const availableStock = getStockForDisplay();
             if (availableStock === 1) return ' (LAST ONE)';
             return availableStock > 1 && availableStock <= 3 ? ` (ONLY ${availableStock} LEFT)` : '';
           })()}
-          {!isOutOfStock && isApparel && variants && (() => {
-            // For apparel, calculate total available stock across all sizes
+          {!isOutOfStock && hasSizes && variants && (() => {
+            // Sized apparel: calculate total available stock across all sizes
             const availableVariants = variants.filter(v => getStockForDisplay(v.size) > 0);
             if (availableVariants.length === 0) return '';
             

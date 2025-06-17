@@ -15,7 +15,7 @@ export function AddToCart({
   quantity = 1,
   available = true,
   selectedSize,
-  isApparel = false,
+  hasSizes = false,
   ...props
 }: {
   product: {
@@ -29,7 +29,7 @@ export function AddToCart({
   quantity?: number
   available?: boolean
   selectedSize?: string
-  isApparel?: boolean
+  hasSizes?: boolean
   [key: string]: unknown
 }) {
   const { addItem, getCartItemQuantity } = useCart()
@@ -83,8 +83,8 @@ export function AddToCart({
     ? getAvailableStock(sanityProduct, selectedSize)
     : undefined
 
-  // For apparel without size selection, just show disabled state
-  const needsSizeSelection = isApparel && !selectedSize
+  // For sized products without size selection, just show disabled state
+  const needsSizeSelection = hasSizes && !selectedSize
   
   // Determine if item is actually available
   const isAvailable = available && (availableStock === undefined || availableStock > 0) && !needsSizeSelection

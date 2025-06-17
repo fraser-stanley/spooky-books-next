@@ -45,13 +45,15 @@ export const product = defineType({
       name: 'stockQuantity',
       type: 'number',
       title: 'Stock Quantity',
-      description: 'Available inventory for publications (books, magazines). For apparel, use Size Variants below.',
+      description: 'Available inventory for publications and non-sized apparel (tote bags, etc). For sized apparel, use Size Variants below.',
       validation: Rule => Rule.required().min(0).integer(),
       initialValue: 0,
       hidden: ({ document }: { document?: any }) => {
-        // Hide main stock for apparel products (they use variant stock)
-        // Check if category reference is to Apparel category
-        return document?.category?._ref === 'f16b392c-4089-4e48-8d5e-7401efb17902' // Apparel category ID
+        // Hide main stock only for apparel products that have size variants
+        // Show for publications and non-sized apparel (tote bags, etc)
+        const isApparel = document?.category?._ref === 'f16b392c-4089-4e48-8d5e-7401efb17902' // Apparel category ID
+        const hasVariants = document?.variants && document.variants.length > 0
+        return isApparel && hasVariants
       }
     }),
     defineField({
@@ -66,9 +68,9 @@ export const product = defineType({
     }),
     defineField({
       name: 'variants',
-      title: 'Size Variants (for Apparel only)',
+      title: 'Size Variants (for sized Apparel)',
       type: 'array',
-      description: 'Add different sizes with individual stock levels. Only shown when category is Apparel.',
+      description: 'Add different sizes with individual stock levels. Only use for apparel that comes in multiple sizes (t-shirts, etc). Leave empty for non-sized apparel (tote bags, etc).',
       of: [
         {
           type: 'object',

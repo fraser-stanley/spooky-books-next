@@ -30,7 +30,7 @@ This is a **Next.js 15 e-commerce site** for Spooky Books, migrated from Gatsby 
 - ✅ **Routing**: Dynamic product pages with static generation
 - ✅ **Styling**: Light mode styling with proper contrast
 - ✅ **Backends**: Stripe + Sanity integrations complete with webhook automation
-- ✅ **Product Variants**: Apparel sizing system with individual stock tracking
+- ✅ **Product Variants**: Flexible apparel system supporting both sized (t-shirts) and non-sized (tote bags) products
 - ✅ **Category System**: Unified Publications vs Apparel categories
 - ✅ **Homepage CMS**: Sanity-powered homepage with visual editing capabilities  
 - ✅ **Visual Editing**: Complete draft mode and presentation tool setup with Live Content API
@@ -56,8 +56,8 @@ This is a **Next.js 15 e-commerce site** for Spooky Books, migrated from Gatsby 
 - **Core Fields**: id, title, slug, price, category, images[], description, stockQuantity
 - **Inventory Fields**: stockQuantity, reservedQuantity (for tracking available vs reserved stock)
 - **Stripe Fields**: stripePriceId, stripeProductId (auto-populated)
-- **Variants**: Optional array for apparel with size-specific stock tracking and individual reservedQuantity
-- **Categories**: Publications (books, magazines) or Apparel (t-shirts, totes)
+- **Variants**: Optional array for sized apparel with size-specific stock tracking and individual reservedQuantity
+- **Categories**: Publications (books, magazines) or Apparel (sized: t-shirts, hoodies | non-sized: tote bags, stickers)
 
 ### Advanced Inventory Management System
 - **Stock Reservations**: 30-minute session-based inventory locking during checkout process
@@ -245,6 +245,39 @@ html, body {
 - **Smart Quantity Controls**: Cart + and - buttons respect actual available stock limits
 
 **Design Philosophy**: The interface relies on clear visual states and intelligent messaging hierarchy rather than redundant text labels, creating urgency where appropriate while maintaining a clean, professional user experience. Stock calculation consistency ensures users never encounter conflicting availability information between product pages and cart.
+
+### Non-Sized Apparel Implementation (2024)
+**Flexible Product Architecture:**
+- **Three Product Types**: Publications (books), Sized Apparel (t-shirts), Non-sized Apparel (tote bags)
+- **Conditional Logic**: Components distinguish between `isApparel` (category) and `hasSizes` (has variants)
+- **Smart Stock Management**: Non-sized apparel uses main `stockQuantity` like publications
+- **Unified UX**: Same stock messaging and cart behavior across all non-sized products
+
+**Key Technical Patterns:**
+```tsx
+// Separate apparel category from size requirement
+const isApparel = product.category.toLowerCase() === 'apparel'
+const hasSizes = isApparel && product.variants && product.variants.length > 0
+
+// Size selector only for products that actually have sizes
+{hasSizes && <SizeSelector variants={product.variants} />}
+
+// Stock display for publications AND non-sized apparel
+{!hasSizes && <StockDisplay />}
+
+// AddToCart logic - only require size selection if product has sizes
+const needsSizeSelection = hasSizes && !selectedSize
+```
+
+**Sanity Schema Logic:**
+```typescript
+// Show stockQuantity field for publications and non-sized apparel
+hidden: ({ document }) => {
+  const isApparel = document?.category?._ref === 'f16b392c-4089-4e48-8d5e-7401efb17902'
+  const hasVariants = document?.variants && document.variants.length > 0
+  return isApparel && hasVariants // Only hide if apparel AND has variants
+}
+```
 
 ### Import Conventions
 **Use kebab-case file names with named exports:**
