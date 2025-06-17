@@ -27,11 +27,12 @@ export function CartItem({ item, sanityProduct }: CartItemProps) {
   // Calculate available stock from Sanity
   const totalAvailableStock = sanityProduct 
     ? getAvailableStock(sanityProduct, item.size)
-    : 0 // Conservative fallback - no stock if no Sanity data
+    : null // No stock data available
   
-  // For cart quantity controls, the max should be the total available stock
-  // (not reduced by current cart quantity, since this IS the cart quantity)
-  const maxQuantity = Math.min(totalAvailableStock, 10) // Cap at 10 for UI purposes
+  // For cart quantity controls - if we have stock data, use it; otherwise allow reasonable operations
+  const maxQuantity = totalAvailableStock !== null 
+    ? Math.min(totalAvailableStock, 10) // Use actual stock limit
+    : Math.max(localQuantity, 10) // Allow current quantity or up to 10 if no stock data
   
   // Debug the calculated values
   console.log(`📊 Cart item calculations for ${item.title}:`, {
@@ -49,7 +50,7 @@ export function CartItem({ item, sanityProduct }: CartItemProps) {
 
   // Auto-adjust quantity if it exceeds available stock
   useEffect(() => {
-    if (sanityProduct && item.quantity > totalAvailableStock && totalAvailableStock >= 0) {
+    if (sanityProduct && totalAvailableStock !== null && item.quantity > totalAvailableStock && totalAvailableStock >= 0) {
       console.log(`Auto-adjusting ${item.title} quantity from ${item.quantity} to ${totalAvailableStock}`)
       const adjustedQuantity = Math.max(totalAvailableStock, 0)
       const sizeText = item.size ? ` (${item.size.toUpperCase()})` : ''
@@ -72,20 +73,35 @@ export function CartItem({ item, sanityProduct }: CartItemProps) {
       maxQuantity,
       sanityProduct: !!sanityProduct,
       isIncrease: newQuantity > localQuantity,
-      isDecrease: newQuantity < localQuantity,
-      willBlock: newQuantity > localQuantity && newQuantity > maxQuantity
+      isDecrease: newQuantity < localQuantity
     })
 
+    // Remove item if quantity goes below 1
     if (newQuantity < 1) {
       removeItem(item.id, item.size)
       return
     }
 
-    // Only block increases beyond stock, but allow decreases
-    if (newQuantity > localQuantity && newQuantity > maxQuantity) {
-      // Don't allow quantity increases higher than available stock
-      console.log(`❌ Blocked increase: ${newQuantity} > ${maxQuantity}`)
+    // Always allow decreases
+    if (newQuantity < localQuantity) {
+      console.log(`✅ Allowing decrease from ${localQuantity} to ${newQuantity}`)
+      setLocalQuantity(newQuantity)
+      updateItemQuantity(item.id, newQuantity, item.size)
       return
+    }
+
+    // For increases, check stock limits only if we have stock data
+    if (newQuantity > localQuantity) {
+      if (totalAvailableStock !== null && newQuantity > totalAvailableStock) {
+        console.log(`❌ Blocked increase: ${newQuantity} > ${totalAvailableStock} (available stock)`)
+        return
+      }
+      
+      // Cap increases at 10 for UI sanity
+      if (newQuantity > 10) {
+        console.log(`❌ Blocked increase: ${newQuantity} > 10 (UI limit)`)
+        return
+      }
     }
 
     console.log(`✅ Allowing quantity change from ${localQuantity} to ${newQuantity}`)
@@ -142,7 +158,11 @@ export function CartItem({ item, sanityProduct }: CartItemProps) {
             </span>
             <button
               onClick={() => handleQuantityChange(localQuantity + 1)}
-              disabled={localQuantity >= maxQuantity}
+              disabled={
+                // Disable + if we have stock data and at limit, or if at UI limit of 10
+                (totalAvailableStock !== null && localQuantity >= totalAvailableStock) ||
+                localQuantity >= 10
+              }
               className="px-3 py-1 text-sm hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed"
             >
               +
