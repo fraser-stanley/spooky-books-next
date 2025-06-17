@@ -96,9 +96,9 @@ This is a **Next.js 15 e-commerce site** for Spooky Books, migrated from Gatsby 
 - **AddToCart**: Enhanced button with smart disabled states, real-time stock validation, and apparel size awareness
 - **SizeSelector**: Clean apparel size selection with minimal UI, strikethrough for sold-out sizes, and responsive grid
 - **CartButton**: Simplified inline text component showing "Cart" or "Cart (X)" format
-- **CartPage**: Clean, minimal design with automatic quantity adjustment and consistent stock enforcement
-- **CartItem**: Advanced cart items with automatic stock limit enforcement, quantity adjustment, and toast notifications
-- **SkeletonLoaders**: Loading states for cart validation and checkout processing
+- **CartPage**: Mobile-first responsive design with full-width images on small screens, no discount functionality
+- **CartItem**: Unified stock calculation using identical logic from product pages, responsive layout with proper mobile image sizing
+- **SkeletonLoaders**: Responsive loading states matching mobile-first cart layout with full-width image skeletons
 
 ### Stock Management Components
 - **Stock Validation**: Real-time available stock calculation (stockQuantity - reservedQuantity)
@@ -119,7 +119,7 @@ This is a **Next.js 15 e-commerce site** for Spooky Books, migrated from Gatsby 
 - **Home**: `/` - Hero product showcases with image pairs
 - **Products**: `/products/` - Product grid with category navigation and stock status
 - **Product Detail**: `/products/[slug]/` - Dynamic pages with size selection and stock validation
-- **Cart**: `/cart/` - Clean checkout page with size variant support and stock validation
+- **Cart**: `/cart/` - Mobile-first responsive checkout page with real-time stock validation (no discount functionality)
 - **Cart Demo**: `/cart/demo/` - Populates cart with sample items for testing
 - **Static Generation**: `generateStaticParams` for build optimization
 
@@ -231,12 +231,19 @@ html, body {
 - **Consistent Formatting**: Uppercase messaging across all contexts for professional appearance
 - **Automatic Cart Adjustment**: Quantities automatically reduced when stock limits are exceeded
 
+**Unified Cart Stock Management (Latest):**
+- **Product Page Parity**: Cart quantity controls use identical stock calculation logic as product pages
+- **Real Stock Limits**: Removed arbitrary maximum quantities, now uses actual Sanity inventory data
+- **Mobile-First Cart Layout**: Responsive design with full-width images on mobile, proper spacing on desktop
+- **No Discount Functionality**: Completely removed discount code features from cart interface
+- **Toast Notifications**: Clear feedback when quantities are automatically adjusted due to stock limits
+
 **Advanced Inventory Management:**
 - **Consistent Enforcement**: Stock limits enforced across product pages, cart controls, and checkout
 - **Real-time Validation**: Toast notifications inform users of automatic adjustments
 - **Smart Quantity Controls**: Cart + and - buttons respect actual available stock limits
 
-**Design Philosophy**: The interface relies on clear visual states and intelligent messaging hierarchy rather than redundant text labels, creating urgency where appropriate while maintaining a clean, professional user experience.
+**Design Philosophy**: The interface relies on clear visual states and intelligent messaging hierarchy rather than redundant text labels, creating urgency where appropriate while maintaining a clean, professional user experience. Stock calculation consistency ensures users never encounter conflicting availability information between product pages and cart.
 
 ### Import Conventions
 **Use kebab-case file names with named exports:**
@@ -269,20 +276,30 @@ const availableStock = getAvailableStock(sanityProduct, size)
 const lowestStock = Math.min(...availableVariants.map(v => getStockForDisplay(v.size)))
 ```
 
-**Cart Quantity Enforcement:**
+**Cart Quantity Logic (Latest Implementation):**
 ```tsx
-// Maximum quantity enforcement
-const maxQuantity = Math.min(availableStock, 10) // Cap at available stock
-const isOverStock = item.quantity > availableStock
+// Use identical logic as product pages for consistency
+const getCurrentAvailableStock = () => {
+  if (!sanityProduct) return null
+  
+  const availableStock = getAvailableStock(sanityProduct, item.size)
+  const inCart = getCartItemQuantity(item.id, item.size)
+  // For cart stepper, available stock is total stock minus everything else in cart
+  return Math.max(0, availableStock - (inCart - localQuantity))
+}
 
-// Automatic adjustment with notifications
+// Automatic adjustment with clear notifications
 if (adjustedQuantity === 0) {
   removeItem(item.id, item.size)
-  toast.warning(`${item.title} was removed - no longer in stock`)
+  toast.warning(`${item.title}${sizeText} was removed – no longer in stock`)
 } else {
-  updateItemQuantity(item.id, adjustedQuantity, item.size)  
-  toast.info(`${item.title} quantity reduced to ${adjustedQuantity} (stock limit)`)
+  setLocalQuantity(adjustedQuantity)
+  updateItemQuantity(item.id, adjustedQuantity, item.size)
+  toast.info(`${item.title}${sizeText} quantity reduced to ${adjustedQuantity} (stock limit)`)
 }
+
+// Button disabled logic matches product pages exactly
+disabled={currentAvailableStock !== null && localQuantity >= currentAvailableStock}
 ```
 
 ### Interaction Patterns
@@ -415,6 +432,34 @@ function ProductPage({ product }) {
 }
 ```
 
+#### Responsive Cart Layout
+```tsx
+// Mobile-first cart item layout
+<div className="flex flex-col sm:flex-row sm:items-start gap-4 sm:gap-6 w-full">
+  {/* Full-width images on mobile */}
+  <div className="w-full sm:w-24 sm:h-32">
+    <Image
+      className="w-full h-auto sm:h-32 sm:w-24 object-cover rounded"
+      // ... other props
+    />
+  </div>
+  
+  {/* Responsive quantity controls */}
+  <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4 mb-2">
+    <div className="flex items-center gap-2">
+      <span className="text-sm text-gray-600 uppercase">Qty:</span>
+      {/* Quantity stepper */}
+    </div>
+    <button className="px-4 py-1 border rounded">Remove</button>
+  </div>
+  
+  {/* Responsive subtotal positioning */}
+  <div className="text-sm text-right sm:text-left sm:ml-auto mt-2 sm:mt-0">
+    <CurrencyPrice price={total} />
+  </div>
+</div>
+```
+
 #### Custom Button Animations with Disabled States
 ```css
 .addToCart {
@@ -424,7 +469,7 @@ function ProductPage({ product }) {
 }
 
 .addToCart:hover {
-  background-color: rgb(31, 41, 55);
+  background-color: rgb(32, 32, 32);
 }
 
 .addToCart:active {
@@ -482,6 +527,8 @@ SANITY_STUDIO_PREVIEW_ORIGIN=https://your-domain.com
 ### Stock Management
 - **Publications**: Single `stockQuantity` field for entire product
 - **Apparel**: Individual `stockQuantity` per size variant in `variants` array
+- **Unified Logic**: Cart quantity controls use identical stock calculation method as product pages for consistency
+- **Real Stock Limits**: No arbitrary maximums - cart steppers respect actual Sanity inventory data
 - **Validation**: Real-time stock checking during checkout session creation with automatic quantity adjustment
 - **Consistent Enforcement**: Stock limits enforced across product pages, cart quantity controls, and checkout process
 - **UI Indicators**: Smart button states and strikethrough for sold out items (no redundant text labels)
