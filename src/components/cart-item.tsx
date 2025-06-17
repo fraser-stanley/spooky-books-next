@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useEffect } from "react"
 import Image from "next/image"
 import { useCart } from "./cart-contex"
 import { CurrencyPrice } from "./currency-price"
@@ -21,73 +21,24 @@ interface CartItemProps {
 }
 
 export function CartItem({ item, sanityProduct }: CartItemProps) {
-  const { removeItem, updateItemQuantity } = useCart()
-  const [localQuantity, setLocalQuantity] = useState(item.quantity)
+  const { removeItem } = useCart()
 
-  // Calculate maximum quantity this cart item can have
-  const getCurrentAvailableStock = () => {
-    if (!sanityProduct) {
-      console.log(`No sanityProduct for cart item: ${item.title} (id: ${item.id})`)
-      return null
-    }
-    
-    // For cart items: max quantity is simply the total available stock
-    // since cart merges items - there's only one instance per product+size
-    const availableStock = getAvailableStock(sanityProduct, item.size)
-    console.log(`Cart item ${item.title}: availableStock=${availableStock}, currentQuantity=${localQuantity}`)
-    return availableStock
-  }
-
-  const currentAvailableStock = getCurrentAvailableStock()
-  
-  console.log(`Cart item ${item.title}: currentAvailableStock=${currentAvailableStock}, + button disabled=${currentAvailableStock !== null && localQuantity >= currentAvailableStock}`)
-
+  // Auto-adjust if item quantity exceeds available stock on mount
   useEffect(() => {
-    setLocalQuantity(item.quantity)
-  }, [item.quantity])
-
-  // Auto-adjust if item quantity exceeds available stock
-  useEffect(() => {
-    if (sanityProduct && currentAvailableStock !== null && localQuantity > currentAvailableStock) {
-      const adjustedQuantity = Math.max(currentAvailableStock, 0)
-      const sizeText = item.size ? ` (${item.size.toUpperCase()})` : ""
-
-      if (adjustedQuantity === 0) {
-        removeItem(item.id, item.size)
-        toast.warning(`${item.title}${sizeText} was removed – no longer in stock`)
-      } else {
-        setLocalQuantity(adjustedQuantity)
-        updateItemQuantity(item.id, adjustedQuantity, item.size)
-        toast.info(`${item.title}${sizeText} quantity reduced to ${adjustedQuantity} (stock limit)`)
+    if (sanityProduct) {
+      const availableStock = getAvailableStock(sanityProduct, item.size)
+      if (item.quantity > availableStock) {
+        const sizeText = item.size ? ` (${item.size.toUpperCase()})` : ""
+        
+        if (availableStock === 0) {
+          removeItem(item.id, item.size)
+          toast.warning(`${item.title}${sizeText} was removed – no longer in stock`)
+        } else {
+          toast.info(`${item.title}${sizeText} quantity exceeds available stock. Please add items from the product page.`)
+        }
       }
     }
-  }, [sanityProduct, currentAvailableStock, localQuantity, item.title, item.id, item.size, removeItem, updateItemQuantity])
-
-  const handleQuantityChange = (newQuantity: number) => {
-    // Remove item if quantity goes to 0
-    if (newQuantity < 1) {
-      removeItem(item.id, item.size)
-      return
-    }
-
-    // Always allow decreases
-    if (newQuantity < localQuantity) {
-      setLocalQuantity(newQuantity)
-      updateItemQuantity(item.id, newQuantity, item.size)
-      return
-    }
-
-    // For increases, check if we have enough stock
-    if (newQuantity > localQuantity) {
-      if (currentAvailableStock !== null && newQuantity > currentAvailableStock) {
-        // Don't allow increase beyond available stock
-        return
-      }
-    }
-
-    setLocalQuantity(newQuantity)
-    updateItemQuantity(item.id, newQuantity, item.size)
-  }
+  }, [sanityProduct, item.quantity, item.title, item.id, item.size, removeItem])
 
   return (
     <div className="flex flex-col sm:flex-row sm:items-start gap-4 sm:gap-6 w-full">
@@ -126,25 +77,9 @@ export function CartItem({ item, sanityProduct }: CartItemProps) {
 
         {/* Quantity & Remove */}
         <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4 mb-2">
-          <div className="flex items-center gap-2">
-            <span className="text-sm text-gray-600 uppercase">Qty:</span>
-            <input
-              type="number"
-              value={localQuantity}
-              onChange={(e) => {
-                const newQuantity = parseInt(e.target.value) || 1
-                handleQuantityChange(newQuantity)
-              }}
-              min={1}
-              max={currentAvailableStock || undefined}
-              className="w-16 px-2 py-1 text-sm border border-gray-300 rounded text-center"
-            />
-            {currentAvailableStock !== null && (
-              <span className="text-xs text-gray-500">
-                max {currentAvailableStock}
-              </span>
-            )}
-          </div>
+          <span className="text-sm text-gray-600 uppercase">
+            Qty: {item.quantity}
+          </span>
 
           <button
             onClick={() => removeItem(item.id, item.size)}
@@ -157,7 +92,7 @@ export function CartItem({ item, sanityProduct }: CartItemProps) {
 
       {/* Subtotal */}
       <div className="text-sm text-right sm:text-left sm:ml-auto mt-2 sm:mt-0 whitespace-nowrap">
-        <CurrencyPrice price={item.price * localQuantity} />
+        <CurrencyPrice price={item.price * item.quantity} />
       </div>
     </div>
   )
