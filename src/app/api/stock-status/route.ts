@@ -52,7 +52,7 @@ export async function GET(request: NextRequest) {
         category: (product.category as {title: string})?.title
       }
 
-      if (product.variants && (product.variants as unknown[]).length > 0) {
+      if (product.variants && Array.isArray(product.variants) && product.variants.length > 0) {
         // Apparel with variants
         result.variants = (product.variants as Record<string, unknown>[]).map(variant => ({
           size: variant.size,
@@ -81,7 +81,10 @@ export async function GET(request: NextRequest) {
   } catch (error) {
     console.error('Stock status API error:', error)
     return NextResponse.json(
-      { error: 'Internal server error' },
+      { 
+        error: 'Internal server error',
+        details: error instanceof Error ? error.message : 'Unknown error'
+      },
       { status: 500 }
     )
   }
@@ -161,7 +164,10 @@ export async function POST(request: NextRequest) {
   } catch (error) {
     console.error('Stock check API error:', error)
     return NextResponse.json(
-      { error: 'Internal server error' },
+      { 
+        error: 'Internal server error',
+        details: error instanceof Error ? error.message : 'Unknown error'
+      },
       { status: 500 }
     )
   }

@@ -7,7 +7,7 @@ import { CurrencyPrice } from "@/components/currency-price"
 import { CartItem } from "@/components/cart-item"
 import Link from "next/link"
 import { useState, useEffect } from "react"
-import { sanityClient } from "@/lib/sanity/client"
+import { liveClient } from "@/lib/sanity/client"
 import type { SanityProduct } from "@/lib/sanity/types"
 import { CartPageSkeleton } from "@/components/skeletons/cart-skeleton"
 import { CheckoutLoadingSkeleton, CheckoutProcessingSkeleton, StockValidationOverlay } from "@/components/skeletons/checkout-skeleton"
@@ -27,8 +27,8 @@ export default function CartPage() {
   useEffect(() => {
     const fetchProducts = async () => {
       try {
-        // Use direct Sanity client call without Live functionality for cart page
-        const products = await sanityClient.fetch(`
+        // Use live client with proper token for cart page
+        const products = await liveClient.fetch(`
           *[_type == "product"] {
             "id": slug.current,
             "slug": slug.current,
@@ -84,10 +84,18 @@ export default function CartPage() {
         }),
       })
 
+      if (!response.ok) {
+        console.error('Stock validation failed:', response.status, response.statusText)
+        alert('Failed to validate stock. Please try again.')
+        setCheckoutLoading(false)
+        setCheckoutStep('idle')
+        return
+      }
+
       const stockValidation = await response.json()
       
       if (!stockValidation.allInStock) {
-        const outOfStock = stockValidation.stockChecks
+        const outOfStock = (stockValidation.stockChecks || [])
           .filter((check: Record<string, unknown>) => !check.inStock)
           .map((check: Record<string, unknown>) => `${check.productTitle}${check.size ? ` (${check.size})` : ''}`)
           .join(', ')
@@ -107,6 +115,14 @@ export default function CartPage() {
         },
         body: JSON.stringify({ items: cart }),
       })
+
+      if (!checkoutResponse.ok) {
+        console.error('Checkout response failed:', checkoutResponse.status, checkoutResponse.statusText)
+        alert('Failed to create checkout session. Please try again.')
+        setCheckoutLoading(false)
+        setCheckoutStep('idle')
+        return
+      }
 
       const { sessionId, error } = await checkoutResponse.json()
 
