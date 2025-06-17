@@ -101,7 +101,7 @@ export function AddToCart({
       title={availableStock !== undefined ? `${availableStock} in stock` : undefined}
       {...props}
     >
-      {isSoldOut ? "SOLD OUT" : "Add to Cart"}
+      {isSoldOut ? "SOLD OUT" : needsSizeSelection ? "Select a size" : "Add to Cart"}
     </button>
   )
 }
