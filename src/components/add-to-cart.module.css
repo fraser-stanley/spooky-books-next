@@ -119,7 +119,7 @@
 }
 
 .addToCart:hover:not(:disabled) {
-  background-color: rgb(31, 41, 55);
+  background-color: rgb(32, 32, 32)
 }
 
 .addToCart:active:not(:disabled) {

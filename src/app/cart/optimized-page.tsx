@@ -11,7 +11,6 @@ import { CheckoutLoadingSkeleton, CheckoutProcessingSkeleton, StockValidationOve
 
 export default function OptimizedCartPage() {
   const { cart, total } = useCart()
-  const [discountCode, setDiscountCode] = useState("")
   const [checkoutLoading, setCheckoutLoading] = useState(false)
   const [checkoutStep, setCheckoutStep] = useState<'idle' | 'validating' | 'creating' | 'redirecting'>('idle')
   
@@ -162,22 +161,6 @@ export default function OptimizedCartPage() {
           })}
         </div>
 
-        {/* Discount Section */}
-        <div className="mt-12 mb-8">
-          <div className="border-b border-gray-200 mb-8"></div>
-          <div className="flex gap-4 items-center">
-            <input
-              type="text"
-              placeholder="DISCOUNT CODE"
-              value={discountCode}
-              onChange={(e) => setDiscountCode(e.target.value)}
-              className="max-w-xs bg-transparent border-0 border-b border-gray-300 px-0 py-2 text-sm placeholder-gray-400 focus:outline-none focus:border-gray-600"
-            />
-            <button className="text-xs px-4 py-1 border border-gray-300 hover:bg-gray-100 font-normal uppercase tracking-wide">
-              APPLY DISCOUNT
-            </button>
-          </div>
-        </div>
 
         {/* Order Summary */}
         <div className="mt-12">

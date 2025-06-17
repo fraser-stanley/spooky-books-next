@@ -46,7 +46,7 @@ export function SizeSelector({ variants, sanityProduct, selectedSize, onSizeChan
                   : 'border-gray-300 hover:border-gray-400'
                 }
                 ${isOutOfStock 
-                  ? 'opacity-50 cursor-not-allowed line-through' 
+                  ? 'opacity-50 cursor-not-allowed' 
                   : 'cursor-pointer'
                 }
                 transition-colors

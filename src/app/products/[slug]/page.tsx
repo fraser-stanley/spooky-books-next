@@ -45,8 +45,8 @@ export default async function ProductPage({ params }: ProductPageProps) {
 
         {/* Product Details */}
         <div className="col-span-12 md:col-span-6">
-          <div className="md:pl-8">
-            <h1 className="text-3xl font-bold mb-4">
+          <div className="md:pl-8 text-pretty ">
+            <h1 className="text-2xl">
               {product.title}
               {product.stockQuantity <= 0 && !product.variants && " (SOLD OUT)"}
               {product.stockQuantity === 1 && !product.variants && " (LAST ONE)"}
@@ -54,12 +54,26 @@ export default async function ProductPage({ params }: ProductPageProps) {
             </h1>
             
             <div className="mb-4">
-              <span className="text-2xl">${product.price} {product.currency}</span>
+              <span className="text-2xl">${product.price}</span>
             </div>
 
-            <div className="mb-8">
-              <p className="text-lg">{product.description}</p>
-            </div>
+
+        {product.description?.trim() && (
+          <div className="text-pretty pr-4 sm:pr-8 mb-4 leading-[1.5] max-w-prose [text-rendering:optimizeLegibility] antialiased ">
+            {product.description
+              .replace(/\r\n/g, '\n')
+              .replace(/\n{3,}/g, '\n\n')
+              .split('\n\n')
+              .map((para, idx) => (
+                <p key={idx} className="mb-4">
+                  {para}
+                </p>
+              ))}
+          </div>
+        )}
+
+
+            
 
             <ProductPageClient product={product} sanityProduct={sanityProduct} />
           </div>

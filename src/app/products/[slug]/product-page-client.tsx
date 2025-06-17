@@ -51,14 +51,11 @@ export function ProductPageClient({ product, sanityProduct }: ProductPageClientP
       {/* Stock Display */}
       {!isApparel && (
         <div className="mb-4">
-          {currentAvailableStock <= 0 && (
-            <span className="text-red-600 font-medium">SOLD OUT</span>
-          )}
           {currentAvailableStock === 1 && (
-            <span className="text-red-600 font-medium">LAST ONE</span>
+            <span className="text-red-600">(LAST ONE)</span>
           )}
           {currentAvailableStock > 1 && currentAvailableStock <= 3 && (
-            <span className="text-orange-600 font-medium">ONLY {currentAvailableStock} LEFT</span>
+            <span className="">(ONLY {currentAvailableStock} LEFT)</span>
           )}
         </div>
       )}

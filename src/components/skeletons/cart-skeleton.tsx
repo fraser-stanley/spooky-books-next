@@ -10,35 +10,37 @@ function Skeleton({ className = "" }: SkeletonProps) {
 
 export function CartItemSkeleton() {
   return (
-    <div className="flex gap-6">
+    <div className="flex flex-col sm:flex-row sm:items-start gap-4 sm:gap-6 w-full">
       {/* Image skeleton */}
-      <div className="flex-shrink-0">
-        <Skeleton className="w-24 h-32" />
+      <div className="w-full sm:w-24 sm:h-32">
+        <Skeleton className="w-full h-auto sm:h-32 sm:w-24 rounded" />
       </div>
       
       {/* Content skeleton */}
-      <div className="flex-1">
+      <div className="flex-1 min-w-0">
         {/* Title */}
-        <Skeleton className="h-4 w-3/4 mb-2" />
+        <div className="mb-1">
+          <Skeleton className="h-4 w-3/4" />
+        </div>
         
         {/* Price */}
-        <Skeleton className="h-4 w-16 mb-3" />
-
-        {/* Quantity controls */}
-        <div className="flex items-center gap-3 mb-2">
+        <div className="mb-2">
           <Skeleton className="h-4 w-16" />
-          <Skeleton className="h-8 w-24" />
         </div>
 
-        {/* Stock message area */}
-        <Skeleton className="h-3 w-24 mb-2" />
-        
-        {/* Remove button */}
-        <Skeleton className="h-7 w-16" />
+        {/* Quantity & Remove */}
+        <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4 mb-2">
+          <div className="flex items-center gap-2">
+            <Skeleton className="h-4 w-8" />
+            <Skeleton className="h-8 w-24 rounded" />
+          </div>
+          
+          <Skeleton className="h-7 w-16 rounded" />
+        </div>
       </div>
       
-      {/* Price skeleton */}
-      <div className="text-right">
+      {/* Subtotal skeleton */}
+      <div className="text-sm text-right sm:text-left sm:ml-auto mt-2 sm:mt-0 whitespace-nowrap">
         <Skeleton className="h-4 w-16" />
       </div>
     </div>
@@ -105,14 +107,6 @@ export function CartPageSkeleton() {
           ))}
         </div>
 
-        {/* Discount section skeleton */}
-        <div className="mt-12 mb-8">
-          <div className="border-b border-gray-200 mb-8" />
-          <div className="flex gap-4 items-center">
-            <Skeleton className="h-8 w-48" />
-            <Skeleton className="h-7 w-24" />
-          </div>
-        </div>
 
         {/* Order summary skeleton */}
         <div className="mt-12">
