@@ -48,13 +48,12 @@ export const product = defineType({
       description: 'Available inventory. Use this field for: Publications (books, magazines) and Non-sized Apparel (tote bags, stickers). For sized apparel (t-shirts), use Size Variants below instead.',
       validation: Rule => Rule.required().min(0).integer(),
       initialValue: 0,
-      hidden: ({ document }: { document?: any }) => {
-        // Hide main stock only for apparel products that have size variants
-        // Show for publications and non-sized apparel (tote bags, etc)
-        const isApparel = document?.category?._ref === 'f16b392c-4089-4e48-8d5e-7401efb17902' // Apparel category ID
-        const hasVariants = document?.variants && document.variants.length > 0
-        return isApparel && hasVariants
-      }
+      // Temporarily always visible for debugging
+      // hidden: ({ document }: { document?: any }) => {
+      //   const isApparel = document?.category?._ref === 'f16b392c-4089-4e48-8d5e-7401efb17902'
+      //   const hasVariants = document?.variants && document.variants.length > 0
+      //   return isApparel && hasVariants
+      // }
     }),
     defineField({
       name: 'reservedQuantity',
