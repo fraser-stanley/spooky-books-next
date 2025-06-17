@@ -91,13 +91,13 @@ This is a **Next.js 15 e-commerce site** for Spooky Books, migrated from Gatsby 
 - **Accessibility**: Proper ARIA labels and semantic HTML structure
 
 ### E-commerce Components
-- **ProductCard**: Grid-compatible with Next.js Image optimization, real-time stock status, and accurate "sold out" styling
+- **ProductCard**: Grid-compatible with Next.js Image optimization, intelligent stock status messaging showing lowest size stock for apparel
 - **ProductListing**: Category filtering with Sanity CMS integration and live stock updates
 - **AddToCart**: Enhanced button with smart disabled states, real-time stock validation, and apparel size awareness
 - **SizeSelector**: Clean apparel size selection with minimal UI, strikethrough for sold-out sizes, and responsive grid
 - **CartButton**: Simplified inline text component showing "Cart" or "Cart (X)" format
-- **CartPage**: Clean, minimal design with real-time stock validation and optimized checkout flow
-- **CartItemEnhanced**: Advanced cart items with stock warnings, quantity controls, and availability checks
+- **CartPage**: Clean, minimal design with automatic quantity adjustment and consistent stock enforcement
+- **CartItem**: Advanced cart items with automatic stock limit enforcement, quantity adjustment, and toast notifications
 - **SkeletonLoaders**: Loading states for cart validation and checkout processing
 
 ### Stock Management Components
@@ -221,11 +221,22 @@ html, body {
 **Clean Product Page Interface:**
 - **Smart AddToCart States**: Shows disabled "Add to Cart" (not "SOLD OUT") when no size selected for apparel
 - **Minimal Size Selection**: Removed redundant "Size" headers and status text from SizeSelector component  
-- **Selected Size Display**: Clear "Size L" label appears under button when size is selected
-- **No Redundant Messaging**: Eliminated duplicate category labels and "sold out" text (button states communicate this)
+- **No Redundant Messaging**: Eliminated duplicate category labels and redundant "sold out" text (button states communicate this)
 - **Streamlined Flow**: Removed confusing helper text like "Please select a size to add to cart"
 
-**Design Philosophy**: The interface now relies on clear visual states (disabled buttons, strikethrough text) rather than redundant text labels, creating a cleaner and more professional user experience.
+**Enhanced Stock Messaging System:**
+- **Intelligent Apparel Logic**: Shows lowest individual size stock instead of misleading totals across all sizes
+- **Urgency Hierarchy**: "LAST ONE" (red) for single items, "ONLY X LEFT" (orange) for 2-3 items
+- **Universal Threshold**: ≤3 stock threshold creates clear urgency without overwhelming users
+- **Consistent Formatting**: Uppercase messaging across all contexts for professional appearance
+- **Automatic Cart Adjustment**: Quantities automatically reduced when stock limits are exceeded
+
+**Advanced Inventory Management:**
+- **Consistent Enforcement**: Stock limits enforced across product pages, cart controls, and checkout
+- **Real-time Validation**: Toast notifications inform users of automatic adjustments
+- **Smart Quantity Controls**: Cart + and - buttons respect actual available stock limits
+
+**Design Philosophy**: The interface relies on clear visual states and intelligent messaging hierarchy rather than redundant text labels, creating urgency where appropriate while maintaining a clean, professional user experience.
 
 ### Import Conventions
 **Use kebab-case file names with named exports:**
@@ -240,16 +251,38 @@ import styles from './component.module.css'
 import CartButton from './CartButton'
 ```
 
-### Stock Status Styling
-Consistent parentheses format for stock indicators:
+### Stock Status Implementation
+**Consistent Messaging Patterns:**
 ```tsx
-// Product titles with stock status
-"Product Title (SOLD OUT)"
-"Product Title (ONLY 3 LEFT)"
+// Product titles with stock status (Updated 2024)
+"Product Title (SOLD OUT)"     // 0 stock
+"Product Title (LAST ONE)"     // 1 stock  
+"Product Title (ONLY 2 LEFT)"  // 2-3 stock
 
-// Size selection with stock info  
-"Size M (SOLD OUT)"
-"Size L (ONLY 2 LEFT)"
+// Component-level stock validation
+import { getStockStatusText, getAvailableStock } from '@/lib/utils/stock-validation'
+
+const stockStatus = getStockStatusText(sanityProduct, size)
+const availableStock = getAvailableStock(sanityProduct, size)
+
+// Apparel: Use lowest individual size stock
+const lowestStock = Math.min(...availableVariants.map(v => getStockForDisplay(v.size)))
+```
+
+**Cart Quantity Enforcement:**
+```tsx
+// Maximum quantity enforcement
+const maxQuantity = Math.min(availableStock, 10) // Cap at available stock
+const isOverStock = item.quantity > availableStock
+
+// Automatic adjustment with notifications
+if (adjustedQuantity === 0) {
+  removeItem(item.id, item.size)
+  toast.warning(`${item.title} was removed - no longer in stock`)
+} else {
+  updateItemQuantity(item.id, adjustedQuantity, item.size)  
+  toast.info(`${item.title} quantity reduced to ${adjustedQuantity} (stock limit)`)
+}
 ```
 
 ### Interaction Patterns
@@ -449,8 +482,26 @@ SANITY_STUDIO_PREVIEW_ORIGIN=https://your-domain.com
 ### Stock Management
 - **Publications**: Single `stockQuantity` field for entire product
 - **Apparel**: Individual `stockQuantity` per size variant in `variants` array
-- **Validation**: Real-time stock checking during checkout session creation
-- **UI Indicators**: Button states and strikethrough for sold out items (no redundant text labels)
+- **Validation**: Real-time stock checking during checkout session creation with automatic quantity adjustment
+- **Consistent Enforcement**: Stock limits enforced across product pages, cart quantity controls, and checkout process
+- **UI Indicators**: Smart button states and strikethrough for sold out items (no redundant text labels)
+
+#### Stock Status Messaging (Updated 2024)
+**Universal Threshold**: ≤3 stock triggers urgency messaging across all contexts
+
+**Messaging Hierarchy:**
+- **0 stock**: "SOLD OUT" (red)
+- **1 stock**: "LAST ONE" (red)  
+- **2-3 stock**: "ONLY X LEFT" (orange)
+- **4+ stock**: "IN STOCK" or no label (green/neutral)
+
+**Apparel Logic**: Shows lowest individual size stock (not sum across sizes) to prevent misleading high numbers
+
+**Implementation Locations:**
+- Product grid titles: "(LAST ONE)" or "(ONLY X LEFT)" in parentheses
+- Product pages: Colored status text with proper urgency hierarchy  
+- Cart items: Warning messages with automatic quantity adjustment
+- Size selector: Visual states only (strikethrough for sold out)
 
 ### Data Integrity & Maintenance
 - **Schema Validation**: Automatic cleanup of unknown fields from Sanity documents
