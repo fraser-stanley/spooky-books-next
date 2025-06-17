@@ -25,17 +25,16 @@ export function CartItem({ item, sanityProduct }: CartItemProps) {
   const [localQuantity, setLocalQuantity] = useState(item.quantity)
 
   // Calculate available stock from Sanity
-  const availableStock = sanityProduct 
+  const totalAvailableStock = sanityProduct 
     ? getAvailableStock(sanityProduct, item.size)
     : 999 // Fallback for products without stock data
   
-  // The maximum quantity for this cart item should not exceed available stock
-  // Since we're dealing with the quantity for THIS specific cart item,
-  // the max should be the available stock (period)
-  const maxQuantity = Math.min(availableStock, 10) // Cap at 10 for UI purposes
+  // For cart quantity controls, the max should be the total available stock
+  // (not reduced by current cart quantity, since this IS the cart quantity)
+  const maxQuantity = Math.min(totalAvailableStock, 10) // Cap at 10 for UI purposes
   
-  // Check if current quantity exceeds available stock (for warnings)
-  const isOverStock = item.quantity > availableStock
+  // Check if current quantity exceeds total available stock (for warnings)
+  const isOverStock = item.quantity > totalAvailableStock
 
   useEffect(() => {
     setLocalQuantity(item.quantity)
@@ -43,9 +42,9 @@ export function CartItem({ item, sanityProduct }: CartItemProps) {
 
   // Auto-adjust quantity if it exceeds available stock
   useEffect(() => {
-    if (sanityProduct && item.quantity > availableStock && availableStock >= 0) {
-      console.log(`Auto-adjusting ${item.title} quantity from ${item.quantity} to ${availableStock}`)
-      const adjustedQuantity = Math.max(availableStock, 0)
+    if (sanityProduct && item.quantity > totalAvailableStock && totalAvailableStock >= 0) {
+      console.log(`Auto-adjusting ${item.title} quantity from ${item.quantity} to ${totalAvailableStock}`)
+      const adjustedQuantity = Math.max(totalAvailableStock, 0)
       const sizeText = item.size ? ` (${item.size.toUpperCase()})` : ''
       
       if (adjustedQuantity === 0) {
@@ -56,7 +55,7 @@ export function CartItem({ item, sanityProduct }: CartItemProps) {
         toast.info(`${item.title}${sizeText} quantity reduced to ${adjustedQuantity} (stock limit)`)
       }
     }
-  }, [sanityProduct, availableStock, item.quantity, item.title, item.id, item.size, removeItem, updateItemQuantity])
+  }, [sanityProduct, totalAvailableStock, item.quantity, item.title, item.id, item.size, removeItem, updateItemQuantity])
 
   const handleQuantityChange = (newQuantity: number) => {
     if (newQuantity < 1) {
@@ -75,11 +74,11 @@ export function CartItem({ item, sanityProduct }: CartItemProps) {
 
   const stockWarning = isOverStock
   const stockMessage = stockWarning 
-    ? `ONLY ${availableStock} AVAILABLE` 
-    : sanityProduct && availableStock === 1
+    ? `ONLY ${totalAvailableStock} AVAILABLE` 
+    : sanityProduct && totalAvailableStock === 1
       ? 'LAST ONE'
-    : sanityProduct && availableStock <= 3 && availableStock > 1
-      ? `ONLY ${availableStock} LEFT IN STOCK`
+    : sanityProduct && totalAvailableStock <= 3 && totalAvailableStock > 1
+      ? `ONLY ${totalAvailableStock} LEFT IN STOCK`
       : null
 
   return (
@@ -140,7 +139,7 @@ export function CartItem({ item, sanityProduct }: CartItemProps) {
         {stockMessage && (
           <div className={`text-xs mb-2 ${
             stockWarning ? 'text-red-600' : 
-            availableStock === 1 ? 'text-red-600' : 
+            totalAvailableStock === 1 ? 'text-red-600' : 
             'text-orange-600'
           }`}>
             {stockMessage}
