@@ -190,10 +190,6 @@ export default function CartPage() {
               // Find corresponding Sanity product for stock validation
               const sanityProduct = sanityProducts.find(p => p.slug === item.id || p.id === item.id)
               
-              if (!sanityProduct) {
-                console.warn(`⚠️ No Sanity product found for cart item: ${item.id}`)
-              }
-              
               return (
                 <div key={`${item.id}-${item.size || 'no-size'}`}>
                   <CartItem 

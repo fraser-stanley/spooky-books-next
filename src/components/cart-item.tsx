@@ -36,15 +36,6 @@ export function CartItem({ item, sanityProduct }: CartItemProps) {
   // Check if current quantity exceeds total available stock (for warnings)
   const isOverStock = item.quantity > totalAvailableStock
 
-  // Debug logging
-  console.log(`🛒 Cart item debug for ${item.title}:`, {
-    localQuantity,
-    totalAvailableStock,
-    maxQuantity,
-    isOverStock,
-    disabled: localQuantity >= maxQuantity,
-    sanityProduct: !!sanityProduct
-  })
 
   useEffect(() => {
     setLocalQuantity(item.quantity)
@@ -68,14 +59,6 @@ export function CartItem({ item, sanityProduct }: CartItemProps) {
   }, [sanityProduct, totalAvailableStock, item.quantity, item.title, item.id, item.size, removeItem, updateItemQuantity])
 
   const handleQuantityChange = (newQuantity: number) => {
-    console.log(`🔄 Quantity change attempt for ${item.title}:`, {
-      current: localQuantity,
-      new: newQuantity,
-      maxQuantity,
-      totalAvailableStock,
-      willBlock: newQuantity > maxQuantity
-    })
-
     if (newQuantity < 1) {
       removeItem(item.id, item.size)
       return
@@ -83,7 +66,6 @@ export function CartItem({ item, sanityProduct }: CartItemProps) {
 
     if (newQuantity > maxQuantity) {
       // Don't allow quantity higher than available stock
-      console.log(`❌ Blocked quantity change - ${newQuantity} > ${maxQuantity}`)
       return
     }
 
