@@ -95,11 +95,7 @@ export function AddToCart({
   return (
     <button
       type="button"
-      className={
-        isAvailable 
-          ? styles.addToCart
-          : `${styles.addToCart} opacity-50 cursor-not-allowed bg-gray-300 text-gray-600 !hover:bg-gray-300 !active:transform-none !active:scale-100`
-      }
+      className={styles.addToCart}
       onClick={isAvailable ? handleAddToCart : undefined}
       disabled={!isAvailable}
       title={availableStock !== undefined ? `${availableStock} in stock` : undefined}

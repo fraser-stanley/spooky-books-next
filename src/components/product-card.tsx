@@ -69,13 +69,15 @@ export function ProductCard({ product, sanityProduct, eager }: ProductCardProps)
             return availableStock > 1 && availableStock <= 3 ? ` (ONLY ${availableStock} LEFT)` : '';
           })()}
           {!isOutOfStock && isApparel && variants && (() => {
-            // For apparel, find the lowest stock among available sizes
+            // For apparel, calculate total available stock across all sizes
             const availableVariants = variants.filter(v => getStockForDisplay(v.size) > 0);
             if (availableVariants.length === 0) return '';
             
-            const lowestStock = Math.min(...availableVariants.map(v => getStockForDisplay(v.size)));
-            if (lowestStock === 1) return ' (LAST ONE)';
-            return lowestStock <= 3 ? ` (ONLY ${lowestStock} LEFT)` : '';
+            const totalAvailableStock = availableVariants.reduce((sum, v) => sum + getStockForDisplay(v.size), 0);
+            
+            // Only show urgency if total available across all sizes is low
+            if (totalAvailableStock === 1) return ' (LAST ONE)';
+            return totalAvailableStock <= 3 ? ` (ONLY ${totalAvailableStock} LEFT)` : '';
           })()}
         </h2>
         <div className="">

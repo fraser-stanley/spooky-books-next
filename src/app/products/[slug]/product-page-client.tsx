@@ -60,9 +60,6 @@ export function ProductPageClient({ product, sanityProduct }: ProductPageClientP
           {currentAvailableStock > 1 && currentAvailableStock <= 3 && (
             <span className="text-orange-600 font-medium">ONLY {currentAvailableStock} LEFT</span>
           )}
-          {currentAvailableStock > 3 && (
-            <span className="text-green-600 font-medium">IN STOCK</span>
-          )}
         </div>
       )}
 

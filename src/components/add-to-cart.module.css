@@ -118,10 +118,18 @@
   }
 }
 
-.addToCart:hover {
+.addToCart:hover:not(:disabled) {
   background-color: rgb(31, 41, 55);
 }
 
-.addToCart:active {
+.addToCart:active:not(:disabled) {
   transform: scale(0.95);
+}
+
+.addToCart:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  background-color: rgb(209, 213, 219);
+  color: rgb(107, 114, 128);
+  transform: none;
 }
