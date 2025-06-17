@@ -33,10 +33,6 @@ export function CartItem({ item, sanityProduct }: CartItemProps) {
   // (not reduced by current cart quantity, since this IS the cart quantity)
   const maxQuantity = Math.min(totalAvailableStock, 10) // Cap at 10 for UI purposes
   
-  // Check if current quantity exceeds total available stock (for warnings)
-  const isOverStock = item.quantity > totalAvailableStock
-
-
   useEffect(() => {
     setLocalQuantity(item.quantity)
   }, [item.quantity])
@@ -64,8 +60,9 @@ export function CartItem({ item, sanityProduct }: CartItemProps) {
       return
     }
 
-    if (newQuantity > maxQuantity) {
-      // Don't allow quantity higher than available stock
+    // Only block increases beyond stock, but allow decreases
+    if (newQuantity > localQuantity && newQuantity > maxQuantity) {
+      // Don't allow quantity increases higher than available stock
       return
     }
 
@@ -73,14 +70,8 @@ export function CartItem({ item, sanityProduct }: CartItemProps) {
     updateItemQuantity(item.id, newQuantity, item.size)
   }
 
-  const stockWarning = isOverStock
-  const stockMessage = stockWarning 
-    ? `ONLY ${totalAvailableStock} AVAILABLE` 
-    : sanityProduct && totalAvailableStock === 1
-      ? 'LAST ONE'
-    : sanityProduct && totalAvailableStock <= 3 && totalAvailableStock > 1
-      ? `ONLY ${totalAvailableStock} LEFT IN STOCK`
-      : null
+  // Remove stock messages from cart page for cleaner interface
+  const stockMessage = null
 
   return (
     <div className="flex gap-6">
@@ -136,13 +127,9 @@ export function CartItem({ item, sanityProduct }: CartItemProps) {
           </div>
         </div>
 
-        {/* Stock Warning/Info */}
+        {/* Stock Warning/Info - Removed for cleaner cart interface */}
         {stockMessage && (
-          <div className={`text-xs mb-2 ${
-            stockWarning ? 'text-red-600' : 
-            totalAvailableStock === 1 ? 'text-red-600' : 
-            'text-orange-600'
-          }`}>
+          <div className="text-xs mb-2 text-red-600">
             {stockMessage}
           </div>
         )}
