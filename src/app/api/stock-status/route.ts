@@ -4,8 +4,8 @@ import { getAvailableStock } from '@/lib/utils/stock-validation'
 import type { SanityProduct } from '@/lib/sanity/types'
 
 const sanityClient = createClient({
-  projectId: process.env.NEXT_PUBLIC_SANITY_PROJECT_ID!,
-  dataset: process.env.NEXT_PUBLIC_SANITY_DATASET!,
+  projectId: process.env.NEXT_PUBLIC_SANITY_PROJECT_ID || '0gbx06x6',
+  dataset: process.env.NEXT_PUBLIC_SANITY_DATASET || 'production',
   apiVersion: '2023-05-03',
   token: process.env.SANITY_API_TOKEN,
   useCdn: false,
