@@ -97,7 +97,7 @@ This is a **Next.js 15 e-commerce site** for Spooky Books, migrated from Gatsby 
 - **SizeSelector**: Clean apparel size selection with minimal UI, strikethrough for sold-out sizes, and responsive grid
 - **CartButton**: Simplified inline text component showing "Cart" or "Cart (X)" format
 - **CartPage**: Mobile-first responsive design with full-width images on small screens, no discount functionality
-- **CartItem**: Unified stock calculation using identical logic from product pages, responsive layout with proper mobile image sizing
+- **CartItem**: Cart-specific stock calculation with sophisticated quantity validation, responsive layout with proper mobile image sizing
 - **SkeletonLoaders**: Responsive loading states matching mobile-first cart layout with full-width image skeletons
 
 ### Stock Management Components
@@ -232,8 +232,9 @@ html, body {
 - **Automatic Cart Adjustment**: Quantities automatically reduced when stock limits are exceeded
 
 **Unified Cart Stock Management (Latest):**
-- **Product Page Parity**: Cart quantity controls use identical stock calculation logic as product pages
-- **Real Stock Limits**: Removed arbitrary maximum quantities, now uses actual Sanity inventory data
+- **Cart-Specific Logic**: Sophisticated stock calculation that accounts for current item quantity in cart stepper
+- **Real Stock Limits**: Removed arbitrary maximum quantities, now uses actual Sanity inventory data with proper validation
+- **Reliable Quantity Controls**: Simplified validation logic prevents overselling while allowing proper quantity adjustments
 - **Mobile-First Cart Layout**: Responsive design with full-width images on mobile, proper spacing on desktop
 - **No Discount Functionality**: Completely removed discount code features from cart interface
 - **Toast Notifications**: Clear feedback when quantities are automatically adjusted due to stock limits
@@ -278,14 +279,21 @@ const lowestStock = Math.min(...availableVariants.map(v => getStockForDisplay(v.
 
 **Cart Quantity Logic (Latest Implementation):**
 ```tsx
-// Use identical logic as product pages for consistency
+// Cart-specific stock calculation accounting for current item quantity
 const getCurrentAvailableStock = () => {
   if (!sanityProduct) return null
   
-  const availableStock = getAvailableStock(sanityProduct, item.size)
-  const inCart = getCartItemQuantity(item.id, item.size)
-  // For cart stepper, available stock is total stock minus everything else in cart
-  return Math.max(0, availableStock - (inCart - localQuantity))
+  const totalAvailableStock = getAvailableStock(sanityProduct, item.size)
+  // For cart stepper: show how much more can be added beyond current quantity
+  const otherItemsInCart = getCartItemQuantity(item.id, item.size) - localQuantity
+  return Math.max(0, totalAvailableStock - otherItemsInCart)
+}
+
+// Simplified quantity validation - prevent increases beyond available stock
+if (newQuantity > localQuantity) {
+  if (currentAvailableStock !== null && newQuantity > currentAvailableStock) {
+    return // Block increase beyond stock limit
+  }
 }
 
 // Automatic adjustment with clear notifications
@@ -298,7 +306,7 @@ if (adjustedQuantity === 0) {
   toast.info(`${item.title}${sizeText} quantity reduced to ${adjustedQuantity} (stock limit)`)
 }
 
-// Button disabled logic matches product pages exactly
+// Button disabled when at stock limit
 disabled={currentAvailableStock !== null && localQuantity >= currentAvailableStock}
 ```
 
@@ -527,8 +535,8 @@ SANITY_STUDIO_PREVIEW_ORIGIN=https://your-domain.com
 ### Stock Management
 - **Publications**: Single `stockQuantity` field for entire product
 - **Apparel**: Individual `stockQuantity` per size variant in `variants` array
-- **Unified Logic**: Cart quantity controls use identical stock calculation method as product pages for consistency
-- **Real Stock Limits**: No arbitrary maximums - cart steppers respect actual Sanity inventory data
+- **Cart-Specific Logic**: Sophisticated quantity validation that accounts for current item quantity in cart calculations
+- **Real Stock Limits**: No arbitrary maximums - cart steppers respect actual Sanity inventory data with proper overflow prevention
 - **Validation**: Real-time stock checking during checkout session creation with automatic quantity adjustment
 - **Consistent Enforcement**: Stock limits enforced across product pages, cart quantity controls, and checkout process
 - **UI Indicators**: Smart button states and strikethrough for sold out items (no redundant text labels)
