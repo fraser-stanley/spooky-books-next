@@ -188,7 +188,11 @@ export default function CartPage() {
           <div className="space-y-8">
             {cart.map((item, index) => {
               // Find corresponding Sanity product for stock validation
-              const sanityProduct = sanityProducts.find(p => p.slug === item.id)
+              const sanityProduct = sanityProducts.find(p => p.slug === item.id || p.id === item.id)
+              
+              if (!sanityProduct) {
+                console.warn(`⚠️ No Sanity product found for cart item: ${item.id}`)
+              }
               
               return (
                 <div key={`${item.id}-${item.size || 'no-size'}`}>

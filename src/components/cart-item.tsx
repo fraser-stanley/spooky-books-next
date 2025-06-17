@@ -27,7 +27,7 @@ export function CartItem({ item, sanityProduct }: CartItemProps) {
   // Calculate available stock from Sanity
   const totalAvailableStock = sanityProduct 
     ? getAvailableStock(sanityProduct, item.size)
-    : 999 // Fallback for products without stock data
+    : 0 // Conservative fallback - no stock if no Sanity data
   
   // For cart quantity controls, the max should be the total available stock
   // (not reduced by current cart quantity, since this IS the cart quantity)
