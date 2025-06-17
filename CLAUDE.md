@@ -127,7 +127,7 @@ This is a **Next.js 15 e-commerce site** for Spooky Books, migrated from Gatsby 
 
 #### Core E-commerce APIs
 - **Sanity Webhook**: `/api/sanity-stripe` - Auto-creates Stripe products when Sanity content is published
-- **Optimized Checkout**: `/api/checkout` - **NEW** Single endpoint combining stock validation + session creation for 1-2 second checkout
+- **Optimized Checkout**: `/api/checkout` - **NEW** Single endpoint with rate limiting (5/min), combining stock validation + session creation for 1-2 second checkout
 - **Checkout Session**: `/api/create-checkout-session` - Legacy endpoint (replaced by `/api/checkout`)
 - **Stripe Webhook**: `/api/stripe-webhook` - Payment event processing with automatic stock deduction
 - **Product Sync**: `/api/sync-existing-products` - Bulk migration utility for existing products
@@ -150,6 +150,10 @@ This is a **Next.js 15 e-commerce site** for Spooky Books, migrated from Gatsby 
 - **Sync Status**: `/api/check-product-sync` - Monitor sync status between Sanity and Stripe
 - **Draft Mode**: `/api/draft-mode/enable` & `/api/draft-mode/disable` - Visual editing draft mode control
 - **Debug**: `/debug` - Sanity data debugging endpoint for development
+
+#### Rate Limiting & Monitoring APIs
+- **Rate Limit Stats**: `/api/rate-limit-stats` - Monitor rate limiter statistics and system health (admin-only)
+- **Test Rate Limit**: `/api/test-rate-limit` - Development endpoint for testing rate limiting behavior (dev-only)
 
 ### Route Patterns
 ```tsx
@@ -459,6 +463,54 @@ useEffect(() => {
   }
   if (cart.length > 0) loadStripe()
 }, [cart.length])
+```
+
+#### Rate Limiting Implementation (2024)
+**Production-Ready Rate Limiting for Checkout Protection:**
+- **Intelligent Limits**: 5 checkout attempts per minute per IP address
+- **Success Exemption**: Successful checkouts don't count against the limit (prevents legitimate user penalties)
+- **Automatic Cleanup**: Memory-efficient with automatic cleanup of expired rate limit entries
+- **Client Identification**: Multi-header IP detection (Vercel, Cloudflare, proxy-aware)
+- **Graceful Errors**: User-friendly rate limit messages with retry timing
+- **Monitoring**: Admin endpoint for rate limit statistics and system health
+
+**Rate Limiting Configuration:**
+```tsx
+// Rate limiter setup
+const checkoutRateLimiter = new RateLimiter({
+  maxRequests: 5,                    // 5 attempts per window
+  windowMs: 60 * 1000,              // 1 minute window
+  skipSuccessfulRequests: true       // Don't penalize successful checkouts
+})
+
+// IP detection with fallbacks
+function getClientIdentifier(request: Request): string {
+  const forwarded = request.headers.get('x-forwarded-for')
+  const realIp = request.headers.get('x-real-ip')
+  const cfConnectingIp = request.headers.get('cf-connecting-ip') // Cloudflare
+  const vercelForwarded = request.headers.get('x-vercel-forwarded-for') // Vercel
+  
+  return forwarded?.split(',')[0]?.trim() || realIp || cfConnectingIp || vercelForwarded || 'unknown'
+}
+
+// Checkout endpoint integration
+const clientId = getClientIdentifier(request)
+const rateLimitResult = checkoutRateLimiter.check(clientId)
+
+if (!rateLimitResult.allowed) {
+  return createRateLimitResponse(rateLimitResult) // 429 with Retry-After header
+}
+
+// On successful checkout, reduce rate limit count
+checkoutRateLimiter.recordSuccess(clientId)
+```
+
+**Client-Side Error Handling:**
+```tsx
+// Rate limit error handling in cart
+if (result.type === 'RATE_LIMIT_ERROR') {
+  setCheckoutError(result.message || 'Too many checkout attempts. Please wait a moment and try again.')
+}
 ```
 
 #### Visual Editing Usage

@@ -4,6 +4,11 @@ import { sanityClient } from '@/lib/sanity/client'
 import { reserveStock, type StockOperation } from '@/lib/sanity/stock-operations'
 import { validateCartStock } from '@/lib/utils/stock-validation'
 import type { SanityProduct } from '@/lib/sanity/types'
+import { 
+  checkoutRateLimiter, 
+  getClientIdentifier, 
+  createRateLimitResponse 
+} from '@/lib/utils/rate-limiter'
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
   apiVersion: '2025-05-28.basil',
@@ -25,6 +30,17 @@ interface CheckoutRequest {
 
 export async function POST(request: NextRequest) {
   try {
+    // Apply rate limiting
+    const clientId = getClientIdentifier(request)
+    const rateLimitResult = checkoutRateLimiter.check(clientId)
+    
+    if (!rateLimitResult.allowed) {
+      console.log(`🚫 Rate limit exceeded for client: ${clientId} (${rateLimitResult.totalHits} attempts)`)
+      return createRateLimitResponse(rateLimitResult)
+    }
+    
+    console.log(`✅ Rate limit check passed for client: ${clientId} (${rateLimitResult.totalHits}/5 attempts)`)
+
     const { items, productData, locale = 'en-US', currency = 'USD' }: CheckoutRequest = await request.json()
     
     if (!items || items.length === 0) {
@@ -235,6 +251,10 @@ export async function POST(request: NextRequest) {
 
     console.log('✅ Stock reserved successfully for session:', session.id)
     console.log('🚀 Optimized checkout completed successfully')
+
+    // Record successful checkout (reduces rate limit count)
+    checkoutRateLimiter.recordSuccess(clientId)
+    console.log(`📉 Rate limit count reduced for successful checkout: ${clientId}`)
 
     return NextResponse.json({
       sessionId: session.id,

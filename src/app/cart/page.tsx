@@ -120,6 +120,8 @@ export default function CartPage() {
           setCheckoutError(errorMessage)
         } else if (result.type === 'RESERVATION_ERROR') {
           setCheckoutError('Unable to reserve stock for checkout. Please try again.')
+        } else if (result.type === 'RATE_LIMIT_ERROR') {
+          setCheckoutError(result.message || 'Too many checkout attempts. Please wait a moment and try again.')
         } else {
           setCheckoutError(result.error || 'Failed to process checkout. Please try again.')
         }
