@@ -111,9 +111,9 @@ export function isInStock(product: SanityProduct, size?: string): boolean {
 }
 
 /**
- * Check if a product is low stock (5 or fewer available)
+ * Check if a product is low stock (3 or fewer available)
  */
-export function isLowStock(product: SanityProduct, size?: string, threshold: number = 5): boolean {
+export function isLowStock(product: SanityProduct, size?: string, threshold: number = 3): boolean {
   const available = getAvailableStock(product, size)
   return available > 0 && available <= threshold
 }
@@ -128,7 +128,11 @@ export function getStockStatusText(product: SanityProduct, size?: string): strin
     return 'SOLD OUT'
   }
   
-  if (available <= 5) {
+  if (available === 1) {
+    return 'LAST ONE'
+  }
+  
+  if (available <= 3) {
     return `ONLY ${available} LEFT`
   }
   

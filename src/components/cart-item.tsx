@@ -75,9 +75,11 @@ export function CartItem({ item, sanityProduct }: CartItemProps) {
 
   const stockWarning = isOverStock
   const stockMessage = stockWarning 
-    ? `Only ${availableStock} available` 
-    : sanityProduct && availableStock <= 5 && availableStock > 0
-      ? `${availableStock} left in stock`
+    ? `ONLY ${availableStock} AVAILABLE` 
+    : sanityProduct && availableStock === 1
+      ? 'LAST ONE'
+    : sanityProduct && availableStock <= 3 && availableStock > 1
+      ? `ONLY ${availableStock} LEFT IN STOCK`
       : null
 
   return (
@@ -136,7 +138,11 @@ export function CartItem({ item, sanityProduct }: CartItemProps) {
 
         {/* Stock Warning/Info */}
         {stockMessage && (
-          <div className={`text-xs mb-2 ${stockWarning ? 'text-red-600' : 'text-orange-600'}`}>
+          <div className={`text-xs mb-2 ${
+            stockWarning ? 'text-red-600' : 
+            availableStock === 1 ? 'text-red-600' : 
+            'text-orange-600'
+          }`}>
             {stockMessage}
           </div>
         )}

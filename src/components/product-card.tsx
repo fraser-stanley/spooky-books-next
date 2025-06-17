@@ -65,15 +65,17 @@ export function ProductCard({ product, sanityProduct, eager }: ProductCardProps)
           {isOutOfStock && " (SOLD OUT)"}
           {!isOutOfStock && !isApparel && (() => {
             const availableStock = getStockForDisplay();
-            return availableStock > 0 && availableStock <= 5 ? ` (ONLY ${availableStock} LEFT)` : '';
+            if (availableStock === 1) return ' (LAST ONE)';
+            return availableStock > 1 && availableStock <= 3 ? ` (ONLY ${availableStock} LEFT)` : '';
           })()}
           {!isOutOfStock && isApparel && variants && (() => {
-            const lowStockVariants = variants.filter(v => {
-              const availableStock = getStockForDisplay(v.size);
-              return availableStock > 0 && availableStock <= 5;
-            });
-            const totalLowStock = lowStockVariants.reduce((sum, v) => sum + getStockForDisplay(v.size), 0);
-            return totalLowStock > 0 ? ` (ONLY ${totalLowStock} LEFT)` : '';
+            // For apparel, find the lowest stock among available sizes
+            const availableVariants = variants.filter(v => getStockForDisplay(v.size) > 0);
+            if (availableVariants.length === 0) return '';
+            
+            const lowestStock = Math.min(...availableVariants.map(v => getStockForDisplay(v.size)));
+            if (lowestStock === 1) return ' (LAST ONE)';
+            return lowestStock <= 3 ? ` (ONLY ${lowestStock} LEFT)` : '';
           })()}
         </h2>
         <div className="">

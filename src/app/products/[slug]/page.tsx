@@ -49,7 +49,8 @@ export default async function ProductPage({ params }: ProductPageProps) {
             <h1 className="text-3xl font-bold mb-4">
               {product.title}
               {product.stockQuantity <= 0 && !product.variants && " (SOLD OUT)"}
-              {product.stockQuantity > 0 && product.stockQuantity <= 5 && !product.variants && ` (ONLY ${product.stockQuantity} LEFT)`}
+              {product.stockQuantity === 1 && !product.variants && " (LAST ONE)"}
+              {product.stockQuantity > 1 && product.stockQuantity <= 3 && !product.variants && ` (ONLY ${product.stockQuantity} LEFT)`}
             </h1>
             
             <div className="mb-4">

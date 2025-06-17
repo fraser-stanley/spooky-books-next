@@ -54,11 +54,14 @@ export function ProductPageClient({ product, sanityProduct }: ProductPageClientP
           {currentAvailableStock <= 0 && (
             <span className="text-red-600 font-medium">SOLD OUT</span>
           )}
-          {currentAvailableStock > 0 && currentAvailableStock <= 5 && (
+          {currentAvailableStock === 1 && (
+            <span className="text-red-600 font-medium">LAST ONE</span>
+          )}
+          {currentAvailableStock > 1 && currentAvailableStock <= 3 && (
             <span className="text-orange-600 font-medium">ONLY {currentAvailableStock} LEFT</span>
           )}
-          {currentAvailableStock > 5 && (
-            <span className="text-green-600 font-medium">In Stock</span>
+          {currentAvailableStock > 3 && (
+            <span className="text-green-600 font-medium">IN STOCK</span>
           )}
         </div>
       )}
