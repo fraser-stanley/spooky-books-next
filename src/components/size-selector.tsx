@@ -43,7 +43,7 @@ export function SizeSelector({ variants, sanityProduct, selectedSize, onSizeChan
                 border px-3 py-2 text-sm font-medium rounded
                 ${isSelected 
                   ? 'border-black bg-black text-white' 
-                  : 'border-gray-300 hover:border-gray-400'
+                  : `border-gray-300 ${!isOutOfStock ? 'hover:border-gray-400' : ''}`
                 }
                 ${isOutOfStock 
                   ? 'opacity-50 cursor-not-allowed' 
