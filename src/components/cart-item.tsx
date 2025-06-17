@@ -26,14 +26,21 @@ export function CartItem({ item, sanityProduct }: CartItemProps) {
 
   // Calculate maximum quantity this cart item can have
   const getCurrentAvailableStock = () => {
-    if (!sanityProduct) return null
+    if (!sanityProduct) {
+      console.log(`No sanityProduct for cart item: ${item.title} (id: ${item.id})`)
+      return null
+    }
     
     // For cart items: max quantity is simply the total available stock
     // since cart merges items - there's only one instance per product+size
-    return getAvailableStock(sanityProduct, item.size)
+    const availableStock = getAvailableStock(sanityProduct, item.size)
+    console.log(`Cart item ${item.title}: availableStock=${availableStock}, currentQuantity=${localQuantity}`)
+    return availableStock
   }
 
   const currentAvailableStock = getCurrentAvailableStock()
+  
+  console.log(`Cart item ${item.title}: currentAvailableStock=${currentAvailableStock}, + button disabled=${currentAvailableStock !== null && localQuantity >= currentAvailableStock}`)
 
   useEffect(() => {
     setLocalQuantity(item.quantity)
@@ -121,25 +128,22 @@ export function CartItem({ item, sanityProduct }: CartItemProps) {
         <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4 mb-2">
           <div className="flex items-center gap-2">
             <span className="text-sm text-gray-600 uppercase">Qty:</span>
-            <div className="flex items-center border border-gray-300 rounded">
-              <button
-                onClick={() => handleQuantityChange(localQuantity - 1)}
-                disabled={localQuantity <= 1}
-                className="px-3 py-1 text-sm hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                −
-              </button>
-              <span className="px-3 py-1 text-sm border-x border-gray-300 min-w-[3rem] text-center">
-                {localQuantity}
+            <input
+              type="number"
+              value={localQuantity}
+              onChange={(e) => {
+                const newQuantity = parseInt(e.target.value) || 1
+                handleQuantityChange(newQuantity)
+              }}
+              min={1}
+              max={currentAvailableStock || undefined}
+              className="w-16 px-2 py-1 text-sm border border-gray-300 rounded text-center"
+            />
+            {currentAvailableStock !== null && (
+              <span className="text-xs text-gray-500">
+                max {currentAvailableStock}
               </span>
-              <button
-                onClick={() => handleQuantityChange(localQuantity + 1)}
-                disabled={currentAvailableStock !== null && localQuantity >= currentAvailableStock}
-                className="px-3 py-1 text-sm hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                +
-              </button>
-            </div>
+            )}
           </div>
 
           <button
