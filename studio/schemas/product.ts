@@ -42,18 +42,29 @@ export const product = defineType({
       validation: Rule => Rule.required()
     }),
     defineField({
+      name: 'hasSizes',
+      type: 'boolean',
+      title: 'Has Sizes?',
+      description: 'Toggle ON for sized apparel (t-shirts, hoodies). Toggle OFF for non-sized items (tote bags, books, magazines).',
+      initialValue: false,
+      hidden: ({ document }: { document?: any }) => {
+        // Only show this toggle for Apparel category
+        return document?.category?._ref !== 'f16b392c-4089-4e48-8d5e-7401efb17902' // Apparel category ID
+      }
+    }),
+    defineField({
       name: 'stockQuantity',
       type: 'number',
       title: 'Stock Quantity',
       description: 'Available inventory. Use this field for: Publications (books, magazines) and Non-sized Apparel (tote bags, stickers). For sized apparel (t-shirts), use Size Variants below instead.',
       validation: Rule => Rule.required().min(0).integer(),
       initialValue: 0,
-      // Temporarily always visible for debugging
-      // hidden: ({ document }: { document?: any }) => {
-      //   const isApparel = document?.category?._ref === 'f16b392c-4089-4e48-8d5e-7401efb17902'
-      //   const hasVariants = document?.variants && document.variants.length > 0
-      //   return isApparel && hasVariants
-      // }
+      hidden: ({ document }: { document?: any }) => {
+        // Hide stock quantity only for apparel products that have sizes enabled
+        const isApparel = document?.category?._ref === 'f16b392c-4089-4e48-8d5e-7401efb17902'
+        const hasSizesEnabled = document?.hasSizes === true
+        return isApparel && hasSizesEnabled
+      }
     }),
     defineField({
       name: 'reservedQuantity',
@@ -67,9 +78,9 @@ export const product = defineType({
     }),
     defineField({
       name: 'variants',
-      title: 'Size Variants (Optional)',
+      title: 'Size Variants',
       type: 'array',
-      description: '⚠️ ONLY add sizes for apparel that comes in multiple sizes (t-shirts, hoodies). For non-sized apparel (tote bags, stickers), leave this completely empty and use the Stock Quantity field above instead.',
+      description: 'Add different sizes (XS, S, M, L, XL) with individual stock levels for each size.',
       of: [
         {
           type: 'object',
@@ -133,9 +144,10 @@ export const product = defineType({
         }
       ],
       hidden: ({ document }: { document?: any }) => {
-        // Only show variants for Apparel category
-        // Show if category reference is to Apparel category
-        return document?.category?._ref !== 'f16b392c-4089-4e48-8d5e-7401efb17902' // Apparel category ID
+        // Only show variants for Apparel category with sizes enabled
+        const isApparel = document?.category?._ref === 'f16b392c-4089-4e48-8d5e-7401efb17902'
+        const hasSizesEnabled = document?.hasSizes === true
+        return !(isApparel && hasSizesEnabled)
       }
     }),
     defineField({ 

@@ -21,6 +21,7 @@ export interface SanityProduct {
   price: number
   stockQuantity: number
   reservedQuantity?: number
+  hasSizes?: boolean
   category: SanityCategory
   heroImage: string
   secondaryImages?: string[]

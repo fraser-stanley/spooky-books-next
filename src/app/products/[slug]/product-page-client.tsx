@@ -19,7 +19,7 @@ export function ProductPageClient({ product, sanityProduct }: ProductPageClientP
   const { getCartItemQuantity } = useCart()
   
   const isApparel = product.category.toLowerCase() === 'apparel'
-  const hasSizes = isApparel && product.variants && product.variants.length > 0
+  const hasSizes = sanityProduct?.hasSizes || false
   
   // Calculate real-time available stock considering cart contents
   const getCurrentAvailableStock = (size?: string) => {

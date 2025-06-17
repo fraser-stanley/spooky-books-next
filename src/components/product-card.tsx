@@ -35,7 +35,7 @@ export function ProductCard({ product, sanityProduct, eager }: ProductCardProps)
   
   // Determine product type and stock checking logic
   const isApparel = category.toLowerCase() === 'apparel'
-  const hasSizes = isApparel && variants && variants.length > 0
+  const hasSizes = sanityProduct?.hasSizes || false
   
   const isOutOfStock = hasSizes 
     ? variants.every(v => getStockForDisplay(v.size) <= 0) // Sized apparel: check all variants

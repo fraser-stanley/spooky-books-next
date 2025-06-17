@@ -6,6 +6,7 @@ export const productQuery = `*[_type == "product" && slug.current == $slug][0]{
   price,
   stockQuantity,
   reservedQuantity,
+  hasSizes,
   category->{
     title,
     "slug": slug.current
@@ -29,6 +30,7 @@ export const productsQuery = `*[_type == "product"]{
   price,
   stockQuantity,
   reservedQuantity,
+  hasSizes,
   category->{
     title,
     "slug": slug.current
@@ -51,6 +53,7 @@ export const productsByCategoryQuery = `*[_type == "product" && category->slug.c
   price,
   stockQuantity,
   reservedQuantity,
+  hasSizes,
   category->{
     title,
     "slug": slug.current
