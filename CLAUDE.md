@@ -93,8 +93,8 @@ This is a **Next.js 15 e-commerce site** for Spooky Books, migrated from Gatsby 
 ### E-commerce Components
 - **ProductCard**: Grid-compatible with Next.js Image optimization, real-time stock status, and accurate "sold out" styling
 - **ProductListing**: Category filtering with Sanity CMS integration and live stock updates
-- **AddToCart**: Enhanced button with size support, real-time stock validation, and disabled states for sold out items
-- **SizeSelector**: Apparel size selection with individual size stock counts and color-coded availability
+- **AddToCart**: Enhanced button with smart disabled states, real-time stock validation, and apparel size awareness
+- **SizeSelector**: Clean apparel size selection with minimal UI, strikethrough for sold-out sizes, and responsive grid
 - **CartButton**: Simplified inline text component showing "Cart" or "Cart (X)" format
 - **CartPage**: Clean, minimal design with real-time stock validation and optimized checkout flow
 - **CartItemEnhanced**: Advanced cart items with stock warnings, quantity controls, and availability checks
@@ -143,6 +143,9 @@ This is a **Next.js 15 e-commerce site** for Spooky Books, migrated from Gatsby 
 #### System Administration APIs
 - **Init Reserved Quantity**: `/api/init-reserved-quantity` - Initialize reservedQuantity fields for existing products
 - **Cleanup Products**: `/api/cleanup-products` - Remove legacy fields from product documents
+- **Cleanup Reserved Fields**: `/api/cleanup-reserved-fields` - Remove orphaned reservedQuantity fields from existing products
+- **Fix Variant Keys**: `/api/fix-variant-keys` - Add missing _key properties to variant arrays for Sanity compliance
+- **Revalidate**: `/api/revalidate` - Webhook-triggered page revalidation optimized for Vercel free tier
 - **Sync Status**: `/api/check-product-sync` - Monitor sync status between Sanity and Stripe
 - **Draft Mode**: `/api/draft-mode/enable` & `/api/draft-mode/disable` - Visual editing draft mode control
 - **Debug**: `/debug` - Sanity data debugging endpoint for development
@@ -213,6 +216,16 @@ html, body {
 ```
 
 ## Development Patterns
+
+### Recent UX Improvements (2024)
+**Clean Product Page Interface:**
+- **Smart AddToCart States**: Shows disabled "Add to Cart" (not "SOLD OUT") when no size selected for apparel
+- **Minimal Size Selection**: Removed redundant "Size" headers and status text from SizeSelector component  
+- **Selected Size Display**: Clear "Size L" label appears under button when size is selected
+- **No Redundant Messaging**: Eliminated duplicate category labels and "sold out" text (button states communicate this)
+- **Streamlined Flow**: Removed confusing helper text like "Please select a size to add to cart"
+
+**Design Philosophy**: The interface now relies on clear visual states (disabled buttons, strikethrough text) rather than redundant text labels, creating a cleaner and more professional user experience.
 
 ### Import Conventions
 **Use kebab-case file names with named exports:**
@@ -355,9 +368,15 @@ function ProductPage({ product }) {
       )}
       <AddToCart
         product={product}
-        available={!needsSizeSelection && hasStock}
+        available={hasStock}
         selectedSize={selectedSize}
+        isApparel={isApparel}
       />
+      {selectedSize && (
+        <p className="text-sm text-gray-600 mt-2">
+          Size {selectedSize.toUpperCase()}
+        </p>
+      )}
     </>
   )
 }
@@ -413,8 +432,10 @@ SANITY_STUDIO_PREVIEW_ORIGIN=https://your-domain.com
 
 ### Webhook Configuration
 1. **Sanity Webhook**: Configure webhook in Sanity Studio to trigger `/api/sanity-stripe` on document publish
-2. **Event Types**: Listen for `create`, `update`, `delete` events on product documents
+2. **Event Types**: Listen for `create`, `update`, `delete` events on product and homepage documents
 3. **Automatic Sync**: Creates Stripe products/prices and saves IDs back to Sanity
+4. **Page Revalidation**: Automatic revalidation of affected pages via `/api/revalidate` webhook
+5. **Vercel Optimization**: Selective revalidation reduces build usage on free tier
 
 ### Visual Editing Setup
 1. **Draft Mode**: Enabled via `/api/draft-mode/enable` endpoint with SANITY_VIEWER_TOKEN
@@ -429,7 +450,30 @@ SANITY_STUDIO_PREVIEW_ORIGIN=https://your-domain.com
 - **Publications**: Single `stockQuantity` field for entire product
 - **Apparel**: Individual `stockQuantity` per size variant in `variants` array
 - **Validation**: Real-time stock checking during checkout session creation
-- **UI Indicators**: Consistent parentheses format for low stock and sold out states
+- **UI Indicators**: Button states and strikethrough for sold out items (no redundant text labels)
+
+### Data Integrity & Maintenance
+- **Schema Validation**: Automatic cleanup of unknown fields from Sanity documents
+- **Array Key Management**: UUID-based `_key` generation for Sanity array compliance  
+- **Webhook Optimization**: Selective page revalidation for Vercel free tier efficiency
+- **Error Recovery**: Comprehensive cleanup APIs for production data maintenance
+
+#### Maintenance API Usage
+```bash
+# Fix Sanity Studio "Unknown field found" errors
+POST /api/cleanup-reserved-fields
+
+# Resolve "Missing keys" errors in variant arrays  
+POST /api/fix-variant-keys
+
+# Trigger selective page revalidation
+POST /api/revalidate
+```
+
+**Common Issues Resolved:**
+- Unknown `reservedQuantity` fields appearing in Sanity Studio
+- Missing `_key` properties preventing variant array editing
+- Sanity Studio validation errors for system-managed fields
 
 ## Deployment Guide
 
