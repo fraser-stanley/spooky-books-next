@@ -33,6 +33,16 @@ export function CartItem({ item, sanityProduct }: CartItemProps) {
   // (not reduced by current cart quantity, since this IS the cart quantity)
   const maxQuantity = Math.min(totalAvailableStock, 10) // Cap at 10 for UI purposes
   
+  // Debug the calculated values
+  console.log(`📊 Cart item calculations for ${item.title}:`, {
+    totalAvailableStock,
+    maxQuantity,
+    localQuantity,
+    sanityProduct: !!sanityProduct,
+    plusDisabled: localQuantity >= maxQuantity,
+    minusDisabled: localQuantity <= 1
+  })
+  
   useEffect(() => {
     setLocalQuantity(item.quantity)
   }, [item.quantity])
@@ -55,6 +65,17 @@ export function CartItem({ item, sanityProduct }: CartItemProps) {
   }, [sanityProduct, totalAvailableStock, item.quantity, item.title, item.id, item.size, removeItem, updateItemQuantity])
 
   const handleQuantityChange = (newQuantity: number) => {
+    console.log(`🔄 Cart stepper debug for ${item.title}:`, {
+      current: localQuantity,
+      new: newQuantity,
+      totalAvailableStock,
+      maxQuantity,
+      sanityProduct: !!sanityProduct,
+      isIncrease: newQuantity > localQuantity,
+      isDecrease: newQuantity < localQuantity,
+      willBlock: newQuantity > localQuantity && newQuantity > maxQuantity
+    })
+
     if (newQuantity < 1) {
       removeItem(item.id, item.size)
       return
@@ -63,9 +84,11 @@ export function CartItem({ item, sanityProduct }: CartItemProps) {
     // Only block increases beyond stock, but allow decreases
     if (newQuantity > localQuantity && newQuantity > maxQuantity) {
       // Don't allow quantity increases higher than available stock
+      console.log(`❌ Blocked increase: ${newQuantity} > ${maxQuantity}`)
       return
     }
 
+    console.log(`✅ Allowing quantity change from ${localQuantity} to ${newQuantity}`)
     setLocalQuantity(newQuantity)
     updateItemQuantity(item.id, newQuantity, item.size)
   }
