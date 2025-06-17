@@ -45,7 +45,7 @@ export const product = defineType({
       name: 'stockQuantity',
       type: 'number',
       title: 'Stock Quantity',
-      description: 'Available inventory for publications and non-sized apparel (tote bags, etc). For sized apparel, use Size Variants below.',
+      description: 'Available inventory. Use this field for: Publications (books, magazines) and Non-sized Apparel (tote bags, stickers). For sized apparel (t-shirts), use Size Variants below instead.',
       validation: Rule => Rule.required().min(0).integer(),
       initialValue: 0,
       hidden: ({ document }: { document?: any }) => {
@@ -68,9 +68,9 @@ export const product = defineType({
     }),
     defineField({
       name: 'variants',
-      title: 'Size Variants (for sized Apparel)',
+      title: 'Size Variants (Optional)',
       type: 'array',
-      description: 'Add different sizes with individual stock levels. Only use for apparel that comes in multiple sizes (t-shirts, etc). Leave empty for non-sized apparel (tote bags, etc).',
+      description: '⚠️ ONLY add sizes for apparel that comes in multiple sizes (t-shirts, hoodies). For non-sized apparel (tote bags, stickers), leave this completely empty and use the Stock Quantity field above instead.',
       of: [
         {
           type: 'object',
