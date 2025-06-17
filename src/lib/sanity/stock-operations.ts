@@ -33,12 +33,6 @@ export async function reserveStock(
 ): Promise<{ success: boolean; errors: string[] }> {
   const errors: string[] = []
   
-  console.log('🔧 Stock reservation environment check:', {
-    projectId: process.env.NEXT_PUBLIC_SANITY_PROJECT_ID,
-    dataset: process.env.NEXT_PUBLIC_SANITY_DATASET,
-    hasToken: !!process.env.SANITY_API_TOKEN
-  })
-  
   try {
     // Start a transaction for atomic operations
     const transaction = sanityClient.transaction()

@@ -92,13 +92,6 @@ export async function GET(request: NextRequest) {
 
 export async function POST(request: NextRequest) {
   try {
-    // Debug environment variables
-    console.log('🔧 Environment check:', {
-      projectId: process.env.NEXT_PUBLIC_SANITY_PROJECT_ID,
-      dataset: process.env.NEXT_PUBLIC_SANITY_DATASET,
-      hasToken: !!process.env.SANITY_API_TOKEN
-    })
-
     const { items } = await request.json()
     
     if (!Array.isArray(items)) {
