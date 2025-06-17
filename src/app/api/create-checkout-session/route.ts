@@ -13,8 +13,8 @@ const sanityClient = createClient({
   projectId: process.env.NEXT_PUBLIC_SANITY_PROJECT_ID!,
   dataset: process.env.NEXT_PUBLIC_SANITY_DATASET!,
   apiVersion: '2023-05-03',
-  token: process.env.SANITY_API_TOKEN, // Add API token for write operations
-  useCdn: false, // Disable CDN for write operations
+  token: process.env.SANITY_API_TOKEN,
+  useCdn: false,
 })
 
 interface CartItem {
