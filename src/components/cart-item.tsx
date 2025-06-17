@@ -21,17 +21,16 @@ interface CartItemProps {
 }
 
 export function CartItem({ item, sanityProduct }: CartItemProps) {
-  const { removeItem, updateItemQuantity, getCartItemQuantity } = useCart()
+  const { removeItem, updateItemQuantity } = useCart()
   const [localQuantity, setLocalQuantity] = useState(item.quantity)
 
-  // Calculate available stock for the cart stepper
+  // Calculate maximum quantity this cart item can have
   const getCurrentAvailableStock = () => {
     if (!sanityProduct) return null
     
-    const totalAvailableStock = getAvailableStock(sanityProduct, item.size)
-    // For cart stepper: show how much more can be added beyond current quantity
-    const otherItemsInCart = getCartItemQuantity(item.id, item.size) - localQuantity
-    return Math.max(0, totalAvailableStock - otherItemsInCart)
+    // For cart items: max quantity is simply the total available stock
+    // since cart merges items - there's only one instance per product+size
+    return getAvailableStock(sanityProduct, item.size)
   }
 
   const currentAvailableStock = getCurrentAvailableStock()
