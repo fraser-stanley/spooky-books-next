@@ -77,11 +77,6 @@ export function ProductPageClient({ product, sanityProduct }: ProductPageClientP
           selectedSize={selectedSize}
           isApparel={isApparel}
         />
-        {selectedSize && (
-          <p className="text-sm text-gray-600 mt-2">
-            Size {selectedSize.toUpperCase()}
-          </p>
-        )}
       </div>
     </>
   )
