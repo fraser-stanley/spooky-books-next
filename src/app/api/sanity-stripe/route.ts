@@ -10,8 +10,8 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
 
 // Initialize Sanity client with write permissions
 const sanityClient = createClient({
-  projectId: process.env.NEXT_PUBLIC_SANITY_PROJECT_ID!,
-  dataset: process.env.NEXT_PUBLIC_SANITY_DATASET!,
+  projectId: process.env.NEXT_PUBLIC_SANITY_PROJECT_ID || '0gbx06x6',
+  dataset: process.env.NEXT_PUBLIC_SANITY_DATASET || 'production',
   token: process.env.SANITY_API_TOKEN!, // This needs a write token
   apiVersion: '2023-05-03',
   useCdn: false,
