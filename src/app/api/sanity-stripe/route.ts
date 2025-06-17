@@ -77,13 +77,18 @@ export async function POST(request: NextRequest) {
     console.log(`Creating Stripe product for: ${product.title}`)
 
     // Create Stripe product
+    const productName = product.author 
+      ? `${product.title} by ${product.author}`
+      : product.title
+    
     const stripeProduct = await stripe.products.create({
-      name: product.title,
+      name: productName,
       description: product.description || undefined,
       metadata: {
         sanity_id: product._id,
         sanity_slug: product.slug.current,
         vendor: 'Spooky Books',
+        ...(product.author && { author: product.author }),
       },
     })
 

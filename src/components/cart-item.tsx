@@ -71,6 +71,12 @@ export function CartItem({ item, sanityProduct }: CartItemProps) {
           )}
         </div>
 
+        {sanityProduct?.author && (
+          <div className="mb-1">
+            {sanityProduct.author}
+          </div>
+        )}
+
         <div className="mb-2">
           <CurrencyPrice price={item.price} />
         </div>

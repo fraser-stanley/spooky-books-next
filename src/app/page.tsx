@@ -97,6 +97,7 @@ function HeroPair({ section }: { section: SanityHeroPair }) {
       <TitleLink 
         href={productUrl} 
         title={section.title} 
+        author={section.linkedProduct.author}
         caption={section.caption}
       />
     </>
@@ -131,14 +132,15 @@ function HeroSingle({ section }: { section: SanityHeroSingle }) {
       <TitleLink 
         href={productUrl} 
         title={section.title} 
+        author={section.linkedProduct.author}
         caption={section.caption}
       />
     </>
   )
 }
 
-// Enhanced TitleLink component with caption support
-function TitleLink({ href, title, caption }: { href: string; title: string; caption?: string }) {
+// Enhanced TitleLink component with author and caption support
+function TitleLink({ href, title, author, caption }: { href: string; title: string; author?: string; caption?: string }) {
   return (
     <div className="col-span-12">
       <Link
@@ -147,6 +149,11 @@ function TitleLink({ href, title, caption }: { href: string; title: string; capt
         aria-label={`View product page`}
       >
         <h2>{title}</h2>
+        {author && (
+          <div className="text-md sm:text-sm">
+            {author}
+          </div>
+        )}
         {caption && (
           <p className="text-sm text-gray-600 mt-2 normal-case leading-relaxed">
             {caption}

@@ -103,6 +103,7 @@ export const homepageQuery = `*[_type == "homepage"][0]{
       linkedProduct->{
         _id,
         title,
+        author,
         "slug": slug.current,
         category->{
           title,
@@ -126,6 +127,7 @@ export const homepageQuery = `*[_type == "homepage"][0]{
       linkedProduct->{
         _id,
         title,
+        author,
         "slug": slug.current,
         category->{
           title,

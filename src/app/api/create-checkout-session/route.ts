@@ -48,6 +48,7 @@ export async function POST(request: NextRequest) {
       `*[_type == "product" && slug.current in $productIds] {
         "id": slug.current,
         title,
+        author,
         price,
         stockQuantity,
         reservedQuantity,
@@ -161,14 +162,19 @@ export async function POST(request: NextRequest) {
       } else {
         // Fallback to dynamic pricing if no Stripe price found
         console.log(`⚠️ No Stripe price found for ${cartItem.title}${cartItem.size ? ` (${cartItem.size})` : ''}, using dynamic pricing`)
+        const productName = product.author 
+          ? `${cartItem.title} by ${product.author}`
+          : cartItem.title
+        
         lineItems.push({
           price_data: {
             currency: 'usd',
             product_data: {
-              name: cartItem.title,
+              name: productName,
               metadata: {
                 product_id: cartItem.id,
-                ...(cartItem.size && { size: cartItem.size })
+                ...(cartItem.size && { size: cartItem.size }),
+                ...(product.author && { author: product.author })
               }
             },
             unit_amount: Math.round(product.price * 100) // Convert to cents

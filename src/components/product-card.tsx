@@ -15,7 +15,7 @@ export type ProductCardProps = {
 }
 
 export function ProductCard({ product, sanityProduct, eager }: ProductCardProps) {
-  const { title, slug, price, images, variants, category } = product
+  const { title, slug, price, images, variants } = product
   const image = images[0] // Use first image
   
   // Helper function to get available stock with fallback for Product type
@@ -34,11 +34,10 @@ export function ProductCard({ product, sanityProduct, eager }: ProductCardProps)
   }
   
   // Determine product type and stock checking logic
-  const isApparel = category.toLowerCase() === 'apparel'
   const hasSizes = sanityProduct?.hasSizes || false
   
   const isOutOfStock = hasSizes 
-    ? variants.every(v => getStockForDisplay(v.size) <= 0) // Sized apparel: check all variants
+    ? variants?.every(v => getStockForDisplay(v.size) <= 0) ?? true // Sized apparel: check all variants
     : getStockForDisplay() <= 0 // Publications and non-sized apparel: check main stock
 
   return (
@@ -83,6 +82,11 @@ export function ProductCard({ product, sanityProduct, eager }: ProductCardProps)
             return totalAvailableStock <= 3 ? ` (ONLY ${totalAvailableStock} LEFT)` : '';
           })()}
         </h2>
+        {sanityProduct?.author && (
+          <div className="">
+            {sanityProduct.author}
+          </div>
+        )}
         <div className="">
           <CurrencyPrice price={price} />
         </div>

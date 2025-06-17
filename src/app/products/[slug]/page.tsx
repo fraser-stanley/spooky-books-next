@@ -53,6 +53,12 @@ export default async function ProductPage({ params }: ProductPageProps) {
               {product.stockQuantity > 1 && product.stockQuantity <= 3 && !product.variants && ` (ONLY ${product.stockQuantity} LEFT)`}
             </h1>
             
+            {sanityProduct?.author && (
+              <div className="text-2xl mb-4">
+                {sanityProduct.author}
+              </div>
+            )}
+            
             <div className="mb-4">
               <span className="text-2xl">${product.price}</span>
             </div>

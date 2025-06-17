@@ -49,6 +49,7 @@ export interface SanityHeroPair {
   linkedProduct: {
     _id: string
     title: string
+    author?: string
     slug: string
     category: SanityCategory
   }
@@ -62,6 +63,7 @@ export interface SanityHeroSingle {
   linkedProduct: {
     _id: string
     title: string
+    author?: string
     slug: string
     category: SanityCategory
   }

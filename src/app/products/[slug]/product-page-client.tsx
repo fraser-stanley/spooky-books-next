@@ -18,7 +18,6 @@ export function ProductPageClient({ product, sanityProduct }: ProductPageClientP
   const [, setSelectedVariant] = useState<ProductVariant | null>(null)
   const { getCartItemQuantity } = useCart()
   
-  const isApparel = product.category.toLowerCase() === 'apparel'
   const hasSizes = sanityProduct?.hasSizes || false
   
   // Calculate real-time available stock considering cart contents
