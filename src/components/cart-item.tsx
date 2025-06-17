@@ -24,14 +24,14 @@ export function CartItem({ item, sanityProduct }: CartItemProps) {
   const { removeItem, updateItemQuantity, getCartItemQuantity } = useCart()
   const [localQuantity, setLocalQuantity] = useState(item.quantity)
 
-  // Use the exact same logic as product pages
+  // Calculate available stock for the cart stepper
   const getCurrentAvailableStock = () => {
     if (!sanityProduct) return null
     
-    const availableStock = getAvailableStock(sanityProduct, item.size)
-    const inCart = getCartItemQuantity(item.id, item.size)
-    // For cart stepper, available stock is total stock minus everything else in cart
-    return Math.max(0, availableStock - (inCart - localQuantity))
+    const totalAvailableStock = getAvailableStock(sanityProduct, item.size)
+    // For cart stepper: show how much more can be added beyond current quantity
+    const otherItemsInCart = getCartItemQuantity(item.id, item.size) - localQuantity
+    return Math.max(0, totalAvailableStock - otherItemsInCart)
   }
 
   const currentAvailableStock = getCurrentAvailableStock()
