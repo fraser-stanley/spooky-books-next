@@ -25,9 +25,9 @@ export default defineConfig({
                   .documentId('homepage')
               ),
             S.divider(),
-            // Regular documents
+            // Regular documents (hiding system-managed types)
             ...S.documentTypeListItems().filter(
-              (listItem) => !['homepage'].includes(listItem.getId()!)
+              (listItem) => !['homepage', 'stockReservation', 'idempotencyRecord', 'errorLog'].includes(listItem.getId()!)
             ),
           ])
     }),

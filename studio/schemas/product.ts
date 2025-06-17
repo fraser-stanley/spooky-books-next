@@ -125,7 +125,7 @@ export const product = defineType({
               title: 'Stripe Price ID',
               type: 'string',
               readOnly: true,
-              hidden: true,
+              hidden: true, // Always hidden - auto-managed by webhooks
             })
           ],
           preview: {
@@ -175,14 +175,14 @@ export const product = defineType({
       title: 'Stripe Price ID',
       type: 'string',
       readOnly: true,
-      hidden: true,
+      hidden: true, // Always hidden - auto-managed by webhooks
     }),
     defineField({
       name: 'stripeProductId',
       title: 'Stripe Product ID',
       type: 'string',
       readOnly: true,
-      hidden: true,
+      hidden: true, // Always hidden - auto-managed by webhooks
     }),
   ],
   preview: {
