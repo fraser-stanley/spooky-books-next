@@ -4,9 +4,11 @@ import { revalidatePath, revalidateTag } from 'next/cache'
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json()
+    console.log(`🚀 Webhook received! Document type: ${body._type}, ID: ${body._id}`)
     
     // Validate webhook payload
     if (!body || !body._type) {
+      console.log('❌ Invalid webhook payload - missing document type')
       return NextResponse.json(
         { error: 'Invalid payload - missing document type' },
         { status: 400 }
