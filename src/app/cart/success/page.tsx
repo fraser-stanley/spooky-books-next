@@ -65,4 +65,4 @@ export default function CheckoutSuccessPage() {
   )
 }
 
-// Force rebuild trigger
+// Updated checkout success page with proper navigation and styling
