@@ -29,24 +29,12 @@ export function ProductCard({ product, sanityProduct, eager }: ProductCardProps)
         const variant = variants.find(v => v.size === size)
         return variant ? variant.stockQuantity : 0
       }
-      return product.stockQuantity
+      return product.stockQuantity || 0 // Handle null/undefined stockQuantity
     }
   }
   
   // Determine product type and stock checking logic
   const hasSizes = sanityProduct?.variants && sanityProduct.variants.length > 0
-  
-  // Debug logging for Halloween tee
-  if (product.slug === 'halloween-tee') {
-    console.log('Halloween tee debug:', {
-      slug: product.slug,
-      hasSizes,
-      sanityProduct: sanityProduct ? 'present' : 'missing',
-      variants: sanityProduct?.variants?.length || 0,
-      mainStock: sanityProduct?.stockQuantity,
-      variantStocks: sanityProduct?.variants?.map(v => ({ size: v.size, stock: v.stockQuantity }))
-    })
-  }
   
   const isOutOfStock = hasSizes 
     ? sanityProduct.variants.every(v => getStockForDisplay(v.size) <= 0) // Sized apparel: check all variants

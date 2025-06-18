@@ -11,7 +11,7 @@ export function adaptSanityProduct(sanityProduct: SanityProduct): Product {
     title: sanityProduct.title,
     slug: sanityProduct.slug,
     price: sanityProduct.price,
-    stockQuantity: sanityProduct.stockQuantity,
+    stockQuantity: sanityProduct.stockQuantity || 0, // Default to 0 for sized apparel
     currency: "USD", // Default currency, can be made configurable later
     category: sanityProduct.category.title,
     images: [
