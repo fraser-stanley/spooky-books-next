@@ -64,3 +64,5 @@ export default function CheckoutSuccessPage() {
     </Suspense>
   )
 }
+
+// Force rebuild trigger
