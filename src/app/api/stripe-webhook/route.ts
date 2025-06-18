@@ -4,6 +4,7 @@ import { headers } from 'next/headers'
 import { deductStock, releaseStock } from '@/lib/sanity/stock-operations'
 import { sanityClient } from '@/lib/sanity/client'
 import type { StockOperation } from '@/lib/sanity/stock-operations'
+import { revalidatePath, revalidateTag } from 'next/cache'
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
   apiVersion: '2025-05-28.basil',
@@ -122,6 +123,19 @@ async function handleCheckoutSessionExpired(session: Stripe.Checkout.Session) {
     
     if (result.success) {
       console.log(`Released stock for expired session ${session.id}`)
+      
+      // Immediately revalidate cache to show released stock
+      revalidatePath('/products')
+      revalidatePath('/products/category/Publications')
+      revalidatePath('/products/category/apparel')
+      revalidateTag('products')
+      
+      // Revalidate specific product pages
+      for (const operation of stockOperations) {
+        revalidatePath(`/products/${operation.productId}`)
+      }
+      
+      console.log(`🔄 Cache revalidated after stock release`)
     } else {
       console.error(`Failed to release stock for expired session ${session.id}:`, result.errors)
     }
@@ -184,6 +198,19 @@ async function handlePaymentSucceeded(paymentIntent: Stripe.PaymentIntent) {
     
     if (result.success) {
       console.log(`Successfully deducted stock for payment ${paymentIntent.id}`)
+      
+      // CRITICAL: Immediately revalidate cache to prevent overselling
+      revalidatePath('/products')
+      revalidatePath('/products/category/Publications')
+      revalidatePath('/products/category/apparel')
+      revalidateTag('products')
+      
+      // Revalidate specific product pages for faster updates
+      for (const operation of stockOperations) {
+        revalidatePath(`/products/${operation.productId}`)
+      }
+      
+      console.log(`🔄 Cache revalidated immediately after stock deduction`)
     } else {
       console.error(`Failed to deduct stock for payment ${paymentIntent.id}:`, result.errors)
       // TODO: Add alerting for failed stock deduction on successful payment
