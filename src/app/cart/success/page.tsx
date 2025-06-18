@@ -43,7 +43,7 @@ function SuccessContent() {
             href="/products" 
             className={`${styles.addToCart} block text-center font-normal text-xs uppercase tracking-wide`}
           >
-            Continue Shopping
+            CONTINUE SHOPPING
           </Link>
           <Link 
             href="/" 
