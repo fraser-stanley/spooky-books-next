@@ -19,7 +19,7 @@ function SuccessContent() {
   }, [sessionId, clearCart])
 
   return (
-    <div className="flex flex-col items-center justify-center text-center min-h-screen">
+    <div className="flex flex-col items-center justify-center text-center py-16">
       <div className="max-w-md">
         <div className="text-green-600 mb-6">
           <svg className="w-16 h-16 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -41,7 +41,7 @@ function SuccessContent() {
         <div className="space-y-4">
           <Link 
             href="/products" 
-            className={`${styles.addToCart} block text-center font-normal text-xs uppercase tracking-wide`}
+            className={`${styles.addToCart} inline-block text-center font-normal text-xs uppercase tracking-wide`}
           >
             CONTINUE SHOPPING
           </Link>
