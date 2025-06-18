@@ -68,13 +68,16 @@ This is a **Next.js 15 e-commerce site** for Spooky Books, migrated from Gatsby 
 - **Real-time Validation**: Live stock checking with cart quantity consideration
 - **Overselling Prevention**: Comprehensive validation before checkout session creation
 
-### Cart Context
+### Cart Context with Persistence (2024)
 - **Location**: `src/components/cart-contex.tsx`
 - **Provider**: Wraps entire app in `layout.tsx`
 - **State**: CartItem[] with quantity, size variant, and total calculation
 - **Operations**: addItem (with size-aware merging), removeItem (with size), clearCart
 - **Hook**: `useCart()` with error handling for context usage
 - **Size Support**: Tracks size variants for apparel products as separate cart items
+- **Persistence**: localStorage with 30-day expiration, version control, and automatic hydration
+- **Recovery**: Seamless cart restoration on page reload, tab reopen, and Stripe return (cancel)
+- **Clearing**: Cart only cleared on successful payment completion (/cart/success)
 
 ### Currency Localization
 - **Hook**: `src/lib/hooks/use-locale-currency.ts` - Detects browser language and maps to appropriate currency
@@ -512,6 +515,83 @@ if (result.type === 'RATE_LIMIT_ERROR') {
   setCheckoutError(result.message || 'Too many checkout attempts. Please wait a moment and try again.')
 }
 ```
+
+#### Cart Persistence Implementation (2024)
+**Seamless Cart Recovery Across Sessions:**
+- **localStorage Integration**: Cart data persists across page reloads, tab closures, and browser restarts
+- **Automatic Hydration**: Cart state restored on app load without user intervention
+- **Version Control**: Cart schema versioning prevents compatibility issues during updates
+- **Expiration Logic**: 30-day automatic cleanup of stale cart data
+- **Error Handling**: Graceful fallback when localStorage is unavailable or corrupt
+- **Stripe Flow Preservation**: Cart survives Stripe redirect cancellation (only cleared on payment success)
+
+**Technical Implementation:**
+```tsx
+// localStorage utilities with error handling
+const storage = {
+  get: (): StoredCart | null => {
+    const stored = localStorage.getItem(CART_STORAGE_KEY)
+    const data: StoredCart = JSON.parse(stored)
+    
+    // Version compatibility check
+    if (data.version !== CART_VERSION) {
+      storage.clear()
+      return null
+    }
+    
+    // Expiration check (30 days)
+    const daysSinceStored = (Date.now() - data.timestamp) / (1000 * 60 * 60 * 24)
+    if (daysSinceStored > CART_EXPIRY_DAYS) {
+      storage.clear()
+      return null
+    }
+    
+    return data
+  },
+  
+  set: (items: CartItem[]): void => {
+    const data: StoredCart = {
+      items,
+      timestamp: Date.now(),
+      version: CART_VERSION
+    }
+    localStorage.setItem(CART_STORAGE_KEY, JSON.stringify(data))
+  }
+}
+
+// Cart provider with persistence
+export function CartProvider({ children }) {
+  const [cart, setCart] = useState<CartItem[]>([])
+  const [isHydrated, setIsHydrated] = useState(false)
+
+  // Hydrate from localStorage on mount
+  useEffect(() => {
+    const storedCart = storage.get()
+    if (storedCart?.items?.length > 0) {
+      setCart(storedCart.items)
+    }
+    setIsHydrated(true)
+  }, [])
+
+  // Auto-save cart changes (after hydration)
+  useEffect(() => {
+    if (isHydrated) {
+      storage.set(cart)
+    }
+  }, [cart, isHydrated])
+}
+```
+
+**Cart Clearing Behavior:**
+- **Page Reload**: ✅ Cart persists
+- **Tab Close/Reopen**: ✅ Cart persists
+- **Browser Restart**: ✅ Cart persists (30 days)
+- **Stripe Cancel**: ✅ Cart persists (returns to /cart)
+- **Stripe Success**: ❌ Cart cleared (at /cart/success)
+- **Manual Clear**: ❌ Cart cleared from both memory and localStorage
+
+**Testing Endpoint:**
+- **Development**: `/cart/test-persistence` - Interactive testing interface for cart persistence behavior
 
 #### Visual Editing Usage
 ```tsx
