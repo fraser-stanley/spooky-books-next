@@ -1,3 +1,5 @@
+import { PortableTextBlock } from '@portabletext/types'
+
 export interface SanityCategory {
   title: string
   slug: string
@@ -17,7 +19,8 @@ export interface SanityProduct {
   title: string
   author: string
   slug: string
-  description: string
+  description: string // Legacy plaintext description
+  richDescription?: PortableTextBlock[] // New rich text description
   price: number
   stockQuantity: number
   reservedQuantity?: number

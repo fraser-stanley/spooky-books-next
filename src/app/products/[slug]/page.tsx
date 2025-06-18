@@ -4,6 +4,7 @@ import { Layout } from "@/components/layout"
 import { getProduct, getCategories } from "@/lib/sanity/queries"
 import { adaptSanityProduct } from "@/lib/sanity/adapters"
 import { ProductPageClient } from "./product-page-client"
+import { ProductDescription, LegacyDescription } from "@/components/portable-text"
 
 interface ProductPageProps {
   params: Promise<{ slug: string }>
@@ -64,19 +65,14 @@ export default async function ProductPage({ params }: ProductPageProps) {
             </div>
 
 
-        {product.description?.trim() && (
-          <div className="text-pretty pr-4 sm:pr-8 mb-4 leading-[1.5] max-w-prose [text-rendering:optimizeLegibility] antialiased ">
-            {product.description
-              .replace(/\r\n/g, '\n')
-              .replace(/\n{3,}/g, '\n\n')
-              .split('\n\n')
-              .map((para, idx) => (
-                <p key={idx} className="mb-4">
-                  {para}
-                </p>
-              ))}
-          </div>
-        )}
+            {/* Rich text description (new) or fallback to legacy plaintext */}
+            {sanityProduct?.richDescription ? (
+              <ProductDescription value={sanityProduct.richDescription} />
+            ) : (
+              product.description?.trim() && (
+                <LegacyDescription text={product.description} />
+              )
+            )}
 
 
             
