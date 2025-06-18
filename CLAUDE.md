@@ -8,6 +8,8 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - `npm run build` - Build production version
 - `npm run start` - Start production server
 - `npm run lint` - Run ESLint for code quality checks
+- `npm run inventory:fix` - Fix Sanity Studio issues and initialize inventory system
+- `npm run inventory:verify` - Verify autonomous inventory system health and configuration
 
 ## Architecture Overview
 
@@ -211,6 +213,12 @@ export async function generateStaticParams() {
   - `studio/schemas/` - Product, category, and homepage schema definitions
 - `public/images/` - Product images and static assets
 - `src/webfonts/` - Custom Neue Haas Unica Pro font files
+- `scripts/` - Maintenance and setup scripts for inventory management
+  - `scripts/fix-sanity-studio.js` - Fix Sanity Studio issues and initialize inventory fields
+  - `scripts/verify-inventory-setup.js` - Verify autonomous inventory system configuration
+  - `scripts/fix-sized-apparel-stock.js` - Remove main stockQuantity from sized apparel products
+  - `scripts/reset-all-reservations.js` - Comprehensive reset of all inventory reservations
+  - `scripts/init-reserved-quantity.js` - Initialize reservedQuantity fields for existing products
 
 ## Styling System
 
@@ -273,6 +281,12 @@ html, body {
 - **Universal Threshold**: ≤3 stock threshold creates clear urgency without overwhelming users
 - **Consistent Formatting**: Uppercase messaging across all contexts for professional appearance
 - **Automatic Cart Adjustment**: Quantities automatically reduced when stock limits are exceeded
+
+**Fixed Sized Apparel Stock Detection (Latest):**
+- **ProductCard Logic**: Fixed `hasSizes` detection to check actual `sanityProduct.variants` instead of non-existent properties
+- **Main Stock Removal**: Sized apparel products now have `stockQuantity: null` to prevent confusion with variant-level stock
+- **Proper Stock Display**: Resolved "(SOLD OUT)" showing incorrectly when sizes have available stock
+- **Maintenance Scripts**: Added `fix-sized-apparel-stock.js` and `reset-all-reservations.js` for data cleanup
 
 **Unified Cart Stock Management (Latest):**
 - **Cart-Specific Logic**: Sophisticated stock calculation that accounts for current item quantity in cart stepper
@@ -906,6 +920,32 @@ SANITY_STUDIO_PREVIEW_ORIGIN=https://spooky-books-next.vercel.app
 2. **Trigger Events**: Document create, update, delete
 3. **Filter**: `_type == "product"`
 4. **Auto-sync**: Creates Stripe products and saves IDs back to Sanity
+
+### Autonomous System Configuration
+**Vercel Cron Jobs** (`vercel.json`):
+```json
+{
+  "crons": [
+    {
+      "path": "/api/cron/cleanup-inventory",
+      "schedule": "*/15 * * * *"
+    },
+    {
+      "path": "/api/cron/health-check", 
+      "schedule": "*/5 * * * *"
+    },
+    {
+      "path": "/api/cron/auto-remediation",
+      "schedule": "0 * * * *"
+    }
+  ]
+}
+```
+
+**Cron Schedule Breakdown:**
+- **Every 15 minutes**: Cleanup expired inventory reservations and stale data
+- **Every 5 minutes**: Monitor system health and log critical issues  
+- **Every hour**: Automatically fix common inventory issues and perform self-healing operations
 
 ## Performance Optimizations (2024)
 
