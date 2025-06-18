@@ -26,7 +26,54 @@ export const product = defineType({
     defineField({ 
       name: 'description', 
       type: 'text', 
-      title: 'Description' 
+      title: 'Description (Legacy - will be removed)',
+      description: 'Copy this text to Rich Description below, then delete this field content'
+    }),
+    defineField({
+      name: 'richDescription',
+      type: 'array',
+      title: 'Rich Description',
+      description: 'Rich text description with formatting support (bold, italics, paragraphs, etc.)',
+      of: [
+        {
+          type: 'block',
+          styles: [
+            { title: 'Normal', value: 'normal' },
+            { title: 'Heading 4', value: 'h4' },
+            { title: 'Heading 5', value: 'h5' },
+            { title: 'Quote', value: 'blockquote' }
+          ],
+          marks: {
+            decorators: [
+              { title: 'Strong', value: 'strong' },
+              { title: 'Emphasis', value: 'em' }
+            ],
+            annotations: [
+              {
+                title: 'URL',
+                name: 'link',
+                type: 'object',
+                fields: [
+                  {
+                    title: 'URL',
+                    name: 'href',
+                    type: 'url',
+                    validation: Rule => Rule.uri({
+                      scheme: ['http', 'https', 'mailto', 'tel']
+                    })
+                  },
+                  {
+                    title: 'Open in new tab',
+                    name: 'blank',
+                    type: 'boolean',
+                    initialValue: true
+                  }
+                ]
+              }
+            ]
+          }
+        }
+      ]
     }),
     defineField({ 
       name: 'price', 
