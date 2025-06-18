@@ -4,34 +4,24 @@ import { PortableTextBlock } from '@portabletext/types'
 // Component configuration for rendering Portable Text
 const components = {
   block: {
-    normal: ({ children }: { children: React.ReactNode }) => (
-      <p className="mb-4">{children}</p>
-    ),
-    h4: ({ children }: { children: React.ReactNode }) => (
-      <h4 className="text-lg font-medium mb-3 mt-6">{children}</h4>
-    ),
-    h5: ({ children }: { children: React.ReactNode }) => (
-      <h5 className="text-base font-medium mb-2 mt-4">{children}</h5>
-    ),
-    blockquote: ({ children }: { children: React.ReactNode }) => (
+    normal: ({ children }: any) => <p className="mb-4">{children}</p>,
+    h4: ({ children }: any) => <h4 className="text-lg font-medium mb-3 mt-6">{children}</h4>,
+    h5: ({ children }: any) => <h5 className="text-base font-medium mb-2 mt-4">{children}</h5>,
+    blockquote: ({ children }: any) => (
       <blockquote className="border-l-4 border-gray-300 pl-4 italic mb-4 text-gray-700">
         {children}
       </blockquote>
     )
   },
   marks: {
-    strong: ({ children }: { children: React.ReactNode }) => (
-      <strong className="font-semibold">{children}</strong>
-    ),
-    em: ({ children }: { children: React.ReactNode }) => (
-      <em className="italic">{children}</em>
-    ),
-    link: ({ children, value }: { children: React.ReactNode; value: { href: string; blank?: boolean } }) => (
+    strong: ({ children }: any) => <strong className="font-semibold">{children}</strong>,
+    em: ({ children }: any) => <em className="italic">{children}</em>,
+    link: ({ children, value }: any) => (
       <a 
-        href={value.href} 
+        href={value?.href || '#'} 
         className="underline hover:no-underline text-blue-600 hover:text-blue-800 transition-colors" 
-        target={value.blank ? "_blank" : undefined}
-        rel={value.blank ? "noopener noreferrer" : undefined}
+        target={value?.blank ? "_blank" : undefined}
+        rel={value?.blank ? "noopener noreferrer" : undefined}
       >
         {children}
       </a>

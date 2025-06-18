@@ -10,7 +10,7 @@ import { cleanupExpiredReservations } from '@/lib/sanity/stock-operations'
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json()
-    const { action, productId, force = false } = body
+    const { action, productId } = body
 
     switch (action) {
       case 'cleanup-expired':

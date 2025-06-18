@@ -1,4 +1,4 @@
-import { Suspense } from 'react'
+// import { Suspense } from 'react'
 
 export const dynamic = 'force-dynamic'
 
@@ -248,6 +248,7 @@ export default async function AutonomousStatusPage() {
   )
 }
 
+/*
 function LoadingStatus() {
   return (
     <div className="p-8 max-w-6xl">
@@ -263,3 +264,4 @@ function LoadingStatus() {
     </div>
   )
 }
+*/

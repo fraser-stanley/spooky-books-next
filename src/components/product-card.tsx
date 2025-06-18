@@ -37,7 +37,7 @@ export function ProductCard({ product, sanityProduct, eager }: ProductCardProps)
   const hasSizes = sanityProduct?.variants && sanityProduct.variants.length > 0
   
   const isOutOfStock = hasSizes 
-    ? sanityProduct.variants.every(v => getStockForDisplay(v.size) <= 0) // Sized apparel: check all variants
+    ? sanityProduct?.variants?.every(v => getStockForDisplay(v.size) <= 0) ?? true // Sized apparel: check all variants
     : getStockForDisplay() <= 0 // Publications and non-sized apparel: check main stock
 
   return (

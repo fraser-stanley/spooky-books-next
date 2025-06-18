@@ -47,14 +47,14 @@ export async function GET(request: NextRequest) {
       if (criticalOversellingIssues.length > 0) {
         console.error(`   - ${criticalOversellingIssues.length} critical overselling issues detected`)
         criticalOversellingIssues.forEach(issue => {
-          console.error(`     * ${issue.message}`)
+          console.error(`     * ${issue.details}`)
         })
       }
       
       if (highSeverityRaceConditions.length > 0) {
         console.warn(`   - ${highSeverityRaceConditions.length} high-severity race condition patterns`)
         highSeverityRaceConditions.forEach(pattern => {
-          console.warn(`     * ${pattern.description}`)
+          console.warn(`     * ${pattern.details}`)
         })
       }
     }

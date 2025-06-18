@@ -1,6 +1,4 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { inventoryHealthCheck } from '@/lib/utils/error-handling'
-import { checkForOverselling } from '@/lib/utils/inventory-monitoring'
 import { sanityClient } from '@/lib/sanity/client'
 import { revalidatePath, revalidateTag } from 'next/cache'
 
@@ -31,11 +29,11 @@ export async function GET(request: NextRequest) {
       console.log('🔍 Checking for stale reservations...')
       
       // Get all reservation documents to see what's actually reserved
-      const activeReservations = await sanityClient.fetch(
-        `*[_type == "stockReservation" && expiresAt > now()]{ sessionId, operations }`
-      )
+      // const activeReservations = await sanityClient.fetch(
+      //   `*[_type == "stockReservation" && expiresAt > now()]{ sessionId, operations }`
+      // )
       
-      const activeSessionIds = new Set(activeReservations.map((r: {sessionId: string}) => r.sessionId))
+      // const activeSessionIds = new Set(activeReservations.map((r: {sessionId: string}) => r.sessionId))
       
       // Find products with reserved stock but no active reservations
       const productsWithReservations = await sanityClient.fetch(`
@@ -172,7 +170,7 @@ export async function GET(request: NextRequest) {
 
         // Reset variant high reserved quantities
         if (product.variants) {
-          product.variants.forEach((variant: {size: string, reservedQuantity: number}, index: number) => {
+          product.variants.forEach((variant: {size: string, reservedQuantity: number}) => {
             // Find the actual index in the full variants array
             // This is a simplified approach - in production you'd want more robust indexing
             transaction.patch(product._id, {

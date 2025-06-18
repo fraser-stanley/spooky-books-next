@@ -250,7 +250,7 @@ async function handleEmergencyCleanup() {
   }
 }
 
-async function autoFixNegativeStock(product: any) {
+async function autoFixNegativeStock(product: { _id: string; title?: string; stockQuantity: number; reservedQuantity?: number; variants?: Array<{ stockQuantity: number; reservedQuantity?: number }> }) {
   const transaction = sanityClient.transaction()
   let needsUpdate = false
 
@@ -264,7 +264,7 @@ async function autoFixNegativeStock(product: any) {
 
   // Fix variant negative stock
   if (product.variants) {
-    product.variants.forEach((variant: any, index: number) => {
+    product.variants.forEach((variant, index: number) => {
       if ((variant.reservedQuantity || 0) > variant.stockQuantity) {
         transaction.patch(product._id, {
           set: { [`variants[${index}].reservedQuantity`]: Math.max(0, variant.stockQuantity) }
@@ -280,7 +280,7 @@ async function autoFixNegativeStock(product: any) {
   }
 }
 
-async function autoFixOverselling(criticalIssues: any[]) {
+async function autoFixOverselling(criticalIssues: Array<{ type: string; productId: string; [key: string]: unknown }>) {
   for (const issue of criticalIssues) {
     try {
       // Parse the issue and apply appropriate fix
