@@ -34,21 +34,26 @@ export async function POST(request: NextRequest) {
     if (body._type === 'product') {
       console.log(`🔄 Revalidating pages for product: ${body.title || body._id}`)
       
-      // Revalidate product-related pages
+      // CRITICAL: Always revalidate ALL category pages when ANY product changes
+      // This ensures products appear in correct categories immediately
       revalidatePath('/products')
       revalidatePath('/products/category/Publications')
       revalidatePath('/products/category/apparel')
+      revalidatePath('/') // Homepage may show category-specific products
       
       // Revalidate specific product page if slug exists
       if (body.slug?.current) {
         revalidatePath(`/products/${body.slug.current}`)
       }
       
-      // Revalidate by tags (if using tagged caching)
-      revalidateTag('products')
-      revalidateTag('categories')
+      // ENHANCED: Clear more comprehensive cache tags for category sync
+      revalidateTag('products') // All product queries
+      revalidateTag('categories') // Category listing queries
+      revalidateTag('homepage') // Homepage product displays
+      revalidateTag('publications') // Publications-specific cache
+      revalidateTag('apparel') // Apparel-specific cache
       
-      console.log(`✅ Product revalidation complete: ${body.title || body._id}`)
+      console.log(`✅ Product revalidation complete (with category sync): ${body.title || body._id}`)
       
       return NextResponse.json({ 
         success: true, 
@@ -58,6 +63,7 @@ export async function POST(request: NextRequest) {
           '/products',
           '/products/category/Publications', 
           '/products/category/apparel',
+          '/', // Homepage for category-specific displays
           body.slug?.current ? `/products/${body.slug.current}` : null
         ].filter(Boolean)
       })

@@ -19,19 +19,23 @@ export async function POST(request: NextRequest) {
     // Clear all product detail pages (we'll clear common ones)
     const commonProducts = [
       'new-item', 'railcam', 'black-tote-bag', 'spooky-books-t-shirt',
-      'white-tote-bag', 'issue-1', 'issue-2'
+      'white-tote-bag', 'issue-1', 'issue-2', 'spooky-books-magazine-issue-1',
+      'spooky-books-magazine-issue-2', 'tote-bag', 'black-t-shirt', 'white-t-shirt'
     ]
     
     for (const productSlug of commonProducts) {
       revalidatePath(`/products/${productSlug}`)
     }
     
-    // Clear tags
-    revalidateTag('products')
-    revalidateTag('categories')
-    revalidateTag('homepage')
+    // CRITICAL: Clear category-specific cache thoroughly
+    // This addresses category sync issues when products move between categories
+    revalidateTag('products') // All product queries
+    revalidateTag('categories') // Category listing queries  
+    revalidateTag('homepage') // Homepage product displays
+    revalidateTag('publications') // Publications-specific cache
+    revalidateTag('apparel') // Apparel-specific cache
     
-    console.log('✅ Emergency cache clear completed')
+    console.log('✅ Emergency cache clear completed (including category sync fix)')
     
     return NextResponse.json({
       success: true,
