@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, Suspense } from "react"
+import { useEffect, Suspense, useState } from "react"
 import { useSearchParams } from "next/navigation"
 import { useCart } from "@/components/cart-contex"
 import Link from "next/link"
@@ -10,13 +10,30 @@ function SuccessContent() {
   const searchParams = useSearchParams()
   const { clearCart } = useCart()
   const sessionId = searchParams.get('session_id')
+  const [isCartCleared, setIsCartCleared] = useState(false)
+  const [isMounted, setIsMounted] = useState(false)
 
   useEffect(() => {
-    // Clear the cart after successful payment
-    if (sessionId) {
-      clearCart()
+    setIsMounted(true)
+    console.log('🎉 Checkout success page mounted', { sessionId })
+  }, [sessionId])
+
+  useEffect(() => {
+    // Clear the cart after successful payment with a slight delay
+    if (sessionId && !isCartCleared && isMounted) {
+      const timer = setTimeout(() => {
+        try {
+          clearCart()
+          setIsCartCleared(true)
+          console.log('✅ Cart cleared after successful payment')
+        } catch (error) {
+          console.error('❌ Error clearing cart:', error)
+        }
+      }, 500) // Small delay to ensure proper hydration
+      
+      return () => clearTimeout(timer)
     }
-  }, [sessionId, clearCart])
+  }, [sessionId, clearCart, isCartCleared, isMounted])
 
   return (
     <div className="flex flex-col items-center justify-center text-center py-16">
@@ -59,7 +76,11 @@ function SuccessContent() {
 
 export default function CheckoutSuccessPage() {
   return (
-    <Suspense fallback={<div>Loading...</div>}>
+    <Suspense fallback={
+      <div className="flex flex-col items-center justify-center text-center py-16">
+        <div className="text-gray-600">Processing your order...</div>
+      </div>
+    }>
       <SuccessContent />
     </Suspense>
   )
