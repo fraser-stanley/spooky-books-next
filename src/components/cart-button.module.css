@@ -1,6 +1,8 @@
 .cartButton {
   color: inherit;
   white-space: nowrap;
+  min-width: 4rem;
+  display: inline-block;
 }
 
 .cartButton:hover {

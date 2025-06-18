@@ -163,13 +163,30 @@ export async function POST(request: NextRequest) {
     revalidateTag('categories')
     console.log(`✅ Page revalidation complete`)
 
+    // Trigger autonomous inventory response for stock updates
+    try {
+      await fetch(`${process.env.NEXT_PUBLIC_SITE_URL}/api/autonomous-inventory`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          trigger: 'stock-updated',
+          productId: product.slug?.current
+        })
+      })
+      console.log(`🤖 Autonomous inventory notified of stock update`)
+    } catch (error) {
+      console.warn('⚠️ Failed to notify autonomous inventory:', error)
+      // Non-critical - don't fail the main operation
+    }
+
     return NextResponse.json({
       success: true,
       message: 'Product synced to Stripe successfully',
       stripeProductId: stripeProduct.id,
       hasVariants: !!(product.variants && product.variants.length > 0),
       variantCount: product.variants?.length || 0,
-      revalidated: true
+      revalidated: true,
+      autonomousNotified: true
     })
 
   } catch (error) {

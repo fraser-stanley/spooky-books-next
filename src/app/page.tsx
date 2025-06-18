@@ -64,8 +64,10 @@ function HeroPair({ section }: { section: SanityHeroPair }) {
             <Image
               src={section.leftImage.asset.url}
               alt={section.leftImage.alt || section.title}
-              width={section.leftImage.asset.metadata.dimensions.width}
-              height={section.leftImage.asset.metadata.dimensions.height}
+              width={800}
+              height={600}
+              sizes="(max-width: 640px) 100vw, 50vw"
+              quality={85}
               className="w-full"
               priority
             />
@@ -82,10 +84,11 @@ function HeroPair({ section }: { section: SanityHeroPair }) {
             <Image
               src={section.rightImage.asset.url}
               alt={section.rightImage.alt || section.title}
-              width={section.rightImage.asset.metadata.dimensions.width}
-              height={section.rightImage.asset.metadata.dimensions.height}
+              width={800}
+              height={600}
+              sizes="(max-width: 640px) 100vw, 50vw"
+              quality={85}
               className="w-full"
-              priority
             />
           </Link>
         ) : (
@@ -116,10 +119,11 @@ function HeroSingle({ section }: { section: SanityHeroSingle }) {
             <Image
               src={section.image.asset.url}
               alt={section.image.alt || section.title}
-              width={section.image.asset.metadata.dimensions.width}
-              height={section.image.asset.metadata.dimensions.height}
+              width={1200}
+              height={800}
+              sizes="100vw"
+              quality={85}
               className="w-full"
-              quality={100}
               priority
             />
           </Link>

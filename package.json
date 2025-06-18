@@ -9,7 +9,9 @@
     "lint": "next lint",
     "sanity:dev": "cd studio && npm run dev",
     "sanity:build": "cd studio && npm run build",
-    "sanity:deploy": "cd studio && npm run deploy"
+    "sanity:deploy": "cd studio && npm run deploy",
+    "inventory:fix": "node scripts/fix-sanity-studio.js",
+    "inventory:verify": "node scripts/verify-inventory-setup.js"
   },
   "dependencies": {
     "@sanity/client": "^7.6.0",

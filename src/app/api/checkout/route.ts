@@ -30,6 +30,16 @@ interface CheckoutRequest {
 
 export async function POST(request: NextRequest) {
   try {
+    // Validate required environment variables
+    const siteUrl = process.env.NEXT_PUBLIC_SITE_URL
+    if (!siteUrl) {
+      console.error('❌ NEXT_PUBLIC_SITE_URL environment variable is not set')
+      return NextResponse.json(
+        { error: 'Server configuration error', type: 'SYSTEM_ERROR' },
+        { status: 500 }
+      )
+    }
+
     // Apply rate limiting
     const clientId = getClientIdentifier(request)
     const rateLimitResult = checkoutRateLimiter.check(clientId)
@@ -209,8 +219,8 @@ export async function POST(request: NextRequest) {
       payment_method_types: ['card'],
       line_items: lineItems,
       mode: 'payment',
-      success_url: `${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/cart/success?session_id={CHECKOUT_SESSION_ID}`,
-      cancel_url: `${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/cart`,
+      success_url: `${siteUrl}/cart/success?session_id={CHECKOUT_SESSION_ID}`,
+      cancel_url: `${siteUrl}/cart`,
       expires_at: Math.floor(Date.now() / 1000) + (30 * 60), // 30 minutes
       metadata: {
         cart_items: JSON.stringify(items.map(item => ({

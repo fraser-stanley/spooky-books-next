@@ -129,6 +129,21 @@ async function handleCheckoutSessionExpired(session: Stripe.Checkout.Session) {
     // Clean up reservation document
     await cleanupReservation(session.id)
 
+    // Trigger autonomous inventory response for checkout expiration
+    try {
+      await fetch(`${process.env.NEXT_PUBLIC_SITE_URL}/api/autonomous-inventory`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          trigger: 'checkout-expired'
+        })
+      })
+      console.log(`🤖 Autonomous inventory notified of checkout expiration`)
+    } catch (error) {
+      console.warn('⚠️ Failed to notify autonomous inventory:', error)
+      // Non-critical - don't fail the main operation
+    }
+
   } catch (error) {
     console.error(`Error handling expired session ${session.id}:`, error)
   }
@@ -176,6 +191,21 @@ async function handlePaymentSucceeded(paymentIntent: Stripe.PaymentIntent) {
 
     // Clean up reservation document
     await cleanupReservation(session.id)
+
+    // Trigger autonomous inventory response for payment completion
+    try {
+      await fetch(`${process.env.NEXT_PUBLIC_SITE_URL}/api/autonomous-inventory`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          trigger: 'payment-completed'
+        })
+      })
+      console.log(`🤖 Autonomous inventory notified of payment completion`)
+    } catch (error) {
+      console.warn('⚠️ Failed to notify autonomous inventory:', error)
+      // Non-critical - don't fail the main operation
+    }
 
   } catch (error) {
     console.error(`Error handling successful payment ${paymentIntent.id}:`, error)
