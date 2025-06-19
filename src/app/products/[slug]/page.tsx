@@ -37,7 +37,7 @@ export default async function ProductPage({ params }: ProductPageProps) {
                 alt={image.alt}
                 width={600}
                 height={600}
-                className="w-full rounded-md transition-opacity duration-200 hover:opacity-80 cursor-pointer"
+                className="w-full rounded-md"
                 priority={index === 0}
               />
             </div>
