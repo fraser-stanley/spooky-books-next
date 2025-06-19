@@ -79,7 +79,7 @@ export function ProductPageClient({ product, sanityProduct }: ProductPageClientP
       </div>
 
       {/* Mobile Sticky Bottom Container */}
-      <div className="md:hidden fixed bottom-0 left-0 right-0 bg-white p-4">
+      <div className="md:hidden fixed bottom-0 left-0 right-0 bg-white pt-3 pb-6">
         <div className="mx-8">
           {/* Size Selector for Mobile */}
           {hasSizes && (
