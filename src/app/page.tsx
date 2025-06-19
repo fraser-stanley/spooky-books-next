@@ -52,10 +52,23 @@ function HeroSection({ section }: { section: SanityHeroSection }) {
   return null
 }
 
-// Updated HeroPair component with three-column layout
+// HeroPair component with layout variants (2-column and 3-column)
 function HeroPair({ section }: { section: SanityHeroPair }) {
   const productUrl = `/products/${section.linkedProduct.slug}/`
   
+  // For testing: Set to 'three' or 'two' to switch between layouts
+  // Later, this will be controlled by a layout field in Sanity
+  const layoutType = 'three' // Options: 'two' | 'three'
+  
+  if (layoutType === 'three') {
+    return <HeroPairThreeColumn section={section} productUrl={productUrl} />
+  } else {
+    return <HeroPairTwoColumn section={section} productUrl={productUrl} />
+  }
+}
+
+// Three-column layout: Text | Image | Image
+function HeroPairThreeColumn({ section, productUrl }: { section: SanityHeroPair; productUrl: string }) {
   return (
     <>
       {/* Column 1: Text Content */}
@@ -120,6 +133,77 @@ function HeroPair({ section }: { section: SanityHeroPair }) {
             <span className="text-gray-500 text-sm">Add right image</span>
           </div>
         )}
+      </div>
+    </>
+  )
+}
+
+// Two-column layout: Image | Image (with text below) - Original layout
+function HeroPairTwoColumn({ section, productUrl }: { section: SanityHeroPair; productUrl: string }) {
+  return (
+    <>
+      {/* Left Image */}
+      <div className="col-span-12 sm:col-span-6">
+        {section.leftImage?.asset?.url ? (
+          <Link href={productUrl}>
+            <Image
+              src={section.leftImage.asset.url}
+              alt={section.leftImage.alt || section.title}
+              width={800}
+              height={600}
+              sizes="(max-width: 640px) 100vw, 50vw"
+              quality={85}
+              className="w-full"
+              priority
+            />
+          </Link>
+        ) : (
+          <div className="w-full h-64 bg-gray-100 flex items-center justify-center">
+            <span className="text-gray-500 text-sm">Add left image</span>
+          </div>
+        )}
+      </div>
+
+      {/* Right Image */}
+      <div className="col-span-12 sm:col-span-6">
+        {section.rightImage?.asset?.url ? (
+          <Link href={productUrl}>
+            <Image
+              src={section.rightImage.asset.url}
+              alt={section.rightImage.alt || section.title}
+              width={800}
+              height={600}
+              sizes="(max-width: 640px) 100vw, 50vw"
+              quality={85}
+              className="w-full"
+            />
+          </Link>
+        ) : (
+          <div className="w-full h-64 bg-gray-100 flex items-center justify-center">
+            <span className="text-gray-500 text-sm">Add right image</span>
+          </div>
+        )}
+      </div>
+
+      {/* Text Content Below Images */}
+      <div className="col-span-12">
+        <Link
+          href={productUrl}
+          className="inline-block text-md sm:text-sm mb-12 sm:mb-8 normal-case"
+          aria-label={`View ${section.title} product page`}
+        >
+          <h2 className="text-2xl leading-tight mb-2">{section.title}</h2>
+          {section.linkedProduct.author && (
+            <div className="text-lg text-black mb-4">
+              {section.linkedProduct.author}
+            </div>
+          )}
+          {section.caption && (
+            <p className="text-sm text-black leading-relaxed">
+              {section.caption}
+            </p>
+          )}
+        </Link>
       </div>
     </>
   )
