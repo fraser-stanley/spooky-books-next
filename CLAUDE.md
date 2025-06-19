@@ -18,7 +18,7 @@ This is a **Next.js 15 e-commerce site** for Spooky Books, migrated from Gatsby 
 - **Sanity CMS** - Content management via `@sanity/client` and `next-sanity` with automated webhook sync
 - **Stripe** - Payment processing via `@stripe/stripe-js` and `stripe` with automated product creation
 - **Tailwind CSS 4** - Styling with custom CSS modules for components
-- **Custom fonts** - Neue Haas Unica Pro served from `/src/webfonts/`
+- **Custom fonts** - Neue Haas Unica Pro served from `/public/webfonts/`
 - **Sonner** - Modern toast notification system with rich colors and animations
 
 ### Migration Status
@@ -40,7 +40,9 @@ This is a **Next.js 15 e-commerce site** for Spooky Books, migrated from Gatsby 
 - ✅ **Advanced Inventory Management**: Sophisticated stock reservation system with race condition prevention
 - ✅ **Real-time Stock Validation**: Atomic transactions and reserved quantity tracking
 - ✅ **Autonomous Inventory System**: Enterprise-grade self-healing inventory with zero manual intervention
-- ✅ **Automated Background Processes**: Vercel cron-based cleanup, monitoring, and remediation
+- ✅ **Automated Background Processes**: Stripe webhook-based cleanup (cron jobs removed for hobby plan compatibility)
+- ✅ **Enhanced Error Handling**: User-friendly error messages with technical debt reduction
+- ✅ **Multiple Success Pages**: Optimized checkout success flow with improved UX
 
 ## Data Management
 
@@ -174,10 +176,20 @@ This is a **Next.js 15 e-commerce site** for Spooky Books, migrated from Gatsby 
 - **Inventory Sync**: `/api/inventory-sync` - Enhanced sync with consistency checks and automated remediation
 - **Test Autonomous**: `/api/test-autonomous` - Test endpoint for validating autonomous system functionality
 
-#### Automated Background Processes (Vercel Cron)
-- **Cleanup Inventory**: `/api/cron/cleanup-inventory` - Runs every 15 minutes, cleans expired reservations and stale data
-- **Health Check**: `/api/cron/health-check` - Runs every 5 minutes, monitors system health and logs critical issues
-- **Auto Remediation**: `/api/cron/auto-remediation` - Runs every hour, automatically fixes common inventory issues
+#### Cache Management & Debugging APIs
+- **Clear Cache**: `/api/clear-cache` - Manual cache clearing for specific paths
+- **Emergency Cache Clear**: `/api/emergency-cache-clear` - Immediate cache clearing for all product-related data
+- **Test Revalidate**: `/api/test-revalidate` - Manual trigger for testing revalidation system
+
+#### Background Process APIs (Manual Trigger Only - Hobby Plan)
+- **Cleanup Inventory**: `/api/cron/cleanup-inventory` - Manual cleanup of expired reservations and stale data
+- **Health Check**: `/api/cron/health-check` - Manual system health monitoring and logging
+- **Auto Remediation**: `/api/cron/auto-remediation` - Manual trigger for automated inventory issue fixing
+
+#### Enhanced Error Handling
+- **User-Friendly Messages**: Stock reservation errors now show "Sorry, someone else just grabbed one of these items!" instead of technical errors
+- **Stripe Webhook Coverage**: Enhanced webhook handling for `checkout.session.expired` and `checkout.session.async_payment_failed`
+- **Intelligent Cleanup**: Automatic stock release on payment failures and session expiration
 
 #### Autonomous System Dashboards
 - **Autonomous Status**: `/autonomous-status` - Real-time dashboard showing autonomous system health and automation status
@@ -188,6 +200,11 @@ This is a **Next.js 15 e-commerce site** for Spooky Books, migrated from Gatsby 
 // Product detail page with size selection
 /products/[slug]/page.tsx
 /products/[slug]/product-page-client.tsx
+
+// Checkout success pages (multiple variants)
+/cart/success/page.tsx           // Original success page
+/cart/success-new/page.tsx       // Enhanced success page with improved UX
+/cart/test-persistence/page.tsx  // Cart persistence testing interface
 
 // Static params generation (now uses Sanity data)
 export async function generateStaticParams() {
@@ -212,7 +229,8 @@ export async function generateStaticParams() {
 - `studio/` - Sanity Studio configuration and schemas
   - `studio/schemas/` - Product, category, and homepage schema definitions
 - `public/images/` - Product images and static assets
-- `src/webfonts/` - Custom Neue Haas Unica Pro font files
+- `public/webfonts/` - Custom Neue Haas Unica Pro font files (served statically)
+- `src/webfonts/` - Source font files (copied to public during build)
 - `scripts/` - Maintenance and setup scripts for inventory management
   - `scripts/fix-sanity-studio.js` - Fix Sanity Studio issues and initialize inventory fields
   - `scripts/verify-inventory-setup.js` - Verify autonomous inventory system configuration
@@ -248,8 +266,8 @@ footer: bg-gray-100 text-black
   font-weight: 400 | 500 | 600;
   font-style: normal;
   font-display: swap; /* Prevents invisible text during font load */
-  src: url(../webfonts/neue-haas-unica-pro-web.woff2) format("woff2"),
-       url(../webfonts/neue-haas-unica-pro-web.woff) format("woff");
+  src: url(/webfonts/neue-haas-unica-pro-web.woff2) format("woff2"),
+       url(/webfonts/neue-haas-unica-pro-web.woff) format("woff");
 }
 
 html, body {
@@ -300,6 +318,17 @@ html, body {
 - **Consistent Enforcement**: Stock limits enforced across product pages, cart controls, and checkout
 - **Real-time Validation**: Toast notifications inform users of automatic adjustments
 - **Smart Quantity Controls**: Cart + and - buttons respect actual available stock limits
+
+**Enhanced Error Messaging (2024):**
+- **User-Friendly Language**: "Sorry, someone else just grabbed one of these items!" instead of "Unable to reserve stock for checkout"
+- **Clear Next Steps**: Specific instructions like "Please refresh the page and try again"
+- **Context-Aware**: Different messages for stock errors, rate limiting, and system issues
+- **Reduced Anxiety**: Frames issues as normal shopping competition rather than system failures
+
+**Product Page Title Cleanup (2024):**
+- **Clean Individual Pages**: Removed stock status labels from product detail page titles (e.g., "Tote bag (black)" instead of "Tote bag (black) (SOLD OUT)")
+- **Preserved Grid Messaging**: Stock labels remain on product listing pages for at-a-glance availability
+- **Consistent Information**: Stock status still available in buttons, selectors, and descriptions
 
 **Design Philosophy**: The interface relies on clear visual states and intelligent messaging hierarchy rather than redundant text labels, creating urgency where appropriate while maintaining a clean, professional user experience. Stock calculation consistency ensures users never encounter conflicting availability information between product pages and cart.
 
@@ -818,6 +847,21 @@ NEXT_PUBLIC_SANITY_STUDIO_URL=https://your-domain.com/studio
 SANITY_STUDIO_PREVIEW_ORIGIN=https://your-domain.com
 ```
 
+### Vercel Configuration (Hobby Plan Optimized)
+**Current vercel.json:**
+```json
+{
+  "buildCommand": "npm run build",
+  "outputDirectory": ".next",
+  "framework": "nextjs"
+}
+```
+
+**Important Notes:**
+- **Cron Jobs Removed**: Vercel cron jobs are not available on hobby plan, causing deployment failures
+- **Background Processes**: Rely on Stripe webhooks instead of cron for inventory cleanup
+- **Manual Triggers**: Background process APIs can be triggered manually if needed
+
 ### Webhook Configuration
 1. **Sanity Webhook**: Configure webhook in Sanity Studio to trigger `/api/sanity-stripe` on document publish
 2. **Event Types**: Listen for `create`, `update`, `delete` events on product and homepage documents
@@ -825,14 +869,18 @@ SANITY_STUDIO_PREVIEW_ORIGIN=https://your-domain.com
 4. **Page Revalidation**: Automatic revalidation of affected pages via `/api/revalidate` webhook
 5. **Vercel Optimization**: Selective revalidation reduces build usage on free tier
 
-### Visual Editing Setup
+### Visual Editing Setup (Next.js 15 Optimized)
 1. **Draft Mode**: Enabled via `/api/draft-mode/enable` endpoint with SANITY_VIEWER_TOKEN
 2. **Presentation Tool**: Configured in Sanity Studio with live preview URL
 3. **Live Content API**: Real-time updates using `defineLive` with `sanityFetch` and `SanityLive`
-4. **Document Locations**: Homepage and product location mapping for editor navigation
-5. **Studio Structure**: Custom structure with homepage singleton prominently displayed
-6. **CORS Configuration**: Middleware handles cross-origin requests from Sanity Studio
-7. **Click-to-Edit**: Visual overlays with stega encoding for instant content editing
+4. **Server/Client Separation**: `SanityLive` in root layout (server component), `VisualEditing` dynamically imported for client
+5. **Component Architecture**: 
+   - `VisualEditingProvider` - Client component wrapper with `ssr: false` dynamic imports
+   - `SanityLive` - Server component in root layout for proper `defineLive` context
+6. **Document Locations**: Homepage and product location mapping for editor navigation
+7. **Studio Structure**: Custom structure with homepage singleton prominently displayed
+8. **CORS Configuration**: Middleware handles cross-origin requests from Sanity Studio
+9. **Click-to-Edit**: Visual overlays with stega encoding for instant content editing
 
 ### Stock Management
 - **Publications**: Single `stockQuantity` field for entire product
@@ -883,6 +931,19 @@ POST /api/revalidate
 - Missing `_key` properties preventing variant array editing
 - Sanity Studio validation errors for system-managed fields
 
+### Production Readiness & Recent Fixes (2024)
+**Critical Production Issues Fixed:**
+- **React Server Component Error**: Fixed `defineLive can only be used in React Server Components` by moving `SanityLive` to root layout
+- **Font Loading Issues**: Moved fonts from `src/webfonts/` to `public/webfonts/` to resolve 404 errors
+- **Vercel Deployment Failures**: Removed cron job configuration incompatible with hobby plan
+- **TypeScript Compilation**: Fixed all type errors and ESLint warnings for production builds
+
+**Build Optimization:**
+- Production builds complete in ~6-7 seconds
+- 52 static pages pre-generated successfully  
+- Bundle size optimized with dynamic imports and code splitting
+- All warnings addressed (only minor unused parameter warnings remain)
+
 ## Deployment Guide
 
 ### Production Deployment (Vercel)
@@ -916,36 +977,30 @@ SANITY_STUDIO_PREVIEW_ORIGIN=https://spooky-books-next.vercel.app
 4. **Content Management**: Add/edit hero sections with real-time updates
 
 ### Webhook Configuration
-1. **Sanity Webhook URL**: `https://spooky-books-next.vercel.app/api/sanity-stripe`
-2. **Trigger Events**: Document create, update, delete
-3. **Filter**: `_type == "product"`
-4. **Auto-sync**: Creates Stripe products and saves IDs back to Sanity
+**Required Webhooks:**
+1. **Sanity → Stripe Sync**: 
+   - URL: `https://spooky-books-next.vercel.app/api/sanity-stripe`
+   - Events: Document create, update, delete
+   - Filter: `_type == "product"`
+   - Purpose: Auto-creates Stripe products and saves IDs back to Sanity
 
-### Autonomous System Configuration
-**Vercel Cron Jobs** (`vercel.json`):
-```json
-{
-  "crons": [
-    {
-      "path": "/api/cron/cleanup-inventory",
-      "schedule": "*/15 * * * *"
-    },
-    {
-      "path": "/api/cron/health-check", 
-      "schedule": "*/5 * * * *"
-    },
-    {
-      "path": "/api/cron/auto-remediation",
-      "schedule": "0 * * * *"
-    }
-  ]
-}
-```
+2. **Sanity → Frontend Revalidation**: 
+   - URL: `https://spooky-books-next.vercel.app/api/revalidate`  
+   - Events: Document create, update, delete
+   - Filter: `_type == "product" || _type == "homepage"`
+   - Purpose: Immediate cache clearing and page updates
 
-**Cron Schedule Breakdown:**
-- **Every 15 minutes**: Cleanup expired inventory reservations and stale data
-- **Every 5 minutes**: Monitor system health and log critical issues  
-- **Every hour**: Automatically fix common inventory issues and perform self-healing operations
+**Stripe Webhook Enhancement (2024):**
+- Enhanced `checkout.session.expired` handling for automatic stock release
+- Added `checkout.session.async_payment_failed` for improved error coverage
+- Replaces most manual cleanup needs previously handled by cron jobs
+
+### Alternative to Cron Jobs (Hobby Plan Compatible)
+**Since Vercel cron jobs are not available on hobby plan:**
+- **Primary Cleanup**: Stripe webhooks handle session expiration and failures
+- **Manual Triggers**: Background process APIs available for manual execution
+- **Monitoring**: `/autonomous-status` dashboard for system health checks
+- **Cache Management**: `/api/emergency-cache-clear` for immediate cache fixes
 
 ## Performance Optimizations (2024)
 
