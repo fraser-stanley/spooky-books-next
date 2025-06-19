@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect, useRef } from "react"
+import { useState, useEffect } from "react"
 import { AddToCart } from "@/components/add-to-cart"
 import { SizeSelector } from "@/components/size-selector"
 import { useCart } from "@/components/cart-contex"
