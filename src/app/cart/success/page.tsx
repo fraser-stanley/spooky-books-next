@@ -44,7 +44,7 @@ function SuccessContent() {
           </svg>
         </div>
         
-        <h1 className="text-2xl mb-4">🚀 TEST VERSION - Payment Successful!</h1>
+        <h1 className="text-2xl mb-4">🚀 DEPLOYMENT TEST - Payment Successful!</h1>
         <p className="text-gray-600 mb-8">
           Thank you for your purchase. You will receive an email confirmation shortly.
         </p>
