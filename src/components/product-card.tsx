@@ -85,13 +85,11 @@ export function ProductCard({ product, sanityProduct, eager }: ProductCardProps)
             return totalAvailableStock <= 3 ? ` (ONLY ${totalAvailableStock} LEFT)` : '';
           })()}
         </h2>
-        <div className="min-h-[1.2rem]">
-          {sanityProduct?.author && (
-            <div className="">
-              {sanityProduct.author}
-            </div>
-          )}
-        </div>
+        {sanityProduct?.author && (
+          <div className="min-h-[1.2rem]">
+            {sanityProduct.author}
+          </div>
+        )}
         <div className="">
           <CurrencyPrice price={price} />
         </div>
