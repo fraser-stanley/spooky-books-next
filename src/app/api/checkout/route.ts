@@ -219,7 +219,7 @@ export async function POST(request: NextRequest) {
       payment_method_types: ['card'],
       line_items: lineItems,
       mode: 'payment',
-      success_url: `${siteUrl}/cart/success?session_id={CHECKOUT_SESSION_ID}`,
+      success_url: `${siteUrl}/cart/success-new?session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${siteUrl}/cart`,
       expires_at: Math.floor(Date.now() / 1000) + (30 * 60), // 30 minutes
       metadata: {
