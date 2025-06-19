@@ -52,21 +52,43 @@ function HeroSection({ section }: { section: SanityHeroSection }) {
   return null
 }
 
-// Updated HeroPair component with Sanity data
+// Updated HeroPair component with three-column layout
 function HeroPair({ section }: { section: SanityHeroPair }) {
   const productUrl = `/products/${section.linkedProduct.slug}/`
   
   return (
     <>
-      <div className="col-span-12 sm:col-span-6">
+      {/* Column 1: Text Content */}
+      <div className="col-span-12 lg:col-span-4 mb-6 lg:mb-0">
+        <Link
+          href={productUrl}
+          className="inline-block text-md sm:text-sm normal-case"
+          aria-label={`View ${section.title} product page`}
+        >
+          <h2 className="text-2xl leading-tight mb-2">{section.title}</h2>
+          {section.linkedProduct.author && (
+            <div className="text-lg text-black mb-4">
+              {section.linkedProduct.author}
+            </div>
+          )}
+          {section.caption && (
+            <p className="text-sm text-black leading-relaxed">
+              {section.caption}
+            </p>
+          )}
+        </Link>
+      </div>
+
+      {/* Column 2: Left Image */}
+      <div className="col-span-6 lg:col-span-4 pr-1 lg:pr-2">
         {section.leftImage?.asset?.url ? (
           <Link href={productUrl}>
             <Image
               src={section.leftImage.asset.url}
               alt={section.leftImage.alt || section.title}
-              width={800}
-              height={600}
-              sizes="(max-width: 640px) 100vw, 50vw"
+              width={600}
+              height={800}
+              sizes="(max-width: 1024px) 50vw, 33vw"
               quality={85}
               className="w-full"
               priority
@@ -74,45 +96,42 @@ function HeroPair({ section }: { section: SanityHeroPair }) {
           </Link>
         ) : (
           <div className="w-full h-64 bg-gray-100 flex items-center justify-center">
-            <span className="text-gray-500 text-sm">Add image in Sanity Studio</span>
+            <span className="text-gray-500 text-sm">Add left image</span>
           </div>
         )}
       </div>
-      <div className="col-span-12 sm:col-span-6">
+
+      {/* Column 3: Right Image */}
+      <div className="col-span-6 lg:col-span-4 pl-1 lg:pl-2">
         {section.rightImage?.asset?.url ? (
           <Link href={productUrl}>
             <Image
               src={section.rightImage.asset.url}
               alt={section.rightImage.alt || section.title}
-              width={800}
-              height={600}
-              sizes="(max-width: 640px) 100vw, 50vw"
+              width={600}
+              height={800}
+              sizes="(max-width: 1024px) 50vw, 33vw"
               quality={85}
               className="w-full"
             />
           </Link>
         ) : (
           <div className="w-full h-64 bg-gray-100 flex items-center justify-center">
-            <span className="text-gray-500 text-sm">Add image in Sanity Studio</span>
+            <span className="text-gray-500 text-sm">Add right image</span>
           </div>
         )}
       </div>
-      <TitleLink 
-        href={productUrl} 
-        title={section.title} 
-        author={section.linkedProduct.author}
-        caption={section.caption}
-      />
     </>
   )
 }
 
-// New HeroSingle component for full-width content
+// HeroSingle component for full-width content
 function HeroSingle({ section }: { section: SanityHeroSingle }) {
   const productUrl = `/products/${section.linkedProduct.slug}/`
   
   return (
     <>
+      {/* Full-width image */}
       <div className="col-span-12">
         {section.image?.asset?.url ? (
           <Link href={productUrl}>
@@ -133,37 +152,28 @@ function HeroSingle({ section }: { section: SanityHeroSingle }) {
           </div>
         )}
       </div>
-      <TitleLink 
-        href={productUrl} 
-        title={section.title} 
-        author={section.linkedProduct.author}
-        caption={section.caption}
-      />
+      
+      {/* Title section for full-width layout */}
+      <div className="col-span-12">
+        <Link
+          href={productUrl}
+          className="inline-block text-md sm:text-sm normal-case mb-12 sm:mb-8"
+          aria-label={`View ${section.title} product page`}
+        >
+          <h2 className="text-2xl leading-tight mb-2">{section.title}</h2>
+          {section.linkedProduct.author && (
+            <div className="text-lg text-black mb-4">
+              {section.linkedProduct.author}
+            </div>
+          )}
+          {section.caption && (
+            <p className="text-sm text-black leading-relaxed">
+              {section.caption}
+            </p>
+          )}
+        </Link>
+      </div>
     </>
   )
 }
 
-// Enhanced TitleLink component with author and caption support
-function TitleLink({ href, title, author, caption }: { href: string; title: string; author?: string; caption?: string }) {
-  return (
-    <div className="col-span-12">
-      <Link
-        href={href}
-        className="inline-block text-md sm:text-sm mb-12 sm:mb-8 normal-case"
-        aria-label={`View product page`}
-      >
-        <h2>{title}</h2>
-        {author && (
-          <div className="text-md sm:text-sm">
-            {author}
-          </div>
-        )}
-        {caption && (
-          <p className="text-sm text-black mt-2 normal-case leading-relaxed">
-            {caption}
-          </p>
-        )}
-      </Link>
-    </div>
-  )
-}
