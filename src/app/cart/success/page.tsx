@@ -2,15 +2,14 @@
 
 import { useEffect, Suspense, useState } from "react"
 import { useSearchParams } from "next/navigation"
-import { useCart } from "@/components/cart-contex"
+// TEMPORARILY DISABLED: Cart context to test if this is causing issues
+// import { useCart } from "@/components/cart-contex"
 import Link from "next/link"
 import styles from "@/components/add-to-cart.module.css"
 
 function SuccessContent() {
   const searchParams = useSearchParams()
-  const { clearCart } = useCart()
   const sessionId = searchParams.get('session_id')
-  const [isCartCleared, setIsCartCleared] = useState(false)
   const [isMounted, setIsMounted] = useState(false)
 
   useEffect(() => {
@@ -18,22 +17,23 @@ function SuccessContent() {
     console.log('🎉 Checkout success page mounted', { sessionId })
   }, [sessionId])
 
-  useEffect(() => {
-    // Clear the cart after successful payment with a slight delay
-    if (sessionId && !isCartCleared && isMounted) {
-      const timer = setTimeout(() => {
-        try {
-          clearCart()
-          setIsCartCleared(true)
-          console.log('✅ Cart cleared after successful payment')
-        } catch (error) {
-          console.error('❌ Error clearing cart:', error)
-        }
-      }, 500) // Small delay to ensure proper hydration
-      
-      return () => clearTimeout(timer)
-    }
-  }, [sessionId, clearCart, isCartCleared, isMounted])
+  // TEMPORARILY DISABLED: Cart clearing to test if this is causing the frozen behavior
+  // useEffect(() => {
+  //   // Clear the cart after successful payment with a slight delay
+  //   if (sessionId && !isCartCleared && isMounted) {
+  //     const timer = setTimeout(() => {
+  //       try {
+  //         clearCart()
+  //         setIsCartCleared(true)
+  //         console.log('✅ Cart cleared after successful payment')
+  //       } catch (error) {
+  //         console.error('❌ Error clearing cart:', error)
+  //       }
+  //     }, 500) // Small delay to ensure proper hydration
+  //     
+  //     return () => clearTimeout(timer)
+  //   }
+  // }, [sessionId, clearCart, isCartCleared, isMounted])
 
   return (
     <div className="flex flex-col items-center justify-center text-center py-16">
