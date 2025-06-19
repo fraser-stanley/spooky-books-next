@@ -27,7 +27,7 @@ export default async function ProductPage({ params }: ProductPageProps) {
 
   return (
     <Layout categories={categories}>
-      <div className="grid grid-cols-12 gap-4 pt-24 md:min-h-screen">
+      <div className="grid grid-cols-12 gap-4 pt-24 md:min-h-screen pb-32 md:pb-0">
         {/* Product Images */}
         <div className="col-span-12 md:col-span-6">
           {product.images.map((image, index) => (
