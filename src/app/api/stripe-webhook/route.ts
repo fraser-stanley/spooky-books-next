@@ -53,6 +53,10 @@ export async function POST(request: NextRequest) {
         await handleCheckoutSessionExpired(event.data.object as Stripe.Checkout.Session)
         break
         
+      case 'checkout.session.async_payment_failed':
+        await handleCheckoutSessionExpired(event.data.object as Stripe.Checkout.Session)
+        break
+        
       case 'payment_intent.succeeded':
         await handlePaymentSucceeded(event.data.object as Stripe.PaymentIntent)
         break
