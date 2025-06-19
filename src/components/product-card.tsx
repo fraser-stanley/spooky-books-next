@@ -88,7 +88,7 @@ export function ProductCard({ product, sanityProduct, eager }: ProductCardProps)
         <div className="min-h-[1.2rem]">
           {sanityProduct?.author && (
             <div className="">
-              {sanityProduct.author} spaghetti
+              {sanityProduct.author}
             </div>
           )}
         </div>
