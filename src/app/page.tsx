@@ -80,7 +80,7 @@ function HeroPair({ section }: { section: SanityHeroPair }) {
       </div>
 
       {/* Column 2: Left Image */}
-      <div className="col-span-6 lg:col-span-4 pr-1 lg:pr-2">
+      <div className="col-span-6 lg:col-span-4 pr-0.5">
         {section.leftImage?.asset?.url ? (
           <Link href={productUrl}>
             <Image
@@ -102,7 +102,7 @@ function HeroPair({ section }: { section: SanityHeroPair }) {
       </div>
 
       {/* Column 3: Right Image */}
-      <div className="col-span-6 lg:col-span-4 pl-1 lg:pl-2">
+      <div className="col-span-6 lg:col-span-4 pl-0.5">
         {section.rightImage?.asset?.url ? (
           <Link href={productUrl}>
             <Image
