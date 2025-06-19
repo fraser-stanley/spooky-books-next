@@ -27,7 +27,7 @@ export default function TestPersistencePage() {
                 ))}
               </ul>
             ) : (
-              <p className="text-gray-500">Cart is empty</p>
+              <p className="text-black">Cart is empty</p>
             )}
           </div>
           

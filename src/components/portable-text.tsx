@@ -8,7 +8,7 @@ const components = {
     h4: ({ children }: any) => <h4 className="text-lg font-medium mb-3 mt-6">{children}</h4>,
     h5: ({ children }: any) => <h5 className="text-base font-medium mb-2 mt-4">{children}</h5>,
     blockquote: ({ children }: any) => (
-      <blockquote className="border-l-4 border-gray-300 pl-4 italic mb-4 text-gray-700">
+      <blockquote className="border-l-4 border-gray-300 pl-4 italic mb-4 text-black">
         {children}
       </blockquote>
     )

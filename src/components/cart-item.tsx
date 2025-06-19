@@ -65,7 +65,7 @@ export function CartItem({ item, sanityProduct }: CartItemProps) {
         <div className="mb-1">
           {item.title}
           {item.size && (
-            <span className="text-gray-500 ml-2 font-normal">
+            <span className="text-black ml-2 font-normal">
               Size: {item.size.toUpperCase()}
             </span>
           )}
@@ -83,7 +83,7 @@ export function CartItem({ item, sanityProduct }: CartItemProps) {
 
         {/* Quantity & Remove */}
         <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4 mb-2">
-          <span className="text-sm text-gray-600 uppercase">
+          <span className="text-sm text-black uppercase">
             Qty: {item.quantity}
           </span>
 

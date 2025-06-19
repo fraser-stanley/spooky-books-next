@@ -112,11 +112,11 @@ export function CartItemEnhanced({ item, sanityProduct, isLoading = false }: Car
         <div className="text-sm mb-1">
           {item.title}
           {item.size && (
-            <span className="text-gray-500 ml-2">Size: {item.size.toUpperCase()}</span>
+            <span className="text-black ml-2">Size: {item.size.toUpperCase()}</span>
           )}
         </div>
         
-        <div className="text-sm text-gray-600 mb-2">
+        <div className="text-sm text-black mb-2">
           <CurrencyPrice price={item.price} />
         </div>
 
@@ -125,7 +125,7 @@ export function CartItemEnhanced({ item, sanityProduct, isLoading = false }: Car
           <QuantitySkeleton />
         ) : (
           <div className="flex items-center gap-3 mb-2">
-            <span className="text-sm text-gray-600">Quantity:</span>
+            <span className="text-sm text-black">Quantity:</span>
             <div className={`flex items-center border border-gray-300 rounded ${isUpdating ? 'opacity-50' : ''}`}>
               <button
                 onClick={() => handleQuantityChange(localQuantity - 1)}

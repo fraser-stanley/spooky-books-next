@@ -166,7 +166,7 @@ export default function CartPage() {
       <div className="min-h-screen">
         <div className="flex flex-col items-center justify-center text-center min-h-screen">
           <span className="text-lg mb-4 uppercase">Your cart is empty</span>
-          <p className="text-sm text-gray-600 mb-8">Looks like you haven&apos;t added anything to your cart yet.</p>
+          <p className="text-sm text-black mb-8">Looks like you haven&apos;t added anything to your cart yet.</p>
           <Link 
             href="/products" 
             className="px-8 py-2 bg-black text-white hover:bg-gray-800 font-normal text-xs uppercase rounded"
@@ -213,17 +213,17 @@ export default function CartPage() {
               <h2 className="text-sm uppercase">Order Summary</h2>
 
               <div className="flex justify-between items-center">
-                <span className="text-sm text-gray-600">Subtotal ({totalItems} items)</span>
+                <span className="text-sm text-black">Subtotal ({totalItems} items)</span>
                 <span className="text-sm"><CurrencyPrice price={total} /></span>
               </div>
 
               <div className="flex justify-between items-center">
-                <span className="text-sm text-gray-600">Shipping</span>
+                <span className="text-sm text-black">Shipping</span>
                 <span className="text-sm">Free</span>
               </div>
 
               <div className="flex justify-between items-center">
-                <span className="text-sm text-gray-600">Tax</span>
+                <span className="text-sm text-black">Tax</span>
                 <span className="text-sm">Calculated at checkout</span>
               </div>
 
@@ -295,7 +295,7 @@ export default function CartPage() {
             <div className="flex justify-center mt-6">
               <Link
                 href="/products"
-                className="text-gray-600 hover:underline uppercase"
+                className="text-black hover:underline uppercase"
               >
                 Return to store
               </Link>

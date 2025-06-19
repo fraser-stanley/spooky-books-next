@@ -27,7 +27,7 @@ export default async function ProductPage({ params }: ProductPageProps) {
 
   return (
     <Layout categories={categories}>
-      <div className="grid grid-cols-12 gap-4 pt-24">
+      <div className="grid grid-cols-12 gap-4 pt-24 md:min-h-screen">
         {/* Product Images */}
         <div className="col-span-12 md:col-span-6">
           {product.images.map((image, index) => (
@@ -37,7 +37,7 @@ export default async function ProductPage({ params }: ProductPageProps) {
                 alt={image.alt}
                 width={600}
                 height={600}
-                className="w-full rounded-md"
+                className="w-full rounded-md "
                 priority={index === 0}
               />
             </div>
@@ -46,7 +46,7 @@ export default async function ProductPage({ params }: ProductPageProps) {
 
         {/* Product Details */}
         <div className="col-span-12 md:col-span-6">
-          <div className="md:pl-8 text-pretty ">
+          <div className="md:pl-8 text-pretty md:sticky md:top-8 md:max-h-[calc(100vh-8rem)] md:overflow-y-auto">
             <h1 className="text-2xl">
               {product.title}
             </h1>

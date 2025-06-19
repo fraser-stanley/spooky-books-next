@@ -32,12 +32,12 @@ function SuccessContent() {
         </div>
         
         <h1 className="text-2xl mb-4">✨ Payment Successful!</h1>
-        <p className="text-gray-600 mb-8">
+        <p className="text-black mb-8">
           Thank you for your purchase. You will receive an email confirmation shortly.
         </p>
         
         {sessionId && (
-          <p className="text-sm text-gray-500 mb-8">
+          <p className="text-sm text-black mb-8">
             Order reference: {sessionId.slice(-8).toUpperCase()}
           </p>
         )}
@@ -51,7 +51,7 @@ function SuccessContent() {
           </Link>
           <Link 
             href="/" 
-            className="block text-sm text-gray-600 hover:underline hover:text-black transition-colors"
+            className="block text-sm text-black hover:underline transition-colors"
           >
             Return to Home
           </Link>
@@ -65,7 +65,7 @@ export default function NewCheckoutSuccessPage() {
   return (
     <Suspense fallback={
       <div className="flex flex-col items-center justify-center text-center py-16">
-        <div className="text-gray-600">Processing your order...</div>
+        <div className="text-black">Processing your order...</div>
       </div>
     }>
       <SuccessContent />

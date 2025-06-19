@@ -159,7 +159,7 @@ function TitleLink({ href, title, author, caption }: { href: string; title: stri
           </div>
         )}
         {caption && (
-          <p className="text-sm text-gray-600 mt-2 normal-case leading-relaxed">
+          <p className="text-sm text-black mt-2 normal-case leading-relaxed">
             {caption}
           </p>
         )}
