@@ -1,19 +1,5 @@
 {
   "buildCommand": "npm run build",
   "outputDirectory": ".next",
-  "framework": "nextjs",
-  "crons": [
-    {
-      "path": "/api/cron/cleanup-inventory",
-      "schedule": "*/15 * * * *"
-    },
-    {
-      "path": "/api/cron/health-check",
-      "schedule": "*/5 * * * *"
-    },
-    {
-      "path": "/api/cron/auto-remediation",
-      "schedule": "0 * * * *"
-    }
-  ]
+  "framework": "nextjs"
 }
