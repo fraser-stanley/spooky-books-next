@@ -56,7 +56,7 @@ export function ProductCard({ product, sanityProduct, eager }: ProductCardProps)
             height={400}
             sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
             quality={80}
-            className="rounded-md sm:rounded-lg w-full transition-brightness duration-200 hover:brightness-90 cursor-pointer"
+            className="w-full transition-brightness duration-200 hover:brightness-90 cursor-pointer"
             loading={eager ? "eager" : "lazy"}
             priority={eager}
           />

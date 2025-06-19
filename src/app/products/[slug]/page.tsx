@@ -37,7 +37,7 @@ export default async function ProductPage({ params }: ProductPageProps) {
                 alt={image.alt}
                 width={600}
                 height={600}
-                className="w-full rounded-md "
+                className="w-full"
                 priority={index === 0}
               />
             </div>
@@ -52,7 +52,7 @@ export default async function ProductPage({ params }: ProductPageProps) {
             </h1>
             
             {sanityProduct?.author && (
-              <div className="text-2xl mb-4">
+              <div className="text-2xl">
                 {sanityProduct.author}
               </div>
             )}
