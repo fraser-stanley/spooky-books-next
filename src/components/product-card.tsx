@@ -41,11 +41,12 @@ export function ProductCard({ product, sanityProduct, eager }: ProductCardProps)
     : getStockForDisplay() <= 0 // Publications and non-sized apparel: check main stock
 
   return (
-    <Link
-      className="col-span-12 sm:col-span-4 capitalize inline-block"
-      href={`/products/${slug}`}
-      aria-label={`View ${title} product page`}
-    >
+    <div className="col-span-12 sm:col-span-4">
+      <Link
+        className="capitalize inline-block"
+        href={`/products/${slug}`}
+        aria-label={`View ${title} product page`}
+      >
       {image ? (
         <div data-name="product-image-box">
           <Image
@@ -94,6 +95,7 @@ export function ProductCard({ product, sanityProduct, eager }: ProductCardProps)
           <CurrencyPrice price={price} />
         </div>
       </div>
-    </Link>
+      </Link>
+    </div>
   )
 }
