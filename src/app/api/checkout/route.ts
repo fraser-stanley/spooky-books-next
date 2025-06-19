@@ -251,7 +251,7 @@ export async function POST(request: NextRequest) {
       
       return NextResponse.json(
         { 
-          error: 'Unable to reserve stock for checkout',
+          error: 'Sorry, someone else just grabbed one of these items',
           details: reservationResult.errors,
           type: 'RESERVATION_ERROR'
         },
