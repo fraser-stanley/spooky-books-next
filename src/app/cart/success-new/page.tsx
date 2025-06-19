@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, Suspense, useState } from "react"
+import { useEffect, Suspense } from "react"
 import { useSearchParams } from "next/navigation"
 import { useCart } from "@/components/cart-contex"
 import Link from "next/link"

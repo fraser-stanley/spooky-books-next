@@ -6,7 +6,7 @@ import { revalidatePath, revalidateTag } from 'next/cache'
  * Immediately clears all product-related cache to force fresh stock data
  * Use this when stock shows incorrectly due to cache issues
  */
-export async function POST(request: NextRequest) {
+export async function POST(_request: NextRequest) {
   try {
     console.log('🚨 Emergency cache clear initiated')
     

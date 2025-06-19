@@ -50,7 +50,7 @@ export async function GET(request: NextRequest) {
       analysis: {
         recentProductUpdates: recentChanges.length,
         recentReservations: recentReservations.length,
-        hasRecentActivity: recentChanges.some(p => p._updatedAt > timeThreshold)
+        hasRecentActivity: recentChanges.some((p: any) => p._updatedAt > timeThreshold)
       },
       data: {
         recentProducts: recentChanges,

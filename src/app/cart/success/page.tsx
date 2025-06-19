@@ -10,7 +10,7 @@ import styles from "@/components/add-to-cart.module.css"
 function SuccessContent() {
   const searchParams = useSearchParams()
   const sessionId = searchParams.get('session_id')
-  const [isMounted, setIsMounted] = useState(false)
+  const [_isMounted, setIsMounted] = useState(false)
 
   useEffect(() => {
     setIsMounted(true)
