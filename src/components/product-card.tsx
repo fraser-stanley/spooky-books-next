@@ -42,7 +42,7 @@ export function ProductCard({ product, sanityProduct, eager }: ProductCardProps)
 
   return (
     <Link
-      className="col-span-12 sm:col-span-4 capitalize"
+      className="col-span-12 sm:col-span-4 capitalize inline-block"
       href={`/products/${slug}`}
       aria-label={`View ${title} product page`}
     >
@@ -55,7 +55,7 @@ export function ProductCard({ product, sanityProduct, eager }: ProductCardProps)
             height={400}
             sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
             quality={80}
-            className="rounded-md sm:rounded-lg w-full transition-opacity duration-200 hover:opacity-90 cursor-pointer"
+            className="rounded-md sm:rounded-lg w-full transition-brightness duration-200 hover:brightness-90 cursor-pointer"
             loading={eager ? "eager" : "lazy"}
             priority={eager}
           />
