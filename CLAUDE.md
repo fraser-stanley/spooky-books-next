@@ -44,6 +44,7 @@ This is a **Next.js 15 e-commerce site** for Spooky Books, migrated from Gatsby 
 - ✅ **Enhanced Error Handling**: User-friendly error messages with technical debt reduction
 - ✅ **Multiple Success Pages**: Optimized checkout success flow with improved UX
 - ✅ **Homepage Layout Options**: Three responsive layout options with Sanity CMS control and visual editing support
+- ✅ **Unified Content System**: Modern contentBlocks system with backward compatibility and draggable reordering (2025)
 
 ## Data Management
 
@@ -51,7 +52,7 @@ This is a **Next.js 15 e-commerce site** for Spooky Books, migrated from Gatsby 
 - **Studio**: `/studio/` - Sanity Studio configuration with custom schemas and visual editing
 - **Product Schema**: Enhanced with variants for apparel sizing and Stripe integration fields
 - **Category Schema**: Simplified to Publications vs Apparel binary system
-- **Homepage Schema**: Three responsive layout options (2-column, 3-column, full-width) with Sanity CMS dropdown selection
+- **Homepage Schema**: Unified content block system with three responsive layout options (2-column, 3-column, full-width) and optional product/custom linking
 - **Webhook System**: Auto-creates Stripe products when Sanity content is published
 - **API Routes**: Complete CRUD operations and sync utilities
 - **Visual Editing**: Secure draft mode API using `@sanity/preview-url-secret`, enhanced presentation tool with location resolvers, and Live Content API
@@ -130,30 +131,63 @@ This is a **Next.js 15 e-commerce site** for Spooky Books, migrated from Gatsby 
 - **Usage**: `toast.success()` with clickable actions and ghost emoji branding
 - **Styling**: Optimized for light mode interface with pointer cursor feedback
 
-### Homepage Layout System (2024)
-- **Three Layout Options**: Content editors can choose layout style for each hero section via Sanity Studio dropdown
-- **2-Column Layout** (`layout: 'two'`): Images side by side with text below, breakpoint: `sm:col-span-6`
-- **3-Column Layout** (`layout: 'three'`): Text | Image | Image with tight spacing, breakpoint: `lg:col-span-4`
-- **Full-Width Layout** (`heroSingle`): Single image with text below, spans full 12 columns
-- **Responsive Design**: All layouts stack to single column on mobile (`col-span-12`)
-- **Typography Consistency**: All text uses `text-lg text-black font-normal` across layouts
+### Homepage Unified Content System (2025)
+- **Unified Content Blocks**: Modern `contentBlocks` array system replacing separate heroPair/heroSingle types
+- **Three Layout Options**: Content editors can choose layout style for each content block via Sanity Studio dropdown
+  - **2-Column Layout** (`layout: 'two'`): Images side by side with text below, breakpoint: `sm:col-span-6`
+  - **3-Column Layout** (`layout: 'three'`): Text | Image | Image with tight spacing, breakpoint: `lg:col-span-4`
+  - **Full-Width Layout** (`layout: 'full'`): Single image with text below, spans full 12 columns
+- **Flexible Linking**: Optional product linking or custom external/internal links per content block
+- **Draggable Reordering**: Sanity array fields provide native drag-and-drop functionality for content organization
+- **Legacy Compatibility**: Existing `heroSections` content preserved and rendered alongside new `contentBlocks`
 - **Visual Editing Support**: Real-time preview and layout switching in Sanity Studio presentation tool
-- **Schema Implementation**: `studio/schemas/homepage.ts` with dropdown selection and preview integration
-- **Backward Compatibility**: Existing content defaults to 3-column layout via fallback logic
+- **Schema Implementation**: `studio/schemas/homepage.ts` with comprehensive content block definition
 
-#### Layout Selection Interface
+#### Content Block Schema
 ```tsx
-// Sanity Studio dropdown options
-options: {
-  list: [
-    { title: '2-Column: Images Side by Side (Text Below)', value: 'two' },
-    { title: '3-Column: Text | Image | Image', value: 'three' },
+// New unified content block structure
+{
+  type: 'object',
+  name: 'contentBlock',
+  fields: [
+    {
+      name: 'layout',
+      type: 'string',
+      options: {
+        list: [
+          { title: '2-Column: Images Side by Side (Text Below)', value: 'two' },
+          { title: '3-Column: Text | Image | Image', value: 'three' },
+          { title: 'Full Width: Single Image', value: 'full' },
+        ],
+      },
+    },
+    { name: 'title', type: 'string' },
+    { name: 'caption', type: 'text' },
+    { name: 'linkedProduct', type: 'reference', to: [{ type: 'product' }] },
+    { name: 'customLink', type: 'object' },
+    { name: 'leftImage', type: 'image' },
+    { name: 'rightImage', type: 'image' },
   ],
 }
 
-// Frontend layout logic
-const layoutType = section.layout || 'three' // Fallback for existing content
+// TypeScript interface
+export interface SanityContentBlock {
+  _type: 'contentBlock'
+  layout: 'two' | 'three' | 'full'
+  title: string
+  caption?: string
+  leftImage: SanityImage
+  rightImage?: SanityImage
+  linkedProduct?: SanityProductReference
+  customLink?: { url: string; text?: string }
+}
 ```
+
+#### Migration Strategy
+- **Backward Compatibility**: GROQ query fetches both `contentBlocks[]` and `heroSections[]`
+- **Dual Rendering**: Homepage component renders both formats seamlessly
+- **Legacy Preservation**: Existing content continues to function without migration
+- **Future-Ready**: New content uses unified `contentBlocks` system with enhanced features
 
 ## Routing Structure
 
@@ -206,6 +240,12 @@ const layoutType = section.layout || 'three' // Fallback for existing content
 - **Clear Cache**: `/api/clear-cache` - Manual cache clearing for specific paths
 - **Emergency Cache Clear**: `/api/emergency-cache-clear` - Immediate cache clearing for all product-related data
 - **Test Revalidate**: `/api/test-revalidate` - Manual trigger for testing revalidation system
+- **Debug Homepage**: `/api/debug-homepage` - Content migration debugging and GROQ query validation
+
+#### Development Debugging Tools
+- **Homepage Debug Page**: `/debug-homepage` - Visual debugging interface for content block migration
+- **Content Inspection**: Real-time comparison between new contentBlocks and legacy heroSections
+- **Migration Validation**: Automated analysis of content structure and GROQ query results
 
 #### Background Process APIs (Manual Trigger Only - Hobby Plan)
 - **Cleanup Inventory**: `/api/cron/cleanup-inventory` - Manual cleanup of expired reservations and stale data
@@ -244,6 +284,8 @@ export async function generateStaticParams() {
 ### Key Directories
 
 - `src/app/` - Next.js App Router pages and layouts
+  - `src/app/page.tsx` - Homepage with unified content block system and legacy compatibility
+  - `src/app/debug-homepage/` - Development debugging tools for content migration
   - `src/app/api/` - API routes for Sanity-Stripe integration and optimized checkout flow
 - `src/components/` - Reusable React components with CSS modules
 - `src/data/` - Type definitions and interfaces (mock data replaced by Sanity)
@@ -253,7 +295,7 @@ export async function generateStaticParams() {
   - `src/lib/sanity/` - Sanity client, queries, type definitions, and Live Content API
 - `src/styles/` - Global CSS styles  
 - `studio/` - Sanity Studio configuration and schemas
-  - `studio/schemas/` - Product, category, and homepage schema definitions
+  - `studio/schemas/` - Product, category, and unified homepage content block schema definitions
 - `public/images/` - Product images and static assets
 - `public/webfonts/` - Custom Neue Haas Unica Pro font files (served statically)
 - `src/webfonts/` - Source font files (copied to public during build)
@@ -696,6 +738,43 @@ export function CartProvider({ children }) {
 
 **Testing Endpoint:**
 - **Development**: `/cart/test-persistence` - Interactive testing interface for cart persistence behavior
+
+#### Unified Content Block Implementation (2025)
+```tsx
+// Homepage with unified content system
+import type { SanityContentBlock, SanityHeroSection } from "@/lib/sanity/types"
+
+// Dual rendering for backward compatibility
+{/* New unified content blocks */}
+{homepage.contentBlocks?.map((block: SanityContentBlock, index: number) => (
+  <ContentBlock key={`content-${index}`} block={block} />
+))}
+
+{/* Legacy hero sections for backward compatibility */}
+{homepage.heroSections?.map((section: SanityHeroSection, index: number) => (
+  <HeroSection key={`hero-${index}`} section={section} />
+))}
+
+// Unified content block component with layout variants
+function ContentBlock({ block }: { block: SanityContentBlock }) {
+  const link = getLink(block) // Product or custom link resolution
+  
+  if (block.layout === 'full') {
+    return <ContentBlockFullWidth block={block} link={link} />
+  } else if (block.layout === 'two') {
+    return <ContentBlockTwoColumn block={block} link={link} />
+  } else {
+    return <ContentBlockThreeColumn block={block} link={link} />
+  }
+}
+
+// GROQ query supporting both formats
+export const homepageQuery = `*[_type == "homepage"][0]{
+  title,
+  contentBlocks[]{ /* new unified blocks */ },
+  heroSections[]{ /* legacy compatibility */ }
+}`
+```
 
 #### Visual Editing Usage (Next.js 15 Optimized - Fixed 2024)
 ```tsx
