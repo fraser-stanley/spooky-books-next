@@ -122,64 +122,48 @@ export const homepageQuery = `*[_type == "homepage"][0]{
   },
   heroSections[]{
     _type,
-    _type == "heroPair" => {
-      layout,
-      leftImage{
-        asset->{
-          _id,
-          url,
-          metadata{
-            dimensions
-          }
-        },
-        alt
-      },
-      rightImage{
-        asset->{
-          _id,
-          url,
-          metadata{
-            dimensions
-          }
-        },
-        alt
-      },
-      linkedProduct->{
+    layout,
+    title,
+    caption,
+    leftImage{
+      asset->{
         _id,
-        title,
-        author,
-        "slug": slug.current,
-        category->{
-          title,
-          "slug": slug.current
+        url,
+        metadata{
+          dimensions
         }
       },
-      title,
-      caption
+      alt
     },
-    _type == "heroSingle" => {
-      image{
-        asset->{
-          _id,
-          url,
-          metadata{
-            dimensions
-          }
-        },
-        alt
-      },
-      linkedProduct->{
+    rightImage{
+      asset->{
         _id,
-        title,
-        author,
-        "slug": slug.current,
-        category->{
-          title,
-          "slug": slug.current
+        url,
+        metadata{
+          dimensions
         }
       },
+      alt
+    },
+    image{
+      asset->{
+        _id,
+        url,
+        metadata{
+          dimensions
+        }
+      },
+      alt
+    },
+    linkedProduct->{
+      _id,
       title,
-      caption
+      author,
+      "slug": slug.current,
+      category->{
+        title,
+        "slug": slug.current
+      }
     }
   }
 }`
