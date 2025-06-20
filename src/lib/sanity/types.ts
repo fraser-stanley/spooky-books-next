@@ -46,6 +46,27 @@ export interface SanityImage {
   alt?: string
 }
 
+export interface SanityContentBlock {
+  _type: 'contentBlock'
+  layout: 'two' | 'three' | 'full'
+  title: string
+  caption?: string
+  leftImage: SanityImage
+  rightImage?: SanityImage
+  linkedProduct?: {
+    _id: string
+    title: string
+    author?: string
+    slug: string
+    category: SanityCategory
+  }
+  customLink?: {
+    url: string
+    text?: string
+  }
+}
+
+// Legacy types for backward compatibility during migration
 export interface SanityHeroPair {
   _type: 'heroPair'
   layout: 'two' | 'three'
@@ -80,5 +101,7 @@ export type SanityHeroSection = SanityHeroPair | SanityHeroSingle
 
 export interface SanityHomepage {
   title: string
-  heroSections: SanityHeroSection[]
+  contentBlocks?: SanityContentBlock[]
+  // Legacy field for backward compatibility
+  heroSections?: SanityHeroSection[]
 }
