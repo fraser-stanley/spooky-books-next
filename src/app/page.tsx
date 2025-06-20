@@ -1,18 +1,21 @@
 // app/page.tsx
 import Image from "next/image"
 import Link from "next/link"
-import { draftMode } from "next/headers"
 import { Layout } from "@/components/layout"
-import { getCategories, getHomepage } from "@/lib/sanity/queries"
+import { getCategories } from "@/lib/sanity/queries"
+import { sanityFetch } from "@/lib/sanity/live"
+import { homepageQuery } from "@/lib/sanity/groq"
 import type { SanityHeroSection, SanityHeroPair, SanityHeroSingle } from "@/lib/sanity/types"
 
 // Force dynamic rendering to ensure fresh data
 export const dynamic = 'force-dynamic'
 
 export default async function HomePage() {
-  const { isEnabled } = await draftMode()
   const categories = await getCategories()
-  const homepage = await getHomepage(isEnabled)
+  const { data: homepage } = await sanityFetch({ 
+    query: homepageQuery, 
+    tags: ['homepage'] 
+  })
   
   
   return (
@@ -27,7 +30,7 @@ export default async function HomePage() {
             <p>No hero sections configured. Please add content in Sanity Studio.</p>
           </div>
         ) : (
-          homepage.heroSections.map((section, index) => (
+          homepage.heroSections.map((section: SanityHeroSection, index: number) => (
             <HeroSection key={index} section={section} />
           ))
         )}

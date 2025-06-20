@@ -1,4 +1,3 @@
-import { sanityClient } from './client'
 import { safeSanityFetch } from './live'
 import { categoriesQuery, productsQuery, productsByCategoryQuery, productQuery, homepageQuery } from './groq'
 import type { SanityCategory, SanityProduct, SanityHomepage } from './types'
@@ -33,17 +32,9 @@ export async function getProduct(slug: string): Promise<SanityProduct | null> {
   })
 }
 
-export async function getHomepage(isDraft = false): Promise<SanityHomepage | null> {
-  if (isDraft) {
-    // For draft mode, still use the old method to avoid conflicts
-    const client = sanityClient.withConfig({ 
-      useCdn: false,
-      token: process.env.SANITY_VIEWER_TOKEN,
-      perspective: 'previewDrafts'
-    })
-    return client.fetch(homepageQuery)
-  }
-  
+export async function getHomepage(): Promise<SanityHomepage | null> {
+  // Always use safeSanityFetch for proper visual editing integration
+  // The live client handles draft mode automatically based on presentation context
   return safeSanityFetch({
     query: homepageQuery,
     tags: ['homepage']

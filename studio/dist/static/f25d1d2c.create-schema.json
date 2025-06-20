@@ -1,0 +1,1000 @@
+[
+  {
+    "fields": [
+      {
+        "options": {
+          "list": [
+            {
+              "title": "Publications",
+              "value": "Publications"
+            },
+            {
+              "title": "Apparel",
+              "value": "Apparel"
+            }
+          ]
+        },
+        "validation": [
+          {
+            "rules": [
+              {
+                "flag": "valid",
+                "constraint": [
+                  "Publications",
+                  "Apparel"
+                ]
+              },
+              {
+                "flag": "presence",
+                "constraint": "required"
+              }
+            ],
+            "level": "error"
+          }
+        ],
+        "name": "title",
+        "type": "string",
+        "title": "Category Name"
+      },
+      {
+        "options": {
+          "source": "title",
+          "maxLength": 96
+        },
+        "validation": [
+          {
+            "rules": [
+              {
+                "flag": "custom"
+              },
+              {
+                "flag": "presence",
+                "constraint": "required"
+              }
+            ],
+            "level": "error"
+          }
+        ],
+        "name": "slug",
+        "type": "slug"
+      },
+      {
+        "description": "Brief description of this category",
+        "name": "description",
+        "type": "text"
+      },
+      {
+        "initialValue": 0,
+        "description": "Lower numbers appear first in navigation",
+        "name": "sortOrder",
+        "type": "number"
+      }
+    ],
+    "name": "category",
+    "type": "document"
+  },
+  {
+    "fields": [
+      {
+        "validation": [
+          {
+            "rules": [
+              {
+                "flag": "presence",
+                "constraint": "required"
+              }
+            ],
+            "level": "error"
+          }
+        ],
+        "name": "title",
+        "type": "string"
+      },
+      {
+        "name": "author",
+        "type": "string"
+      },
+      {
+        "options": {
+          "source": "title",
+          "maxLength": 96
+        },
+        "validation": [
+          {
+            "rules": [
+              {
+                "flag": "custom"
+              },
+              {
+                "flag": "presence",
+                "constraint": "required"
+              }
+            ],
+            "level": "error"
+          }
+        ],
+        "name": "slug",
+        "type": "slug"
+      },
+      {
+        "description": "Copy this text to Rich Description below, then delete this field content",
+        "name": "description",
+        "type": "text",
+        "title": "Description (Legacy - will be removed)"
+      },
+      {
+        "description": "Rich text description with formatting support (bold, italics, paragraphs, etc.)",
+        "of": [
+          {
+            "marks": {
+              "annotations": [
+                {
+                  "fields": [
+                    {
+                      "validation": [
+                        {
+                          "rules": [
+                            {
+                              "flag": "uri",
+                              "constraint": {
+                                "options": {
+                                  "scheme": [
+                                    "/^http$/",
+                                    "/^https$/",
+                                    "/^mailto$/",
+                                    "/^tel$/"
+                                  ],
+                                  "allowRelative": false,
+                                  "relativeOnly": false,
+                                  "allowCredentials": false
+                                }
+                              }
+                            }
+                          ],
+                          "level": "error"
+                        }
+                      ],
+                      "name": "href",
+                      "type": "url",
+                      "title": "URL"
+                    },
+                    {
+                      "initialValue": true,
+                      "name": "blank",
+                      "type": "boolean",
+                      "title": "Open in new tab"
+                    }
+                  ],
+                  "name": "link",
+                  "type": "object",
+                  "title": "URL"
+                }
+              ],
+              "decorators": [
+                {
+                  "value": "strong",
+                  "title": "Strong"
+                },
+                {
+                  "value": "em",
+                  "title": "Emphasis"
+                }
+              ]
+            },
+            "lists": [
+              {
+                "value": "bullet",
+                "title": "Bulleted list"
+              },
+              {
+                "value": "number",
+                "title": "Numbered list"
+              }
+            ],
+            "styles": [
+              {
+                "value": "normal",
+                "title": "Normal"
+              },
+              {
+                "value": "h4",
+                "title": "Heading 4"
+              },
+              {
+                "value": "h5",
+                "title": "Heading 5"
+              },
+              {
+                "value": "blockquote",
+                "title": "Quote"
+              }
+            ],
+            "of": [],
+            "type": "block"
+          }
+        ],
+        "name": "richDescription",
+        "type": "array"
+      },
+      {
+        "validation": [
+          {
+            "rules": [
+              {
+                "flag": "presence",
+                "constraint": "required"
+              },
+              {
+                "flag": "min",
+                "constraint": 0
+              }
+            ],
+            "level": "error"
+          }
+        ],
+        "name": "price",
+        "type": "number",
+        "title": "Price (in major units)"
+      },
+      {
+        "validation": [
+          {
+            "rules": [
+              {
+                "flag": "presence",
+                "constraint": "required"
+              }
+            ],
+            "level": "error"
+          }
+        ],
+        "to": [
+          {
+            "type": "category"
+          }
+        ],
+        "name": "category",
+        "type": "reference"
+      },
+      {
+        "initialValue": false,
+        "description": "Toggle ON for sized apparel (t-shirts, hoodies). Toggle OFF for non-sized items (tote bags, books, magazines).",
+        "hidden": "conditional",
+        "name": "hasSizes",
+        "type": "boolean",
+        "title": "Has Sizes?"
+      },
+      {
+        "initialValue": 0,
+        "validation": [
+          {
+            "rules": [
+              {
+                "flag": "presence",
+                "constraint": "required"
+              },
+              {
+                "flag": "min",
+                "constraint": 0
+              }
+            ],
+            "level": "error"
+          }
+        ],
+        "description": "Available inventory. Use this field for: Publications (books, magazines) and Non-sized Apparel (tote bags, stickers). For sized apparel (t-shirts), use Size Variants below instead.",
+        "hidden": "conditional",
+        "name": "stockQuantity",
+        "type": "number"
+      },
+      {
+        "initialValue": 0,
+        "validation": [
+          {
+            "rules": [
+              {
+                "flag": "min",
+                "constraint": 0
+              }
+            ],
+            "level": "error"
+          }
+        ],
+        "description": "Items temporarily reserved during checkout process. Managed automatically by the system.",
+        "readOnly": true,
+        "hidden": true,
+        "name": "reservedQuantity",
+        "type": "number"
+      },
+      {
+        "description": "Add different sizes (XS, S, M, L, XL) with individual stock levels for each size.",
+        "of": [
+          {
+            "fields": [
+              {
+                "options": {
+                  "list": [
+                    {
+                      "title": "XS",
+                      "value": "xs"
+                    },
+                    {
+                      "title": "S",
+                      "value": "s"
+                    },
+                    {
+                      "title": "M",
+                      "value": "m"
+                    },
+                    {
+                      "title": "L",
+                      "value": "l"
+                    },
+                    {
+                      "title": "XL",
+                      "value": "xl"
+                    },
+                    {
+                      "title": "XXL",
+                      "value": "xxl"
+                    },
+                    {
+                      "title": "XXXL",
+                      "value": "xxxl"
+                    }
+                  ]
+                },
+                "validation": [
+                  {
+                    "rules": [
+                      {
+                        "flag": "valid",
+                        "constraint": [
+                          "xs",
+                          "s",
+                          "m",
+                          "l",
+                          "xl",
+                          "xxl",
+                          "xxxl"
+                        ]
+                      },
+                      {
+                        "flag": "presence",
+                        "constraint": "required"
+                      }
+                    ],
+                    "level": "error"
+                  }
+                ],
+                "name": "size",
+                "type": "string"
+              },
+              {
+                "initialValue": 0,
+                "validation": [
+                  {
+                    "rules": [
+                      {
+                        "flag": "presence",
+                        "constraint": "required"
+                      },
+                      {
+                        "flag": "min",
+                        "constraint": 0
+                      }
+                    ],
+                    "level": "error"
+                  }
+                ],
+                "name": "stockQuantity",
+                "type": "number",
+                "title": "Stock for this size"
+              },
+              {
+                "initialValue": 0,
+                "validation": [
+                  {
+                    "rules": [
+                      {
+                        "flag": "min",
+                        "constraint": 0
+                      }
+                    ],
+                    "level": "error"
+                  }
+                ],
+                "description": "Items temporarily reserved during checkout. Managed automatically by the system.",
+                "readOnly": true,
+                "hidden": true,
+                "name": "reservedQuantity",
+                "type": "number",
+                "title": "Reserved for this size"
+              },
+              {
+                "readOnly": true,
+                "hidden": true,
+                "name": "stripePriceId",
+                "type": "string",
+                "title": "Stripe Price ID"
+              }
+            ],
+            "type": "object",
+            "title": "Size Variant"
+          }
+        ],
+        "hidden": "conditional",
+        "name": "variants",
+        "type": "array",
+        "title": "Size Variants"
+      },
+      {
+        "options": {
+          "hotspot": true
+        },
+        "validation": [
+          {
+            "rules": [
+              {
+                "flag": "presence",
+                "constraint": "required"
+              }
+            ],
+            "level": "error"
+          }
+        ],
+        "name": "heroImage",
+        "type": "image"
+      },
+      {
+        "of": [
+          {
+            "options": {
+              "hotspot": true
+            },
+            "type": "image"
+          }
+        ],
+        "name": "secondaryImages",
+        "type": "array"
+      },
+      {
+        "readOnly": true,
+        "hidden": true,
+        "name": "stripePriceId",
+        "type": "string",
+        "title": "Stripe Price ID"
+      },
+      {
+        "readOnly": true,
+        "hidden": true,
+        "name": "stripeProductId",
+        "type": "string",
+        "title": "Stripe Product ID"
+      }
+    ],
+    "name": "product",
+    "type": "document"
+  },
+  {
+    "fields": [
+      {
+        "initialValue": "Homepage",
+        "readOnly": true,
+        "name": "title",
+        "type": "string",
+        "title": "Page Title"
+      },
+      {
+        "validation": [
+          {
+            "rules": [
+              {
+                "flag": "min",
+                "constraint": 1
+              }
+            ],
+            "level": "error",
+            "message": "At least one hero section is required"
+          }
+        ],
+        "of": [
+          {
+            "fields": [
+              {
+                "options": {
+                  "list": [
+                    {
+                      "title": "2-Column: Images Side by Side (Text Below)",
+                      "value": "two"
+                    },
+                    {
+                      "title": "3-Column: Text | Image | Image",
+                      "value": "three"
+                    }
+                  ]
+                },
+                "initialValue": "three",
+                "validation": [
+                  {
+                    "rules": [
+                      {
+                        "flag": "valid",
+                        "constraint": [
+                          "two",
+                          "three"
+                        ]
+                      },
+                      {
+                        "flag": "presence",
+                        "constraint": "required"
+                      }
+                    ],
+                    "level": "error"
+                  }
+                ],
+                "description": "Choose how to display the images and text",
+                "name": "layout",
+                "type": "string",
+                "title": "Layout Style"
+              },
+              {
+                "options": {
+                  "hotspot": true
+                },
+                "description": "Add image here",
+                "name": "leftImage",
+                "type": "image"
+              },
+              {
+                "options": {
+                  "hotspot": true
+                },
+                "description": "Add image here",
+                "name": "rightImage",
+                "type": "image"
+              },
+              {
+                "validation": [
+                  {
+                    "rules": [
+                      {
+                        "flag": "presence",
+                        "constraint": "required"
+                      }
+                    ],
+                    "level": "error"
+                  }
+                ],
+                "to": [
+                  {
+                    "type": "product"
+                  }
+                ],
+                "name": "linkedProduct",
+                "type": "reference"
+              },
+              {
+                "validation": [
+                  {
+                    "rules": [
+                      {
+                        "flag": "presence",
+                        "constraint": "required"
+                      }
+                    ],
+                    "level": "error"
+                  }
+                ],
+                "name": "title",
+                "type": "string",
+                "title": "Hero Title"
+              },
+              {
+                "rows": 2,
+                "description": "Optional caption displayed below the title",
+                "name": "caption",
+                "type": "text",
+                "title": "Caption (Optional)"
+              }
+            ],
+            "type": "object",
+            "name": "heroPair",
+            "title": "Hero Pair (2 Images)"
+          },
+          {
+            "fields": [
+              {
+                "options": {
+                  "hotspot": true
+                },
+                "description": "Add image here",
+                "name": "image",
+                "type": "image",
+                "title": "Hero Image"
+              },
+              {
+                "validation": [
+                  {
+                    "rules": [
+                      {
+                        "flag": "presence",
+                        "constraint": "required"
+                      }
+                    ],
+                    "level": "error"
+                  }
+                ],
+                "to": [
+                  {
+                    "type": "product"
+                  }
+                ],
+                "name": "linkedProduct",
+                "type": "reference"
+              },
+              {
+                "validation": [
+                  {
+                    "rules": [
+                      {
+                        "flag": "presence",
+                        "constraint": "required"
+                      }
+                    ],
+                    "level": "error"
+                  }
+                ],
+                "name": "title",
+                "type": "string",
+                "title": "Hero Title"
+              },
+              {
+                "rows": 2,
+                "description": "Optional caption displayed below the title",
+                "name": "caption",
+                "type": "text",
+                "title": "Caption (Optional)"
+              }
+            ],
+            "type": "object",
+            "name": "heroSingle",
+            "title": "Hero Single (Full Width)"
+          }
+        ],
+        "name": "heroSections",
+        "type": "array"
+      }
+    ],
+    "name": "homepage",
+    "type": "document"
+  },
+  {
+    "fields": [
+      {
+        "validation": [
+          {
+            "rules": [
+              {
+                "flag": "presence",
+                "constraint": "required"
+              }
+            ],
+            "level": "error"
+          }
+        ],
+        "name": "sessionId",
+        "type": "string",
+        "title": "Stripe Session ID"
+      },
+      {
+        "validation": [
+          {
+            "rules": [
+              {
+                "flag": "presence",
+                "constraint": "required"
+              },
+              {
+                "flag": "min",
+                "constraint": 1
+              }
+            ],
+            "level": "error"
+          }
+        ],
+        "of": [
+          {
+            "fields": [
+              {
+                "validation": [
+                  {
+                    "rules": [
+                      {
+                        "flag": "presence",
+                        "constraint": "required"
+                      }
+                    ],
+                    "level": "error"
+                  }
+                ],
+                "name": "productId",
+                "type": "string",
+                "title": "Product ID"
+              },
+              {
+                "validation": [
+                  {
+                    "rules": [
+                      {
+                        "flag": "presence",
+                        "constraint": "required"
+                      },
+                      {
+                        "flag": "min",
+                        "constraint": 0
+                      }
+                    ],
+                    "level": "error"
+                  }
+                ],
+                "name": "quantity",
+                "type": "number"
+              },
+              {
+                "name": "size",
+                "type": "string",
+                "title": "Size (for apparel)"
+              }
+            ],
+            "type": "object",
+            "title": "Stock Operation"
+          }
+        ],
+        "name": "operations",
+        "type": "array",
+        "title": "Stock Operations"
+      },
+      {
+        "validation": [
+          {
+            "rules": [
+              {
+                "flag": "presence",
+                "constraint": "required"
+              }
+            ],
+            "level": "error"
+          }
+        ],
+        "name": "expiresAt",
+        "type": "datetime"
+      },
+      {
+        "validation": [
+          {
+            "rules": [
+              {
+                "flag": "presence",
+                "constraint": "required"
+              }
+            ],
+            "level": "error"
+          }
+        ],
+        "name": "createdAt",
+        "type": "datetime"
+      }
+    ],
+    "hidden": true,
+    "name": "stockReservation",
+    "type": "document"
+  },
+  {
+    "fields": [
+      {
+        "validation": [
+          {
+            "rules": [
+              {
+                "flag": "presence",
+                "constraint": "required"
+              }
+            ],
+            "level": "error"
+          }
+        ],
+        "name": "key",
+        "type": "string",
+        "title": "Idempotency Key"
+      },
+      {
+        "description": "JSON string of the operation result",
+        "name": "result",
+        "type": "text",
+        "title": "Stored Result"
+      },
+      {
+        "validation": [
+          {
+            "rules": [
+              {
+                "flag": "presence",
+                "constraint": "required"
+              }
+            ],
+            "level": "error"
+          }
+        ],
+        "name": "createdAt",
+        "type": "datetime"
+      },
+      {
+        "validation": [
+          {
+            "rules": [
+              {
+                "flag": "presence",
+                "constraint": "required"
+              }
+            ],
+            "level": "error"
+          }
+        ],
+        "name": "expiresAt",
+        "type": "datetime"
+      }
+    ],
+    "hidden": true,
+    "name": "idempotencyRecord",
+    "type": "document"
+  },
+  {
+    "fields": [
+      {
+        "options": {
+          "list": [
+            {
+              "title": "Stock Validation",
+              "value": "stock_validation"
+            },
+            {
+              "title": "Stock Reservation",
+              "value": "stock_reservation"
+            },
+            {
+              "title": "Stock Deduction",
+              "value": "stock_deduction"
+            },
+            {
+              "title": "Webhook Processing",
+              "value": "webhook_processing"
+            }
+          ]
+        },
+        "validation": [
+          {
+            "rules": [
+              {
+                "flag": "valid",
+                "constraint": [
+                  "stock_validation",
+                  "stock_reservation",
+                  "stock_deduction",
+                  "webhook_processing"
+                ]
+              },
+              {
+                "flag": "presence",
+                "constraint": "required"
+              }
+            ],
+            "level": "error"
+          }
+        ],
+        "name": "type",
+        "type": "string",
+        "title": "Error Type"
+      },
+      {
+        "validation": [
+          {
+            "rules": [
+              {
+                "flag": "presence",
+                "constraint": "required"
+              }
+            ],
+            "level": "error"
+          }
+        ],
+        "name": "message",
+        "type": "text",
+        "title": "Error Message"
+      },
+      {
+        "description": "Additional error details in JSON format",
+        "name": "details",
+        "type": "text",
+        "title": "Error Details"
+      },
+      {
+        "name": "sessionId",
+        "type": "string",
+        "title": "Session ID"
+      },
+      {
+        "name": "productId",
+        "type": "string",
+        "title": "Product ID"
+      },
+      {
+        "name": "userId",
+        "type": "string",
+        "title": "User ID"
+      },
+      {
+        "validation": [
+          {
+            "rules": [
+              {
+                "flag": "presence",
+                "constraint": "required"
+              }
+            ],
+            "level": "error"
+          }
+        ],
+        "name": "timestamp",
+        "type": "datetime"
+      },
+      {
+        "options": {
+          "list": [
+            {
+              "title": "Low",
+              "value": "low"
+            },
+            {
+              "title": "Medium",
+              "value": "medium"
+            },
+            {
+              "title": "High",
+              "value": "high"
+            },
+            {
+              "title": "Critical",
+              "value": "critical"
+            }
+          ]
+        },
+        "validation": [
+          {
+            "rules": [
+              {
+                "flag": "valid",
+                "constraint": [
+                  "low",
+                  "medium",
+                  "high",
+                  "critical"
+                ]
+              },
+              {
+                "flag": "presence",
+                "constraint": "required"
+              }
+            ],
+            "level": "error"
+          }
+        ],
+        "name": "severity",
+        "type": "string",
+        "title": "Severity Level"
+      }
+    ],
+    "hidden": true,
+    "name": "errorLog",
+    "type": "document"
+  }
+]

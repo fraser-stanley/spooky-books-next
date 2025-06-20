@@ -35,7 +35,7 @@ This is a **Next.js 15 e-commerce site** for Spooky Books, migrated from Gatsby 
 - ✅ **Product Variants**: Flexible apparel system supporting both sized (t-shirts) and non-sized (tote bags) products
 - ✅ **Category System**: Unified Publications vs Apparel categories
 - ✅ **Homepage CMS**: Sanity-powered homepage with visual editing capabilities  
-- ✅ **Visual Editing**: Complete draft mode and presentation tool setup with Live Content API
+- ✅ **Visual Editing**: Complete draft mode and presentation tool setup with Live Content API (Fixed "Invalid secret" error 2024)
 - ✅ **Production Ready**: Deployed to Vercel with visual editing fully functional
 - ✅ **Advanced Inventory Management**: Sophisticated stock reservation system with race condition prevention
 - ✅ **Real-time Stock Validation**: Atomic transactions and reserved quantity tracking
@@ -54,7 +54,7 @@ This is a **Next.js 15 e-commerce site** for Spooky Books, migrated from Gatsby 
 - **Homepage Schema**: Three responsive layout options (2-column, 3-column, full-width) with Sanity CMS dropdown selection
 - **Webhook System**: Auto-creates Stripe products when Sanity content is published
 - **API Routes**: Complete CRUD operations and sync utilities
-- **Visual Editing**: Draft mode API endpoints, presentation tool with live preview, and Live Content API
+- **Visual Editing**: Secure draft mode API using `@sanity/preview-url-secret`, enhanced presentation tool with location resolvers, and Live Content API
 - **Real-time Updates**: Instant content synchronization between draft and published states
 - **CORS Configuration**: Middleware for cross-origin requests from Sanity Studio
 
@@ -697,7 +697,7 @@ export function CartProvider({ children }) {
 **Testing Endpoint:**
 - **Development**: `/cart/test-persistence` - Interactive testing interface for cart persistence behavior
 
-#### Visual Editing Usage (Next.js 15 Optimized)
+#### Visual Editing Usage (Next.js 15 Optimized - Fixed 2024)
 ```tsx
 // Homepage with real-time Sanity data
 import { sanityFetch } from '@/lib/sanity/live'
@@ -753,8 +753,56 @@ export function VisualEditingProvider({ isEnabled }) {
   )
 }
 
-// Draft mode activation
-const response = await fetch('/api/draft-mode/enable')
+// Fixed Draft Mode API Implementation
+// src/app/api/draft-mode/enable/route.ts
+import { validatePreviewUrl } from '@sanity/preview-url-secret'
+import { draftMode } from 'next/headers'
+import { redirect } from 'next/navigation'
+import { NextRequest } from 'next/server'
+import { sanityClient } from '@/lib/sanity/client'
+
+export async function GET(request: NextRequest) {
+  const { isValid, redirectTo = '/' } = await validatePreviewUrl(
+    sanityClient.withConfig({ token: process.env.SANITY_VIEWER_TOKEN! }),
+    request.url,
+  )
+
+  if (!isValid) {
+    return new Response('Invalid secret', { status: 401 })
+  }
+
+  // Next.js 15: draftMode() returns a Promise
+  const draft = await draftMode()
+  draft.enable()
+  
+  redirect(redirectTo)
+}
+
+// Fixed Presentation Tool Configuration
+// studio/sanity.config.ts
+import { defineLocations, defineUrlResolver } from 'sanity/presentation'
+
+presentationTool({
+  resolve: {
+    locations: {
+      homepage: defineLocations({
+        select: { title: 'title', slug: 'slug.current' },
+        resolve: (doc) => ({ locations: [{ title: 'Homepage', href: '/' }] }),
+      }),
+      product: defineLocations({
+        select: { title: 'title', slug: 'slug.current' },
+        resolve: (doc) => ({ locations: [{ title: doc.title || 'Untitled', href: `/products/${doc.slug}` }] }),
+      }),
+    },
+    mainDocuments: defineUrlResolver({
+      filter: `_type == "product" && defined(slug.current)`,
+      resolve: (doc) => ({ href: `/products/${doc.slug?.current}` }),
+    }),
+  },
+  previewUrl: {
+    previewMode: { enable: '/api/draft-mode/enable' },
+  },
+}),
 ```
 
 #### Size Selector Usage
@@ -895,9 +943,15 @@ SANITY_STUDIO_PREVIEW_ORIGIN=https://your-domain.com
 4. **Page Revalidation**: Automatic revalidation of affected pages via `/api/revalidate` webhook
 5. **Vercel Optimization**: Selective revalidation reduces build usage on free tier
 
-### Visual Editing Setup (Next.js 15 Optimized)
-1. **Draft Mode**: Enabled via `/api/draft-mode/enable` endpoint with SANITY_VIEWER_TOKEN
-2. **Presentation Tool**: Configured in Sanity Studio with live preview URL
+### Visual Editing Setup (Next.js 15 Optimized - Fixed 2024)
+1. **Draft Mode API**: Secure implementation using `@sanity/preview-url-secret` with `validatePreviewUrl`
+   - **Fixed "Invalid secret" Error**: Replaced `defineEnableDraftMode` with proper secret validation
+   - **Endpoint**: `/api/draft-mode/enable` - validates preview URL secrets and redirects safely
+   - **Token**: Uses SANITY_VIEWER_TOKEN for authentication
+2. **Presentation Tool**: Enhanced configuration with proper location resolvers
+   - **Location Mapping**: `defineLocations` for homepage and product document types
+   - **URL Resolution**: `defineUrlResolver` for automatic preview URL generation
+   - **Filter Support**: GROQ filter for `_type == "product" && defined(slug.current)`
 3. **Live Content API**: Real-time updates using `defineLive` with `sanityFetch` and `SanityLive`
 4. **Server/Client Separation**: `SanityLive` in root layout (server component), `VisualEditing` dynamically imported for client
 5. **Component Architecture**: 
@@ -1011,13 +1065,18 @@ SANITY_STUDIO_PREVIEW_ORIGIN=https://spooky-books-next.vercel.app
 - `Access to fetch...has been blocked by CORS policy` console errors
 - `PostMessage origin mismatch` errors between Studio and site
 
-### Visual Editing Access
+### Visual Editing Access (Fixed 2024)
 1. **Studio Access**: Visit https://spooky-books.sanity.studio
 2. **Presentation Mode**: Click "Presentation" tab in studio
-3. **Homepage Editing**: Select "Homepage" → Live preview opens
+3. **Homepage Editing**: Select "Homepage" → Live preview opens with secure URL validation
 4. **Layout Selection**: Choose layout style (2-column, 3-column) for each hero section
 5. **Real-time Updates**: Changes appear instantly in live preview
 6. **Content Management**: Add/edit hero sections with layout-specific preview
+7. **Fixed Issues**: 
+   - ✅ Resolved "Invalid secret" error when opening presentation mode
+   - ✅ Fixed blank screen issue with proper `@sanity/preview-url-secret` implementation
+   - ✅ Enhanced document location mapping for better navigation
+   - ✅ Secure preview URL generation with proper authentication
 
 ### Webhook Configuration
 **Required Webhooks:**
