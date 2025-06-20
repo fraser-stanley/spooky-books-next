@@ -43,6 +43,7 @@ This is a **Next.js 15 e-commerce site** for Spooky Books, migrated from Gatsby 
 - ✅ **Automated Background Processes**: Stripe webhook-based cleanup (cron jobs removed for hobby plan compatibility)
 - ✅ **Enhanced Error Handling**: User-friendly error messages with technical debt reduction
 - ✅ **Multiple Success Pages**: Optimized checkout success flow with improved UX
+- ✅ **Homepage Layout Options**: Three responsive layout options with Sanity CMS control and visual editing support
 
 ## Data Management
 
@@ -50,7 +51,7 @@ This is a **Next.js 15 e-commerce site** for Spooky Books, migrated from Gatsby 
 - **Studio**: `/studio/` - Sanity Studio configuration with custom schemas and visual editing
 - **Product Schema**: Enhanced with variants for apparel sizing and Stripe integration fields
 - **Category Schema**: Simplified to Publications vs Apparel binary system
-- **Homepage Schema**: Flexible hero sections with layout variables (pair/single) and caption support
+- **Homepage Schema**: Three responsive layout options (2-column, 3-column, full-width) with Sanity CMS dropdown selection
 - **Webhook System**: Auto-creates Stripe products when Sanity content is published
 - **API Routes**: Complete CRUD operations and sync utilities
 - **Visual Editing**: Draft mode API endpoints, presentation tool with live preview, and Live Content API
@@ -129,10 +130,35 @@ This is a **Next.js 15 e-commerce site** for Spooky Books, migrated from Gatsby 
 - **Usage**: `toast.success()` with clickable actions and ghost emoji branding
 - **Styling**: Optimized for light mode interface with pointer cursor feedback
 
+### Homepage Layout System (2024)
+- **Three Layout Options**: Content editors can choose layout style for each hero section via Sanity Studio dropdown
+- **2-Column Layout** (`layout: 'two'`): Images side by side with text below, breakpoint: `sm:col-span-6`
+- **3-Column Layout** (`layout: 'three'`): Text | Image | Image with tight spacing, breakpoint: `lg:col-span-4`
+- **Full-Width Layout** (`heroSingle`): Single image with text below, spans full 12 columns
+- **Responsive Design**: All layouts stack to single column on mobile (`col-span-12`)
+- **Typography Consistency**: All text uses `text-lg text-black font-normal` across layouts
+- **Visual Editing Support**: Real-time preview and layout switching in Sanity Studio presentation tool
+- **Schema Implementation**: `studio/schemas/homepage.ts` with dropdown selection and preview integration
+- **Backward Compatibility**: Existing content defaults to 3-column layout via fallback logic
+
+#### Layout Selection Interface
+```tsx
+// Sanity Studio dropdown options
+options: {
+  list: [
+    { title: '2-Column: Images Side by Side (Text Below)', value: 'two' },
+    { title: '3-Column: Text | Image | Image', value: 'three' },
+  ],
+}
+
+// Frontend layout logic
+const layoutType = section.layout || 'three' // Fallback for existing content
+```
+
 ## Routing Structure
 
 ### App Router Implementation
-- **Home**: `/` - Hero product showcases with image pairs
+- **Home**: `/` - Hero product showcases with three layout options: 2-column (images side by side), 3-column (text | image | image), and full-width
 - **Products**: `/products/` - Product grid with category navigation and stock status
 - **Product Detail**: `/products/[slug]/` - Dynamic pages with size selection and stock validation
 - **Cart**: `/cart/` - Optimized checkout page with 1-2 second checkout flow, Stripe.js preloading, and real-time stock validation
@@ -970,11 +996,28 @@ NEXT_PUBLIC_SANITY_STUDIO_URL=https://spooky-books.sanity.studio
 SANITY_STUDIO_PREVIEW_ORIGIN=https://spooky-books-next.vercel.app
 ```
 
+### CORS Configuration (Required for Visual Editing)
+**Important**: Visual editing will fail without proper CORS setup. Add production URL to Sanity project:
+
+1. **Navigate to Sanity CORS Settings**: https://sanity.io/manage/project/0gbx06x6/api
+2. **Click "Add CORS Origin"** or use direct link: https://sanity.io/manage/project/0gbx06x6/api?cors=add&origin=https%3A%2F%2Fspooky-books-next.vercel.app
+3. **Add Production URL**: `https://spooky-books-next.vercel.app`
+4. **Enable Credentials**: Check "Allow credentials" checkbox
+5. **Save**: Confirm CORS origin addition
+
+**Common CORS Errors Fixed:**
+- `Failed to load resource: net::ERR_FAILED` on Sanity Live API
+- `Unable to connect to visual editing` in presentation tool
+- `Access to fetch...has been blocked by CORS policy` console errors
+- `PostMessage origin mismatch` errors between Studio and site
+
 ### Visual Editing Access
 1. **Studio Access**: Visit https://spooky-books.sanity.studio
 2. **Presentation Mode**: Click "Presentation" tab in studio
 3. **Homepage Editing**: Select "Homepage" → Live preview opens
-4. **Content Management**: Add/edit hero sections with real-time updates
+4. **Layout Selection**: Choose layout style (2-column, 3-column) for each hero section
+5. **Real-time Updates**: Changes appear instantly in live preview
+6. **Content Management**: Add/edit hero sections with layout-specific preview
 
 ### Webhook Configuration
 **Required Webhooks:**

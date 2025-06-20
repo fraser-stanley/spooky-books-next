@@ -32,7 +32,12 @@ export default defineConfig({
           ])
     }),
     presentationTool({
-      previewUrl: 'https://spooky-books-next.vercel.app',
+      previewUrl: {
+        origin: process.env.SANITY_STUDIO_PREVIEW_ORIGIN || 'http://localhost:3000',
+        draftMode: {
+          enable: '/api/draft-mode/enable',
+        },
+      },
     }),
     visionTool()
   ],

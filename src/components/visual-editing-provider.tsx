@@ -11,6 +11,14 @@ const VisualEditing = dynamic(
   }
 )
 
+const SanityLive = dynamic(
+  () => import('@/lib/sanity/live').then(mod => ({ default: mod.SanityLive })),
+  { 
+    ssr: false,
+    loading: () => null
+  }
+)
+
 interface VisualEditingProviderProps {
   isEnabled: boolean
 }
@@ -19,6 +27,7 @@ export function VisualEditingProvider({ isEnabled }: VisualEditingProviderProps)
   return (
     <>
       {isEnabled && <VisualEditing />}
+      <SanityLive />
     </>
   )
 }

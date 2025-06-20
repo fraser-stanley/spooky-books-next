@@ -17,6 +17,7 @@
     "@portabletext/react": "^3.2.1",
     "@sanity/client": "^7.6.0",
     "@sanity/presentation": "^2.0.0",
+    "@sanity/visual-editing": "^2.15.0",
     "@stripe/stripe-js": "^7.3.1",
     "@types/uuid": "^10.0.0",
     "clsx": "^2.1.1",
