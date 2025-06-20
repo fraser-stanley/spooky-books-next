@@ -1,9 +1,7 @@
 import { defineConfig } from 'sanity'
 import { structureTool } from 'sanity/structure'
 import { visionTool } from '@sanity/vision'
-import { presentationTool } from 'sanity/presentation'
-import { defineUrlResolver, Iframe } from 'sanity/presentation'
-import { defineLocations } from 'sanity/presentation'
+import { presentationTool, defineLocations } from 'sanity/presentation'
 import { schemaTypes } from './schemas'
 
 export default defineConfig({
@@ -65,10 +63,6 @@ export default defineConfig({
             }),
           }),
         },
-        mainDocuments: defineUrlResolver({
-          filter: `_type == "product" && defined(slug.current)`,
-          resolve: (doc) => ({ href: `/products/${doc.slug?.current}` }),
-        }),
       },
       previewUrl: {
         previewMode: {
