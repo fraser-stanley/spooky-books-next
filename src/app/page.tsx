@@ -197,14 +197,14 @@ function ContentBlockTwoColumn({
       {/* Text Content Below Images */}
       <div className="col-span-12">
         <div className="inline-block mb-12 sm:mb-8 normal-case">
-          <h2 className="text-lg text-black font-normal leading-tight mb-2">{block.title}</h2>
+          <h2 className="text-black font-normal">{block.title}</h2>
           {block.linkedProduct?.author && (
-            <div className="text-lg text-black font-normal mb-4">
+            <div className="text-black font-normal">
               {block.linkedProduct.author}
             </div>
           )}
           {block.caption && (
-            <p className="text-lg text-black font-normal leading-relaxed">
+            <p className="text-black font-normal">
               {block.caption}
             </p>
           )}
