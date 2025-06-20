@@ -44,7 +44,6 @@ const storage = {
       
       // Check version compatibility
       if (data.version !== CART_VERSION) {
-        console.log('📦 Cart version mismatch, clearing stored cart')
         storage.clear()
         return null
       }
@@ -52,14 +51,13 @@ const storage = {
       // Check expiration
       const daysSinceStored = (Date.now() - data.timestamp) / (1000 * 60 * 60 * 24)
       if (daysSinceStored > CART_EXPIRY_DAYS) {
-        console.log('📦 Stored cart expired, clearing')
         storage.clear()
         return null
       }
       
       return data
     } catch (error) {
-      console.error('📦 Failed to read cart from localStorage:', error)
+      console.error('Failed to read cart from localStorage:', error)
       storage.clear()
       return null
     }
@@ -76,7 +74,7 @@ const storage = {
       }
       localStorage.setItem(CART_STORAGE_KEY, JSON.stringify(data))
     } catch (error) {
-      console.error('📦 Failed to save cart to localStorage:', error)
+      console.error('Failed to save cart to localStorage:', error)
     }
   },
   
@@ -86,7 +84,7 @@ const storage = {
     try {
       localStorage.removeItem(CART_STORAGE_KEY)
     } catch (error) {
-      console.error('📦 Failed to clear cart from localStorage:', error)
+      console.error('Failed to clear cart from localStorage:', error)
     }
   }
 }
@@ -101,7 +99,6 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     const storedCart = storage.get()
     if (storedCart?.items && storedCart.items.length > 0) {
-      console.log(`📦 Restored ${storedCart.items.length} items from stored cart`)
       setCart(storedCart.items)
     }
     setIsHydrated(true)
@@ -111,9 +108,6 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     if (isHydrated) {
       storage.set(cart)
-      if (cart.length > 0) {
-        console.log(`📦 Saved ${cart.length} items to localStorage`)
-      }
     }
   }, [cart, isHydrated])
 
@@ -141,7 +135,6 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
   const clearCart = () => {
     setCart([])
     storage.clear()
-    console.log('📦 Cart cleared from memory and localStorage')
   }
 
   const getCartItemQuantity = (id: string, size?: string): number => {

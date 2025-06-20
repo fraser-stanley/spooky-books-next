@@ -141,7 +141,6 @@ export async function cleanupExpiredIdempotencyRecords(): Promise<void> {
         transaction.delete(id)
       })
       await transaction.commit()
-      console.log(`Cleaned up ${expiredRecords.length} expired idempotency records`)
     }
   } catch (error) {
     console.error('Failed to cleanup expired idempotency records:', error)

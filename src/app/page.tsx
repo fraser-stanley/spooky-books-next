@@ -14,9 +14,6 @@ export default async function HomePage() {
   const categories = await getCategories()
   const homepage = await getHomepage(isEnabled)
   
-  // Debug logging
-  console.log('Homepage data:', homepage)
-  console.log('Hero sections count:', homepage?.heroSections?.length)
   
   return (
     <Layout categories={categories}>
@@ -56,9 +53,8 @@ function HeroSection({ section }: { section: SanityHeroSection }) {
 function HeroPair({ section }: { section: SanityHeroPair }) {
   const productUrl = `/products/${section.linkedProduct.slug}/`
   
-  // For testing: Set to 'three' or 'two' to switch between layouts
-  // Later, this will be controlled by a layout field in Sanity
-  const layoutType = 'three' // Options: 'two' | 'three'
+  // Use layout field from Sanity, fallback to 'three' for existing content
+  const layoutType = section.layout || 'three'
   
   if (layoutType === 'three') {
     return <HeroPairThreeColumn section={section} productUrl={productUrl} />
@@ -75,17 +71,17 @@ function HeroPairThreeColumn({ section, productUrl }: { section: SanityHeroPair;
       <div className="col-span-12 lg:col-span-4 mb-6 lg:mb-0">
         <Link
           href={productUrl}
-          className="inline-block text-md sm:text-sm normal-case"
+          className="inline-block normal-case"
           aria-label={`View ${section.title} product page`}
         >
-          <h2 className="text-2xl leading-tight mb-2">{section.title}</h2>
+          <h2 className="text-lg text-black font-normal leading-tight mb-2">{section.title}</h2>
           {section.linkedProduct.author && (
-            <div className="text-lg text-black mb-4">
+            <div className="text-lg text-black font-normal mb-4">
               {section.linkedProduct.author}
             </div>
           )}
           {section.caption && (
-            <p className="text-sm text-black leading-relaxed">
+            <p className="text-lg text-black font-normal leading-relaxed">
               {section.caption}
             </p>
           )}
@@ -189,17 +185,17 @@ function HeroPairTwoColumn({ section, productUrl }: { section: SanityHeroPair; p
       <div className="col-span-12">
         <Link
           href={productUrl}
-          className="inline-block text-md sm:text-sm mb-12 sm:mb-8 normal-case"
+          className="inline-block mb-12 sm:mb-8 normal-case"
           aria-label={`View ${section.title} product page`}
         >
-          <h2 className="text-2xl leading-tight mb-2">{section.title}</h2>
+          <h2 className="text-lg text-black font-normal leading-tight mb-2">{section.title}</h2>
           {section.linkedProduct.author && (
-            <div className="text-lg text-black mb-4">
+            <div className="text-lg text-black font-normal mb-4">
               {section.linkedProduct.author}
             </div>
           )}
           {section.caption && (
-            <p className="text-sm text-black leading-relaxed">
+            <p className="text-lg text-black font-normal leading-relaxed">
               {section.caption}
             </p>
           )}
@@ -241,17 +237,17 @@ function HeroSingle({ section }: { section: SanityHeroSingle }) {
       <div className="col-span-12">
         <Link
           href={productUrl}
-          className="inline-block text-md sm:text-sm normal-case mb-12 sm:mb-8"
+          className="inline-block normal-case mb-12 sm:mb-8"
           aria-label={`View ${section.title} product page`}
         >
-          <h2 className="text-2xl leading-tight mb-2">{section.title}</h2>
+          <h2 className="text-lg text-black font-normal leading-tight mb-2">{section.title}</h2>
           {section.linkedProduct.author && (
-            <div className="text-lg text-black mb-4">
+            <div className="text-lg text-black font-normal mb-4">
               {section.linkedProduct.author}
             </div>
           )}
           {section.caption && (
-            <p className="text-sm text-black leading-relaxed">
+            <p className="text-lg text-black font-normal leading-relaxed">
               {section.caption}
             </p>
           )}

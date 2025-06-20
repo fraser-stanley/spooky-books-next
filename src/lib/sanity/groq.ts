@@ -83,6 +83,7 @@ export const homepageQuery = `*[_type == "homepage"][0]{
   heroSections[]{
     _type,
     _type == "heroPair" => {
+      layout,
       leftImage{
         asset->{
           _id,

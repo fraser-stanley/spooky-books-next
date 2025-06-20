@@ -12,12 +12,10 @@ function SuccessContent() {
   const sessionId = searchParams.get('session_id')
 
   useEffect(() => {
-    console.log('🎉 NEW SUCCESS PAGE - Navigation should work!')
     // Clear cart after successful payment
     if (sessionId) {
       setTimeout(() => {
         clearCart()
-        console.log('✅ Cart cleared successfully')
       }, 1000)
     }
   }, [sessionId, clearCart])

@@ -61,7 +61,6 @@ export async function cleanupExpiredIdempotencyRecords(): Promise<void> {
       await sanityClient.delete(record._id)
     }
     
-    console.log(`Cleaned up ${expiredRecords.length} expired idempotency records`)
   } catch (error) {
     console.error('Failed to cleanup expired idempotency records:', error)
   }

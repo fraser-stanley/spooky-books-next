@@ -48,6 +48,7 @@ export interface SanityImage {
 
 export interface SanityHeroPair {
   _type: 'heroPair'
+  layout: 'two' | 'three'
   leftImage: SanityImage
   rightImage: SanityImage
   linkedProduct: {

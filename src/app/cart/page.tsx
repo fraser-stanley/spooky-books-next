@@ -27,15 +27,13 @@ export default function CartPage() {
 
   // Preload Stripe.js on cart page mount for faster checkout
   useEffect(() => {
-    console.log('🚀 Preloading Stripe.js for faster checkout')
     const loadStripe = async () => {
       try {
         const { loadStripe } = await import('@stripe/stripe-js')
         const stripe = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!)
         setStripePromise(stripe)
-        console.log('✅ Stripe.js preloaded successfully')
       } catch (error) {
-        console.error('⚠️ Failed to preload Stripe.js:', error)
+        console.error('Failed to preload Stripe.js:', error)
         // Fallback: set promise to null, will load on demand during checkout
         setStripePromise(null)
       }
@@ -92,7 +90,6 @@ export default function CartPage() {
       setCheckoutLoading(true)
       setCheckoutError(null)
 
-      console.log('🚀 Starting optimized checkout flow')
 
       // Use new optimized checkout endpoint with product data from cart page
       const response = await fetch('/api/checkout', {
@@ -130,15 +127,12 @@ export default function CartPage() {
       }
 
       const { sessionId } = result
-      console.log('✅ Checkout session created:', sessionId)
 
       // Use preloaded Stripe.js or fallback to on-demand loading
       let stripe
       if (stripePromise) {
-        console.log('🚀 Using preloaded Stripe.js')
         stripe = await stripePromise
       } else {
-        console.log('⚠️ Stripe.js not preloaded, loading on demand')
         const { loadStripe } = await import('@stripe/stripe-js')
         stripe = await loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!)
       }
@@ -149,7 +143,7 @@ export default function CartPage() {
         throw new Error('Failed to load Stripe')
       }
     } catch (error) {
-      console.error('💥 Checkout error:', error)
+      console.error('Checkout error:', error)
       setCheckoutError('Failed to process checkout. Please try again.')
       setCheckoutLoading(false)
     }

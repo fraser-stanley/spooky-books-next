@@ -22,9 +22,23 @@ export default defineType({
         {
           type: 'object',
           name: 'heroPair',
-          title: 'Hero Pair (2 Images - Side by Side)',
+          title: 'Hero Pair (2 Images)',
           icon: () => '📖',
           fields: [
+            {
+              name: 'layout',
+              title: 'Layout Style',
+              type: 'string',
+              options: {
+                list: [
+                  { title: '2-Column: Images Side by Side (Text Below)', value: 'two' },
+                  { title: '3-Column: Text | Image | Image', value: 'three' },
+                ],
+              },
+              initialValue: 'three',
+              validation: Rule => Rule.required(),
+              description: 'Choose how to display the images and text',
+            },
             {
               name: 'leftImage',
               title: 'Left Image',
@@ -65,11 +79,13 @@ export default defineType({
               title: 'title',
               leftImage: 'leftImage',
               product: 'linkedProduct.title',
+              layout: 'layout',
             },
-            prepare({ title, leftImage, product }) {
+            prepare({ title, leftImage, product, layout }) {
+              const layoutLabel = layout === 'two' ? '2-Column' : '3-Column'
               return {
                 title: title || 'Hero Pair',
-                subtitle: `Links to: ${product || 'No product selected'}`,
+                subtitle: `${layoutLabel} | Links to: ${product || 'No product selected'}`,
                 media: leftImage,
               }
             },

@@ -14,7 +14,6 @@ function SuccessContent() {
 
   useEffect(() => {
     setIsMounted(true)
-    console.log('🎉 Checkout success page mounted', { sessionId })
   }, [sessionId])
 
   // TEMPORARILY DISABLED: Cart clearing to test if this is causing the frozen behavior
