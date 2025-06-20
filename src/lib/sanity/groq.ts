@@ -119,5 +119,67 @@ export const homepageQuery = `*[_type == "homepage"][0]{
       url,
       text
     }
+  },
+  heroSections[]{
+    _type,
+    _type == "heroPair" => {
+      layout,
+      leftImage{
+        asset->{
+          _id,
+          url,
+          metadata{
+            dimensions
+          }
+        },
+        alt
+      },
+      rightImage{
+        asset->{
+          _id,
+          url,
+          metadata{
+            dimensions
+          }
+        },
+        alt
+      },
+      linkedProduct->{
+        _id,
+        title,
+        author,
+        "slug": slug.current,
+        category->{
+          title,
+          "slug": slug.current
+        }
+      },
+      title,
+      caption
+    },
+    _type == "heroSingle" => {
+      image{
+        asset->{
+          _id,
+          url,
+          metadata{
+            dimensions
+          }
+        },
+        alt
+      },
+      linkedProduct->{
+        _id,
+        title,
+        author,
+        "slug": slug.current,
+        category->{
+          title,
+          "slug": slug.current
+        }
+      },
+      title,
+      caption
+    }
   }
 }`
