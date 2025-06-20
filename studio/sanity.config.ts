@@ -2,6 +2,8 @@ import { defineConfig } from 'sanity'
 import { structureTool } from 'sanity/structure'
 import { visionTool } from '@sanity/vision'
 import { presentationTool } from 'sanity/presentation'
+import { defineUrlResolver, Iframe } from 'sanity/presentation'
+import { defineLocations } from 'sanity/presentation'
 import { schemaTypes } from './schemas'
 
 export default defineConfig({
@@ -32,9 +34,44 @@ export default defineConfig({
           ])
     }),
     presentationTool({
+      resolve: {
+        locations: {
+          homepage: defineLocations({
+            select: {
+              title: 'title',
+              slug: 'slug.current',
+            },
+            resolve: (doc) => ({
+              locations: [
+                {
+                  title: 'Homepage',
+                  href: '/',
+                },
+              ],
+            }),
+          }),
+          product: defineLocations({
+            select: {
+              title: 'title',
+              slug: 'slug.current',
+            },
+            resolve: (doc) => ({
+              locations: [
+                {
+                  title: doc.title || 'Untitled',
+                  href: `/products/${doc.slug}`,
+                },
+              ],
+            }),
+          }),
+        },
+        mainDocuments: defineUrlResolver({
+          filter: `_type == "product" && defined(slug.current)`,
+          resolve: (doc) => ({ href: `/products/${doc.slug?.current}` }),
+        }),
+      },
       previewUrl: {
-        origin: process.env.SANITY_STUDIO_PREVIEW_ORIGIN || 'http://localhost:3000',
-        draftMode: {
+        previewMode: {
           enable: '/api/draft-mode/enable',
         },
       },

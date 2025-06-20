@@ -1,9 +1,23 @@
 // src/app/api/draft-mode/enable/route.ts
-import { defineEnableDraftMode } from 'next-sanity/draft-mode'
+import { validatePreviewUrl } from '@sanity/preview-url-secret'
+import { draftMode } from 'next/headers'
+import { redirect } from 'next/navigation'
+import { NextRequest } from 'next/server'
 import { sanityClient } from '@/lib/sanity/client'
 
-export const { GET } = defineEnableDraftMode({
-  client: sanityClient.withConfig({
-    token: process.env.SANITY_VIEWER_TOKEN,
-  }),
-})
+const token = process.env.SANITY_VIEWER_TOKEN!
+
+export async function GET(request: NextRequest) {
+  const { isValid, redirectTo = '/' } = await validatePreviewUrl(
+    sanityClient.withConfig({ token }),
+    request.url,
+  )
+
+  if (!isValid) {
+    return new Response('Invalid secret', { status: 401 })
+  }
+
+  draftMode().enable()
+
+  redirect(redirectTo)
+}
