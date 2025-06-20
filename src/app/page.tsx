@@ -21,15 +21,20 @@ export default async function HomePage() {
   return (
     <Layout categories={categories}>
       <section className="text-md sm:text-sm grid grid-cols-12 gap-2 mb-12 xl:mb-24 mt-8 sm:mt-24">
-        {!homepage?.contentBlocks && !homepage?.heroSections ? (
+        {!homepage ? (
           <div className="col-span-12 text-center py-12">
             <p>No homepage content found. Please create homepage content in Sanity Studio.</p>
           </div>
-        ) : (homepage?.contentBlocks?.length === 0 && homepage?.heroSections?.length === 0) ? (
+        ) : (!homepage.contentBlocks && !homepage.heroSections) ? (
           <div className="col-span-12 text-center py-12">
-            <p>No content blocks configured. Please add content in Sanity Studio.</p>
+            <p>No content configured. Please add content in Sanity Studio.</p>
           </div>
         ) : (
+          (homepage.contentBlocks?.length === 0 && homepage.heroSections?.length === 0) ? (
+            <div className="col-span-12 text-center py-12">
+              <p>No content blocks configured. Please add content in Sanity Studio.</p>
+            </div>
+          ) : (
           <>
             {/* New unified content blocks */}
             {homepage.contentBlocks?.map((block: SanityContentBlock, index: number) => (
@@ -41,6 +46,7 @@ export default async function HomePage() {
               <HeroSection key={`hero-${index}`} section={section} />
             ))}
           </>
+          )
         )}
       </section>
     </Layout>
