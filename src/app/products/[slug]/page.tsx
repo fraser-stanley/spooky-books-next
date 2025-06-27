@@ -65,7 +65,7 @@ export default async function ProductPage({ params }: ProductPageProps) {
             {/* Product metadata with monospace styling */}
             {sanityProduct?.metadata?.trim() && (
               <div className="mt-4 mb-6">
-                <pre className="text-sm text-gray-600 font-mono whitespace-pre-wrap leading-relaxed bg-gray-50 p-3 rounded">
+                <pre className="text-sm whitespace-pre-wrap leading-relaxed">
                   {sanityProduct.metadata}
                 </pre>
               </div>

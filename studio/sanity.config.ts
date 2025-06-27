@@ -42,12 +42,12 @@ export default defineConfig({
                         S.documentTypeList("product").title("All Products"),
                       ),
                     S.listItem()
-                      .title("📚 Publications (Books & Magazines)")
+                      .title("📚 Publications")
                       .child(
                         S.documentList()
                           .title("Publications")
                           .filter(
-                            '_type == "product" && category._ref == "f16b392c-4089-4e48-8d5e-7701efb17902"',
+                            '_type == "product" && category._ref == "f16b392c-4089-4e48-8d5e-7401efb17902"',
                           ),
                       ),
                     S.listItem()
