@@ -83,9 +83,12 @@ export async function POST(request: NextRequest) {
       ? `${product.title} by ${product.author}`
       : product.title;
 
+    // Create description from metadata or use title as fallback
+    const stripeDescription = product.metadata?.trim() || `${productName} - Available from Spooky Books`;
+
     const stripeProduct = await stripe.products.create({
       name: productName,
-      description: product.description || undefined,
+      description: stripeDescription,
       metadata: {
         sanity_id: product._id,
         sanity_slug: product.slug.current,

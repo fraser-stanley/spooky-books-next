@@ -19,8 +19,8 @@ export interface SanityProduct {
   title: string;
   author: string;
   slug: string;
-  description: string; // Legacy plaintext description
-  richDescription?: PortableTextBlock[]; // New rich text description
+  richDescription?: PortableTextBlock[]; // Rich text description
+  metadata?: string; // Technical details like ISBN, size, materials, binding, etc.
   price: number;
   stockQuantity: number;
   reservedQuantity?: number;

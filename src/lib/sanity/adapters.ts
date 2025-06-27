@@ -24,7 +24,6 @@ export function adaptSanityProduct(sanityProduct: SanityProduct): Product {
         alt: `Image ${index + 2} from ${sanityProduct.title}`,
       })) || []),
     ],
-    description: sanityProduct.description,
     variants: sanityProduct.variants, // Pass through variants array
   };
 }

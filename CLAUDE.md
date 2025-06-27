@@ -45,6 +45,7 @@ This is a **Next.js 15 e-commerce site** for Spooky Books, migrated from Gatsby 
 - ✅ **Multiple Success Pages**: Optimized checkout success flow with improved UX
 - ✅ **Homepage Layout Options**: Three responsive layout options with Sanity CMS control and visual editing support
 - ✅ **Unified Content System**: Modern contentBlocks system with backward compatibility and draggable reordering (2025)
+- ✅ **Rich Text Content Migration**: Fully migrated from legacy plaintext descriptions to rich text system with metadata support (2025)
 
 ## Data Management
 
@@ -61,11 +62,96 @@ This is a **Next.js 15 e-commerce site** for Spooky Books, migrated from Gatsby 
 
 ### Product Data Structure
 - **Source**: Sanity CMS via GROQ queries (replaces mock data)
-- **Core Fields**: id, title, author, slug, price, category, images[], description, stockQuantity
+- **Core Fields**: id, title, author, slug, price, category, images[], richDescription, metadata, stockQuantity
+- **Content Fields**: 
+  - **richDescription**: Rich text with formatting support (bold, italics, headings, links) using Portable Text
+  - **metadata**: Technical details like ISBN, size, materials, binding, publication date (displayed in monospace)
 - **Inventory Fields**: stockQuantity, reservedQuantity (for tracking available vs reserved stock)
 - **Stripe Fields**: stripePriceId, stripeProductId (auto-populated)
 - **Variants**: Optional array for sized apparel with size-specific stock tracking and individual reservedQuantity
 - **Categories**: Publications (books, magazines) or Apparel (sized: t-shirts, hoodies | non-sized: tote bags, stickers)
+
+### Rich Text Content System (2025)
+- **Rich Descriptions**: Portable Text array with support for multiple block types and inline formatting
+- **Supported Styles**: Normal text, H4/H5 headings, blockquotes with proper hierarchy
+- **Inline Marks**: Strong (bold), emphasis (italic), and URL links with external/internal options
+- **Link Support**: HTTP/HTTPS URLs, mailto links, tel links with optional new tab behavior
+- **Editor Experience**: Clean WYSIWYG editing in Sanity Studio with real-time preview
+- **Frontend Rendering**: Uses `@portabletext/react` for consistent HTML output and styling
+- **Metadata Display**: Monospace technical details in gray background box below descriptions
+- **Migration Strategy**: Clean removal of legacy plaintext descriptions with zero data loss
+
+#### Rich Text Schema
+```typescript
+{
+  name: 'richDescription',
+  type: 'array',
+  title: 'Rich Description',
+  of: [
+    {
+      type: 'block',
+      styles: [
+        { title: 'Normal', value: 'normal' },
+        { title: 'Heading 4', value: 'h4' },
+        { title: 'Heading 5', value: 'h5' },
+        { title: 'Quote', value: 'blockquote' },
+      ],
+      marks: {
+        decorators: [
+          { title: 'Strong', value: 'strong' },
+          { title: 'Emphasis', value: 'em' },
+        ],
+        annotations: [
+          {
+            title: 'URL',
+            name: 'link',
+            type: 'object',
+            fields: [
+              { name: 'href', type: 'url' },
+              { name: 'blank', type: 'boolean', initialValue: true },
+            ],
+          },
+        ],
+      },
+    },
+  ],
+}
+```
+
+#### Metadata Field Implementation
+```typescript
+{
+  name: 'metadata',
+  type: 'text',
+  title: '📋 Product Metadata (Optional)',
+  description: 'Technical details like ISBN, size, materials, binding, publication date, etc.',
+  placeholder: `ISBN: 978-0-123456-78-9
+Size: 6" × 9" (15cm × 23cm)
+Pages: 320
+Binding: Perfect bound
+Published: October 2024
+Materials: 100% organic cotton`,
+  rows: 8,
+  validation: (Rule) => Rule.max(1000),
+}
+```
+
+#### Frontend Display Pattern
+```tsx
+// Rich text description rendering
+{sanityProduct?.richDescription && (
+  <ProductDescription value={sanityProduct.richDescription} />
+)}
+
+// Metadata display with monospace styling
+{sanityProduct?.metadata?.trim() && (
+  <div className="mt-4 mb-6">
+    <pre className="text-sm text-gray-600 font-mono whitespace-pre-wrap leading-relaxed bg-gray-50 p-3 rounded">
+      {sanityProduct.metadata}
+    </pre>
+  </div>
+)}
+```
 
 ### Advanced Inventory Management System
 - **Stock Reservations**: 30-minute session-based inventory locking during checkout process
@@ -202,11 +288,11 @@ export interface SanityContentBlock {
 ### API Routes
 
 #### Core E-commerce APIs
-- **Sanity Webhook**: `/api/sanity-stripe` - Auto-creates Stripe products when Sanity content is published
+- **Sanity Webhook**: `/api/sanity-stripe` - Auto-creates Stripe products when Sanity content is published, uses metadata for product descriptions
 - **Optimized Checkout**: `/api/checkout` - **NEW** Single endpoint with rate limiting (5/min), combining stock validation + session creation for 1-2 second checkout
 - **Checkout Session**: `/api/create-checkout-session` - Legacy endpoint (replaced by `/api/checkout`)
 - **Stripe Webhook**: `/api/stripe-webhook` - Payment event processing with automatic stock deduction
-- **Product Sync**: `/api/sync-existing-products` - Bulk migration utility for existing products
+- **Product Sync**: `/api/sync-existing-products` - Bulk migration utility using rich text system and metadata fields
 - **Setup Categories**: `/api/setup-categories` - Automated category creation
 
 #### Advanced Inventory Management APIs
@@ -288,6 +374,7 @@ export async function generateStaticParams() {
   - `src/app/debug-homepage/` - Development debugging tools for content migration
   - `src/app/api/` - API routes for Sanity-Stripe integration and optimized checkout flow
 - `src/components/` - Reusable React components with CSS modules
+  - `src/components/portable-text.tsx` - Rich text rendering components for Sanity Portable Text
 - `src/data/` - Type definitions and interfaces (mock data replaced by Sanity)
 - `src/lib/` - Utilities, hooks, and shared logic
   - `src/lib/hooks/` - Custom React hooks (useLocaleCurrency)
@@ -430,6 +517,89 @@ hidden: ({ document }) => {
   const isApparel = document?.category?._ref === 'f16b392c-4089-4e48-8d5e-7401efb17902'
   const hasVariants = document?.variants && document.variants.length > 0
   return isApparel && hasVariants // Only hide if apparel AND has variants
+}
+```
+
+### Rich Text Content Implementation (2025)
+**Portable Text Rendering with Custom Components:**
+```tsx
+// Import rich text renderer
+import { ProductDescription } from '@/components/portable-text'
+
+// Product page rendering
+{sanityProduct?.richDescription && (
+  <ProductDescription value={sanityProduct.richDescription} />
+)}
+
+// Metadata display with monospace styling
+{sanityProduct?.metadata?.trim() && (
+  <div className="mt-4 mb-6">
+    <pre className="text-sm text-gray-600 font-mono whitespace-pre-wrap leading-relaxed bg-gray-50 p-3 rounded">
+      {sanityProduct.metadata}
+    </pre>
+  </div>
+)}
+```
+
+**Custom Portable Text Components:**
+```tsx
+const components = {
+  block: {
+    normal: ({ children }) => <p className="mb-4">{children}</p>,
+    h4: ({ children }) => <h4 className="text-lg font-medium mb-3 mt-6">{children}</h4>,
+    h5: ({ children }) => <h5 className="text-base font-medium mb-2 mt-4">{children}</h5>,
+    blockquote: ({ children }) => (
+      <blockquote className="border-l-4 border-gray-300 pl-4 italic mb-4 text-black">
+        {children}
+      </blockquote>
+    ),
+  },
+  marks: {
+    strong: ({ children }) => <strong className="font-semibold">{children}</strong>,
+    em: ({ children }) => <em className="italic">{children}</em>,
+    link: ({ children, value }) => (
+      <a
+        href={value?.href || "#"}
+        className="underline hover:no-underline text-blue-600 hover:text-blue-800 transition-colors"
+        target={value?.blank ? "_blank" : undefined}
+        rel={value?.blank ? "noopener noreferrer" : undefined}
+      >
+        {children}
+      </a>
+    ),
+  },
+}
+```
+
+**API Integration Patterns:**
+```tsx
+// Stripe product creation using metadata
+const stripeDescription = product.metadata?.trim() || `${productName} - Available from Spooky Books`
+
+const stripeProduct = await stripe.products.create({
+  name: productName,
+  description: stripeDescription, // Uses metadata instead of legacy description
+  metadata: {
+    sanity_id: product._id,
+    sanity_slug: product.slug.current,
+    vendor: "Spooky Books",
+    ...(product.author && { author: product.author }),
+  },
+})
+```
+
+**GROQ Query Updates:**
+```groq
+// Updated product queries without legacy description field
+*[_type == "product"]{
+  "id": slug.current,
+  title,
+  author,
+  richDescription,  // Rich text array
+  metadata,         // Technical details string
+  price,
+  stockQuantity,
+  // ... other fields
 }
 ```
 
@@ -1175,6 +1345,12 @@ SANITY_STUDIO_PREVIEW_ORIGIN=https://spooky-books-next.vercel.app
 - Enhanced `checkout.session.expired` handling for automatic stock release
 - Added `checkout.session.async_payment_failed` for improved error coverage
 - Replaces most manual cleanup needs previously handled by cron jobs
+
+**Rich Text Migration (2025):**
+- Product descriptions migrated from plaintext to Portable Text with rich formatting
+- Metadata field added for technical specifications with monospace display
+- Stripe product descriptions now use metadata field for better product information
+- All GROQ queries updated to use new field structure without legacy description
 
 ### Alternative to Cron Jobs (Hobby Plan Compatible)
 **Since Vercel cron jobs are not available on hobby plan:**

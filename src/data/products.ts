@@ -17,7 +17,6 @@ export interface Product {
     url: string;
     alt: string;
   }>;
-  description: string;
   variants?: ProductVariant[];
 }
 
@@ -40,7 +39,6 @@ export const products: Product[] = [
         alt: "Image from Niijima Gardens by Charlie Hillhouse",
       },
     ],
-    description: "A photobook by Charlie Hillhouse",
   },
   {
     id: "prod_002",
@@ -60,7 +58,6 @@ export const products: Product[] = [
         alt: "Image from Courier by Julian Hutton",
       },
     ],
-    description: "A novel by Julian Hutton",
   },
   {
     id: "prod_003",
@@ -80,7 +77,6 @@ export const products: Product[] = [
         alt: "Image from Let's Get Together by Lynette Letic",
       },
     ],
-    description: "Poetry collection by Lynette Letic",
   },
   {
     id: "prod_004",
@@ -96,7 +92,6 @@ export const products: Product[] = [
         alt: "Photograph of person looking at book spread",
       },
     ],
-    description: "Ink drawings by Scott Keim",
   },
   {
     id: "prod_005",
@@ -113,7 +108,6 @@ export const products: Product[] = [
       },
       { url: "/images/sb-tote-blk.jpg", alt: "Black tote bag with white text" },
     ],
-    description: "Black canvas tote bag with Spooky Books branding",
   },
 ];
 

@@ -21,7 +21,8 @@ export async function POST() {
       *[_type == "product" && !defined(stripePriceId)] {
         _id,
         title,
-        description,
+        author,
+        metadata,
         price,
         slug,
         vendor
@@ -37,13 +38,20 @@ export async function POST() {
         console.log(`Syncing product: ${product.title}`);
 
         // Create Stripe product
+        const productName = product.author
+          ? `${product.title} by ${product.author}`
+          : product.title;
+        
+        const stripeDescription = product.metadata?.trim() || `${productName} - Available from Spooky Books`;
+
         const stripeProduct = await stripe.products.create({
-          name: product.title,
-          description: product.description || undefined,
+          name: productName,
+          description: stripeDescription,
           metadata: {
             sanity_id: product._id,
             sanity_slug: product.slug?.current || "",
             vendor: product.vendor || "Spooky Books",
+            ...(product.author && { author: product.author }),
           },
         });
 

@@ -43,13 +43,6 @@ export const product = defineType({
       validation: (Rule) => Rule.required(),
     }),
     defineField({
-      name: "description",
-      type: "text",
-      title: "Description (Legacy - will be removed)",
-      description:
-        "Copy this text to Rich Description below, then delete this field content",
-    }),
-    defineField({
       name: "richDescription",
       type: "array",
       title: "Rich Description",
@@ -96,6 +89,20 @@ export const product = defineType({
           },
         },
       ],
+    }),
+    defineField({
+      name: "metadata",
+      type: "text",
+      title: "📋 Product Metadata (Optional)",
+      description: "Technical details like ISBN, size, materials, binding, publication date, etc. Will be displayed in monospace font below the description.",
+      placeholder: `ISBN: 978-0-123456-78-9
+Size: 6" × 9" (15cm × 23cm)
+Pages: 320
+Binding: Perfect bound
+Published: October 2024
+Materials: 100% organic cotton`,
+      rows: 8,
+      validation: (Rule) => Rule.max(1000),
     }),
     defineField({
       name: "price",

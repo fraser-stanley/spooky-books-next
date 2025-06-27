@@ -4,10 +4,7 @@ import { Layout } from "@/components/layout";
 import { getProduct, getCategories } from "@/lib/sanity/queries";
 import { adaptSanityProduct } from "@/lib/sanity/adapters";
 import { ProductPageClient } from "./product-page-client";
-import {
-  ProductDescription,
-  LegacyDescription,
-} from "@/components/portable-text";
+import { ProductDescription } from "@/components/portable-text";
 
 interface ProductPageProps {
   params: Promise<{ slug: string }>;
@@ -60,13 +57,18 @@ export default async function ProductPage({ params }: ProductPageProps) {
               <span className="text-2xl">${product.price}</span>
             </div>
 
-            {/* Rich text description (new) or fallback to legacy plaintext */}
-            {sanityProduct?.richDescription ? (
+            {/* Rich text description */}
+            {sanityProduct?.richDescription && (
               <ProductDescription value={sanityProduct.richDescription} />
-            ) : (
-              product.description?.trim() && (
-                <LegacyDescription text={product.description} />
-              )
+            )}
+
+            {/* Product metadata with monospace styling */}
+            {sanityProduct?.metadata?.trim() && (
+              <div className="mt-4 mb-6">
+                <pre className="text-sm text-gray-600 font-mono whitespace-pre-wrap leading-relaxed bg-gray-50 p-3 rounded">
+                  {sanityProduct.metadata}
+                </pre>
+              </div>
             )}
 
             <ProductPageClient
