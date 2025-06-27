@@ -120,50 +120,5 @@ export const homepageQuery = `*[_type == "homepage"][0]{
       text,
       openInNewTab
     }
-  },
-  heroSections[]{
-    _type,
-    layout,
-    title,
-    caption,
-    leftImage{
-      asset->{
-        _id,
-        url,
-        metadata{
-          dimensions
-        }
-      },
-      alt
-    },
-    rightImage{
-      asset->{
-        _id,
-        url,
-        metadata{
-          dimensions
-        }
-      },
-      alt
-    },
-    image{
-      asset->{
-        _id,
-        url,
-        metadata{
-          dimensions
-        }
-      },
-      alt
-    },
-    linkedProduct->{
-      _id,
-      title,
-      "slug": slug.current,
-      category->{
-        title,
-        "slug": slug.current
-      }
-    }
   }
 }`;

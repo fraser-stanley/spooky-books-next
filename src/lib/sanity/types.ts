@@ -67,40 +67,7 @@ export interface SanityContentBlock {
   };
 }
 
-// Legacy types for backward compatibility during migration
-export interface SanityHeroPair {
-  _type: "heroPair";
-  layout: "two" | "three";
-  leftImage: SanityImage;
-  rightImage: SanityImage;
-  linkedProduct: {
-    _id: string;
-    title: string;
-    slug: string;
-    category: SanityCategory;
-  };
-  title: string;
-  caption?: string;
-}
-
-export interface SanityHeroSingle {
-  _type: "heroSingle";
-  image: SanityImage;
-  linkedProduct: {
-    _id: string;
-    title: string;
-    slug: string;
-    category: SanityCategory;
-  };
-  title: string;
-  caption?: string;
-}
-
-export type SanityHeroSection = SanityHeroPair | SanityHeroSingle;
-
 export interface SanityHomepage {
   title: string;
   contentBlocks?: SanityContentBlock[];
-  // Legacy field for backward compatibility
-  heroSections?: SanityHeroSection[];
 }
