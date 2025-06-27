@@ -67,29 +67,36 @@ export default async function HomePage() {
 
 // Unified content block component
 function ContentBlock({ block }: { block: SanityContentBlock }) {
-  // Determine the link URL and properties
+  // Determine the link URL and properties based on new linkType system
   const getLink = () => {
-    if (block.linkedProduct) {
+    if (block.linkType === "product" && block.linkedProduct) {
       return {
         href: `/products/${block.linkedProduct.slug}/`,
         isExternal: false,
+        openInNewTab: false,
       };
     }
-    if (block.customLink) {
+    if (block.linkType === "custom" && block.customLink?.url) {
+      const isExternal = 
+        !block.customLink.url.startsWith("/") &&
+        !block.customLink.url.startsWith("#") &&
+        !block.customLink.url.startsWith("mailto:") &&
+        !block.customLink.url.startsWith("tel:");
+      
       return {
         href: block.customLink.url,
-        isExternal:
-          !block.customLink.url.startsWith("/") &&
-          !block.customLink.url.startsWith("#"),
+        isExternal,
+        openInNewTab: block.customLink.openInNewTab ?? isExternal, // Default to true for external links
       };
     }
+    // linkType === "none" or no linkType means no link
     return null;
   };
 
   const link = getLink();
   const linkProps = link
     ? {
-        ...(link.isExternal
+        ...(link.isExternal || link.openInNewTab
           ? {
               target: "_blank",
               rel: "noopener noreferrer",
@@ -126,7 +133,7 @@ function ContentBlockFullWidth({
   linkProps,
 }: {
   block: SanityContentBlock;
-  link: { href: string; isExternal: boolean } | null;
+  link: { href: string; isExternal: boolean; openInNewTab: boolean } | null;
   linkProps: any;
 }) {
   const content = (
@@ -159,11 +166,6 @@ function ContentBlockFullWidth({
           <h2 className="text-lg text-black font-normal leading-tight mb-2">
             {block.title}
           </h2>
-          {block.linkedProduct?.author && (
-            <div className="text-lg text-black font-normal mb-4">
-              {block.linkedProduct.author}
-            </div>
-          )}
           {block.caption && (
             <p className="text-lg text-black font-normal leading-relaxed">
               {block.caption}
@@ -190,7 +192,7 @@ function ContentBlockTwoColumn({
   linkProps,
 }: {
   block: SanityContentBlock;
-  link: { href: string; isExternal: boolean } | null;
+  link: { href: string; isExternal: boolean; openInNewTab: boolean } | null;
   linkProps: any;
 }) {
   const content = (
@@ -236,13 +238,8 @@ function ContentBlockTwoColumn({
 
       {/* Text Content Below Images */}
       <div className="col-span-12">
-        <div className="inline-block mb-12 sm:mb-8 normal-case">
+        <div className="inline-block mb-4 normal-case">
           <h2 className="text-black font-normal">{block.title}</h2>
-          {block.linkedProduct?.author && (
-            <div className="text-black font-normal">
-              {block.linkedProduct.author}
-            </div>
-          )}
           {block.caption && (
             <p className="text-black font-normal">{block.caption}</p>
           )}
@@ -267,7 +264,7 @@ function ContentBlockThreeColumn({
   linkProps,
 }: {
   block: SanityContentBlock;
-  link: { href: string; isExternal: boolean } | null;
+  link: { href: string; isExternal: boolean; openInNewTab: boolean } | null;
   linkProps: any;
 }) {
   const content = (
@@ -278,11 +275,6 @@ function ContentBlockThreeColumn({
           <h2 className="text-lg text-black font-normal leading-tight mb-2">
             {block.title}
           </h2>
-          {block.linkedProduct?.author && (
-            <div className="text-lg text-black font-normal mb-4">
-              {block.linkedProduct.author}
-            </div>
-          )}
           {block.caption && (
             <p className="text-lg text-black font-normal leading-relaxed">
               {block.caption}
@@ -388,11 +380,6 @@ function HeroPairThreeColumn({
           <h2 className="text-lg text-black font-normal leading-tight mb-2">
             {section.title}
           </h2>
-          {section.linkedProduct.author && (
-            <div className="text-lg text-black font-normal mb-4">
-              {section.linkedProduct.author}
-            </div>
-          )}
           {section.caption && (
             <p className="text-lg text-black font-normal leading-relaxed">
               {section.caption}
@@ -510,11 +497,6 @@ function HeroPairTwoColumn({
           <h2 className="text-lg text-black font-normal leading-tight mb-2">
             {section.title}
           </h2>
-          {section.linkedProduct.author && (
-            <div className="text-lg text-black font-normal mb-4">
-              {section.linkedProduct.author}
-            </div>
-          )}
           {section.caption && (
             <p className="text-lg text-black font-normal leading-relaxed">
               {section.caption}
@@ -566,11 +548,6 @@ function HeroSingle({ section }: { section: SanityHeroSingle }) {
           <h2 className="text-lg text-black font-normal leading-tight mb-2">
             {section.title}
           </h2>
-          {section.linkedProduct.author && (
-            <div className="text-lg text-black font-normal mb-4">
-              {section.linkedProduct.author}
-            </div>
-          )}
           {section.caption && (
             <p className="text-lg text-black font-normal leading-relaxed">
               {section.caption}

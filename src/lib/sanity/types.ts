@@ -53,16 +53,17 @@ export interface SanityContentBlock {
   caption?: string;
   leftImage: SanityImage;
   rightImage?: SanityImage;
+  linkType?: "none" | "product" | "custom";
   linkedProduct?: {
     _id: string;
     title: string;
-    author?: string;
     slug: string;
     category: SanityCategory;
   };
   customLink?: {
     url: string;
     text?: string;
+    openInNewTab?: boolean;
   };
 }
 
@@ -75,7 +76,6 @@ export interface SanityHeroPair {
   linkedProduct: {
     _id: string;
     title: string;
-    author?: string;
     slug: string;
     category: SanityCategory;
   };
@@ -89,7 +89,6 @@ export interface SanityHeroSingle {
   linkedProduct: {
     _id: string;
     title: string;
-    author?: string;
     slug: string;
     category: SanityCategory;
   };

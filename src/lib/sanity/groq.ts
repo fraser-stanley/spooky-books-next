@@ -85,6 +85,7 @@ export const homepageQuery = `*[_type == "homepage"][0]{
     layout,
     title,
     caption,
+    linkType,
     leftImage{
       asset->{
         _id,
@@ -108,7 +109,6 @@ export const homepageQuery = `*[_type == "homepage"][0]{
     linkedProduct->{
       _id,
       title,
-      author,
       "slug": slug.current,
       category->{
         title,
@@ -117,7 +117,8 @@ export const homepageQuery = `*[_type == "homepage"][0]{
     },
     customLink{
       url,
-      text
+      text,
+      openInNewTab
     }
   },
   heroSections[]{
@@ -158,7 +159,6 @@ export const homepageQuery = `*[_type == "homepage"][0]{
     linkedProduct->{
       _id,
       title,
-      author,
       "slug": slug.current,
       category->{
         title,

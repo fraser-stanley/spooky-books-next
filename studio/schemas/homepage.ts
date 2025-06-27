@@ -78,28 +78,53 @@ export default defineType({
               placeholder:
                 'e.g. "Discover spine-chilling tales from emerging horror writers..."',
             },
-            // --- LINKING OPTIONS ---
+            // --- LINKING OPTIONS (OPTIONAL) ---
+            {
+              name: "linkType",
+              title: "🔗 Link Behavior",
+              type: "string",
+              options: {
+                list: [
+                  { title: "🚫 No Link (Display Only)", value: "none" },
+                  { title: "🛍️ Link to Product", value: "product" },
+                  { title: "🌐 Link to Custom URL", value: "custom" },
+                ],
+                layout: "radio",
+              },
+              initialValue: "none",
+              description: "Choose if this content block should be clickable and where it should link",
+            },
             {
               name: "linkedProduct",
-              title: "🔗 Link to Product",
+              title: "🛍️ Product to Link To",
               type: "reference",
               to: [{ type: "product" }],
-              description:
-                "✨ Make this content clickable - choose a product from your store",
+              description: "Choose a product from your store to link to",
               options: {
                 filter: "defined(slug.current)",
                 filterParams: {},
               },
+              hidden: (context) => {
+                const parent = context.parent as { linkType?: string } | undefined;
+                return parent?.linkType !== "product";
+              },
+              validation: (Rule) =>
+                Rule.custom((value, context) => {
+                  const parent = context.parent as { linkType?: string } | undefined;
+                  if (parent?.linkType === "product" && !value) {
+                    return "Please select a product to link to";
+                  }
+                  return true;
+                }),
             },
             {
               name: "customLink",
-              title: "🌐 Custom Link (Alternative)",
+              title: "🌐 Custom Link Details",
               type: "object",
-              description:
-                "🚀 Or link to any other page/website (only used if no product is selected above)",
+              description: "Link to external websites (like Melbourne Art Book Fair) or internal pages",
               hidden: (context) => {
-                const parent = context.parent as { linkedProduct?: unknown } | undefined;
-                return !!parent?.linkedProduct;
+                const parent = context.parent as { linkType?: string } | undefined;
+                return parent?.linkType !== "custom";
               },
               fields: [
                 {
@@ -111,18 +136,32 @@ export default defineType({
                       allowRelative: true,
                       scheme: ["http", "https", "mailto", "tel"],
                     }),
-                  placeholder: "https://example.com or /about-us",
-                  description: "Full URL or relative path (e.g. /contact)",
+                  placeholder: "https://melbourneartbookfair.com or /about-us",
+                  description: "External URL (with https://) or internal path (starting with /)",
                 },
                 {
                   name: "text",
                   title: "Link Text (Optional)",
                   type: "string",
-                  description:
-                    "Custom text for the link (if empty, uses the content title)",
-                  placeholder: 'e.g. "Learn More" or "Shop Now"',
+                  description: "Custom text for the link (if empty, uses the content title)",
+                  placeholder: 'e.g. "Visit Event" or "Learn More"',
+                },
+                {
+                  name: "openInNewTab",
+                  title: "Open in New Tab",
+                  type: "boolean",
+                  description: "Open this link in a new browser tab (recommended for external links)",
+                  initialValue: true,
                 },
               ],
+              validation: (Rule) =>
+                Rule.custom((value, context) => {
+                  const parent = context.parent as { linkType?: string } | undefined;
+                  if (parent?.linkType === "custom" && (!value || !(value as any)?.url)) {
+                    return "Please provide a URL for the custom link";
+                  }
+                  return true;
+                }),
             },
             // --- IMAGES ---
             {
@@ -164,8 +203,9 @@ export default defineType({
               title: "title",
               leftImage: "leftImage",
               rightImage: "rightImage",
+              linkType: "linkType",
               product: "linkedProduct.title",
-              customLink: "customLink.url",
+              customUrl: "customLink.url",
               layout: "layout",
               caption: "caption",
             },
@@ -173,8 +213,9 @@ export default defineType({
               title,
               leftImage,
               rightImage,
+              linkType,
               product,
-              customLink,
+              customUrl,
               layout,
               caption,
             }) {
@@ -187,10 +228,15 @@ export default defineType({
                 layoutLabels[layout] || "📊 3-Column: Text + Images";
 
               let linkInfo = "";
-              if (product) {
+              if (linkType === "product" && product) {
                 linkInfo = ` • Links to: ${product}`;
-              } else if (customLink) {
-                linkInfo = ` • Has custom link`;
+              } else if (linkType === "custom" && customUrl) {
+                const domain = customUrl.includes("://") 
+                  ? customUrl.split("/")[2] 
+                  : "Internal page";
+                linkInfo = ` • Links to: ${domain}`;
+              } else if (linkType === "none") {
+                linkInfo = " • Display only";
               }
 
               const hasCaption = caption ? " • Has caption" : "";
