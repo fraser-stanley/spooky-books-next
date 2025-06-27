@@ -1,6 +1,6 @@
 // components/spinner.tsx
-import * as React from "react"
-import styles from "./progress.module.css"
+import * as React from "react";
+import styles from "./progress.module.css";
 
 export function Spinner({
   className = "",
@@ -14,5 +14,5 @@ export function Spinner({
       className={`${styles.spinner} ${className}`}
       {...props}
     />
-  )
+  );
 }

@@ -1,13 +1,13 @@
 // components/layout.tsx
-"use client"
+"use client";
 
-import { Header } from "@/components/header"
-import { Footer } from "@/components/footer"
-import type { SanityCategory } from "@/lib/sanity/types"
+import { Header } from "@/components/header";
+import { Footer } from "@/components/footer";
+import type { SanityCategory } from "@/lib/sanity/types";
 
 interface LayoutProps {
-  children: React.ReactNode
-  categories: SanityCategory[]
+  children: React.ReactNode;
+  categories: SanityCategory[];
 }
 
 export function Layout({ children, categories }: LayoutProps) {
@@ -17,5 +17,5 @@ export function Layout({ children, categories }: LayoutProps) {
       <main className="mx-4 2xl:mx-16">{children}</main>
       <Footer />
     </>
-  )
+  );
 }

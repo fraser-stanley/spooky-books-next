@@ -1,14 +1,18 @@
 // app/layout.tsx
-import "./globals.css"
-import { CartProvider } from "@/components/cart-contex"
-import { Toaster } from "sonner"
-import { draftMode } from "next/headers"
-import { VisualEditingProvider } from "@/components/visual-editing-provider"
-import { SanityLive } from "@/lib/sanity/live"
+import "./globals.css";
+import { CartProvider } from "@/components/cart-contex";
+import { Toaster } from "sonner";
+import { draftMode } from "next/headers";
+import { VisualEditingProvider } from "@/components/visual-editing-provider";
+import { SanityLive } from "@/lib/sanity/live";
 
-export default async function RootLayout({ children }: { children: React.ReactNode }) {
-  const { isEnabled } = await draftMode()
-  
+export default async function RootLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
+  const { isEnabled } = await draftMode();
+
   return (
     <html lang="en">
       <head>
@@ -29,5 +33,5 @@ export default async function RootLayout({ children }: { children: React.ReactNo
         </CartProvider>
       </body>
     </html>
-  )
+  );
 }

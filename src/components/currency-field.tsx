@@ -1,13 +1,13 @@
-"use client"
+"use client";
 
-import * as React from "react"
-import styles from "./currency-field.module.css"
+import * as React from "react";
+import styles from "./currency-field.module.css";
 
 type CurrencyFieldProps = React.InputHTMLAttributes<HTMLInputElement> & {
-  symbol: string
-  symbolAtEnd?: boolean
-  className?: string
-}
+  symbol: string;
+  symbolAtEnd?: boolean;
+  className?: string;
+};
 
 export function CurrencyField({
   symbol,
@@ -18,11 +18,7 @@ export function CurrencyField({
 }: CurrencyFieldProps) {
   return (
     <span
-      className={[
-        className,
-        styles.wrap,
-        symbolAtEnd ? styles.symbolAfter : "",
-      ]
+      className={[className, styles.wrap, symbolAtEnd ? styles.symbolAfter : ""]
         .filter(Boolean)
         .join(" ")}
       style={style}
@@ -35,5 +31,5 @@ export function CurrencyField({
         {...props}
       />
     </span>
-  )
+  );
 }

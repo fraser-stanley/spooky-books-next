@@ -1,15 +1,15 @@
-"use client"
+"use client";
 
-import * as React from "react"
-import styles from "./check-filter.module.css"
+import * as React from "react";
+import styles from "./check-filter.module.css";
 
 type CheckFilterProps = {
-  items: string[]
-  name?: string
-  selectedItems?: string[]
-  setSelectedItems: (items: string[]) => void
-  open?: boolean
-}
+  items: string[];
+  name?: string;
+  selectedItems?: string[];
+  setSelectedItems: (items: string[]) => void;
+  open?: boolean;
+};
 
 export function CheckFilter({
   items,
@@ -19,19 +19,19 @@ export function CheckFilter({
   open = true,
 }: CheckFilterProps) {
   const toggleItem = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = e.currentTarget.value
-    const isChecked = e.currentTarget.checked
+    const value = e.currentTarget.value;
+    const isChecked = e.currentTarget.checked;
 
     if (isChecked) {
-      setSelectedItems([...selectedItems, value])
+      setSelectedItems([...selectedItems, value]);
     } else {
-      setSelectedItems(selectedItems.filter((item) => item !== value))
+      setSelectedItems(selectedItems.filter((item) => item !== value));
     }
-  }
+  };
 
   const clearItems = () => {
-    setSelectedItems([])
-  }
+    setSelectedItems([]);
+  };
 
   return (
     <details open={open} className={styles.filter}>
@@ -53,7 +53,7 @@ export function CheckFilter({
       )}
       <div className={styles.filterOptions}>
         {items.map((item) => {
-          const isSelected = selectedItems.includes(item)
+          const isSelected = selectedItems.includes(item);
           return (
             <label
               key={item}
@@ -68,9 +68,9 @@ export function CheckFilter({
               />
               {item || "None"}
             </label>
-          )
+          );
         })}
       </div>
     </details>
-  )
+  );
 }

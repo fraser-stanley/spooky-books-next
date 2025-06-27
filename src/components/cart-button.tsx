@@ -1,12 +1,12 @@
-"use client"
+"use client";
 
-import Link from "next/link"
-import { useCart } from "./cart-contex"
-import styles from "./cart-button.module.css"
+import Link from "next/link";
+import { useCart } from "./cart-contex";
+import styles from "./cart-button.module.css";
 
 export function CartButton() {
-  const { cart } = useCart()
-  const quantity = cart.reduce((total, item) => total + item.quantity, 0)
+  const { cart } = useCart();
+  const quantity = cart.reduce((total, item) => total + item.quantity, 0);
 
   return (
     <Link
@@ -16,5 +16,5 @@ export function CartButton() {
     >
       Cart{quantity > 0 && ` (${quantity})`}
     </Link>
-  )
+  );
 }

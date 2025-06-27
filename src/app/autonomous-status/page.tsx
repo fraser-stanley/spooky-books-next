@@ -1,69 +1,79 @@
 // import { Suspense } from 'react'
 
-export const dynamic = 'force-dynamic'
+export const dynamic = "force-dynamic";
 
 async function fetchSystemStatus() {
   try {
-    const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'
-    
-    const [autonomousStatus, healthCheck, inventoryMonitor] = await Promise.all([
-      fetch(`${baseUrl}/api/autonomous-inventory`).then(r => r.json()),
-      fetch(`${baseUrl}/api/inventory-health`).then(r => r.json()),
-      fetch(`${baseUrl}/api/inventory-monitor`).then(r => r.json()).catch(() => ({ healthy: false, error: 'Monitor unavailable' }))
-    ])
+    const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000";
 
-    return { autonomousStatus, healthCheck, inventoryMonitor }
+    const [autonomousStatus, healthCheck, inventoryMonitor] = await Promise.all(
+      [
+        fetch(`${baseUrl}/api/autonomous-inventory`).then((r) => r.json()),
+        fetch(`${baseUrl}/api/inventory-health`).then((r) => r.json()),
+        fetch(`${baseUrl}/api/inventory-monitor`)
+          .then((r) => r.json())
+          .catch(() => ({ healthy: false, error: "Monitor unavailable" })),
+      ],
+    );
+
+    return { autonomousStatus, healthCheck, inventoryMonitor };
   } catch (error) {
-    return { 
-      error: 'Failed to fetch system status',
-      details: error instanceof Error ? error.message : 'Unknown error'
-    }
+    return {
+      error: "Failed to fetch system status",
+      details: error instanceof Error ? error.message : "Unknown error",
+    };
   }
 }
 
 export default async function AutonomousStatusPage() {
-  const systemData = await fetchSystemStatus()
+  const systemData = await fetchSystemStatus();
 
-  if ('error' in systemData) {
+  if ("error" in systemData) {
     return (
       <div className="p-8 max-w-6xl">
         <h1 className="text-3xl mb-6 text-red-600">System Status - Error</h1>
         <div className="bg-red-50 border border-red-200 rounded-lg p-4">
           <p className="text-red-800">{systemData.error}</p>
           {systemData.details && (
-            <pre className="mt-2 text-sm text-red-600">{systemData.details}</pre>
+            <pre className="mt-2 text-sm text-red-600">
+              {systemData.details}
+            </pre>
           )}
         </div>
       </div>
-    )
+    );
   }
 
-  const { autonomousStatus, healthCheck, inventoryMonitor } = systemData
-  const overallHealthy = healthCheck.healthy && (inventoryMonitor.healthy !== false)
+  const { autonomousStatus, healthCheck, inventoryMonitor } = systemData;
+  const overallHealthy =
+    healthCheck.healthy && inventoryMonitor.healthy !== false;
 
   return (
     <div className="p-8 max-w-6xl">
       <div className="mb-8">
         <h1 className="text-3xl mb-2">🤖 Autonomous Inventory System</h1>
-        <p className="text-gray-600">Enterprise-level self-healing inventory management</p>
+        <p className="text-gray-600">
+          Enterprise-level self-healing inventory management
+        </p>
       </div>
 
       {/* Overall Status */}
-      <div className={`mb-8 p-6 rounded-lg border-2 ${
-        overallHealthy 
-          ? 'bg-green-50 border-green-200' 
-          : 'bg-red-50 border-red-200'
-      }`}>
+      <div
+        className={`mb-8 p-6 rounded-lg border-2 ${
+          overallHealthy
+            ? "bg-green-50 border-green-200"
+            : "bg-red-50 border-red-200"
+        }`}
+      >
         <div className="flex items-center justify-between">
           <div>
             <h2 className="text-2xl font-semibold mb-2">
-              {overallHealthy ? '✅ System Operational' : '⚠️ Issues Detected'}
+              {overallHealthy ? "✅ System Operational" : "⚠️ Issues Detected"}
             </h2>
-            <p className={overallHealthy ? 'text-green-700' : 'text-red-700'}>
-              {overallHealthy 
-                ? 'All systems running autonomously without intervention'
-                : 'System is self-healing detected issues automatically'
-              }
+            <p className={overallHealthy ? "text-green-700" : "text-red-700"}>
+              {overallHealthy
+                ? "All systems running autonomously without intervention"
+                : "System is self-healing detected issues automatically"}
             </p>
           </div>
           <div className="text-right text-sm text-gray-500">
@@ -104,16 +114,17 @@ export default async function AutonomousStatusPage() {
       <div className="mb-8">
         <h3 className="text-xl font-semibold mb-4">🏥 Current Health Status</h3>
         <div className="grid md:grid-cols-2 gap-6">
-          
           {/* Health Check Results */}
           <div className="bg-white border rounded-lg p-4">
             <h4 className="font-medium mb-3 flex items-center">
-              {healthCheck.healthy ? '✅' : '❌'} 
+              {healthCheck.healthy ? "✅" : "❌"}
               <span className="ml-2">System Health</span>
             </h4>
-            
+
             {healthCheck.healthy ? (
-              <p className="text-green-600 text-sm">All systems operating normally</p>
+              <p className="text-green-600 text-sm">
+                All systems operating normally
+              </p>
             ) : (
               <div>
                 <p className="text-red-600 text-sm mb-2">Issues detected:</p>
@@ -127,10 +138,12 @@ export default async function AutonomousStatusPage() {
                 </ul>
               </div>
             )}
-            
+
             {healthCheck.recommendations && (
               <div className="mt-3 pt-3 border-t">
-                <p className="text-xs font-medium text-gray-700">System Actions:</p>
+                <p className="text-xs font-medium text-gray-700">
+                  System Actions:
+                </p>
                 <ul className="text-xs text-gray-600 mt-1 space-y-1">
                   {healthCheck.recommendations.map((rec: string, i: number) => (
                     <li key={i}>{rec}</li>
@@ -143,17 +156,21 @@ export default async function AutonomousStatusPage() {
           {/* Monitoring Results */}
           <div className="bg-white border rounded-lg p-4">
             <h4 className="font-medium mb-3 flex items-center">
-              {inventoryMonitor.healthy !== false ? '✅' : '❌'}
+              {inventoryMonitor.healthy !== false ? "✅" : "❌"}
               <span className="ml-2">Inventory Monitor</span>
             </h4>
-            
+
             {inventoryMonitor.healthy !== false ? (
-              <p className="text-green-600 text-sm">No critical inventory issues detected</p>
+              <p className="text-green-600 text-sm">
+                No critical inventory issues detected
+              </p>
             ) : (
               <div>
                 <p className="text-red-600 text-sm mb-2">Monitoring issues:</p>
                 {inventoryMonitor.error && (
-                  <p className="text-xs text-red-600">{inventoryMonitor.error}</p>
+                  <p className="text-xs text-red-600">
+                    {inventoryMonitor.error}
+                  </p>
                 )}
               </div>
             )}
@@ -162,22 +179,30 @@ export default async function AutonomousStatusPage() {
               <div className="mt-3 pt-3 border-t">
                 <div className="flex justify-between text-xs">
                   <span>Overselling Issues:</span>
-                  <span className={
-                    inventoryMonitor.monitoring.overselling.criticalIssues > 0 
-                      ? 'text-red-600 font-medium' 
-                      : 'text-green-600'
-                  }>
-                    {inventoryMonitor.monitoring.overselling.criticalIssues} critical
+                  <span
+                    className={
+                      inventoryMonitor.monitoring.overselling.criticalIssues > 0
+                        ? "text-red-600 font-medium"
+                        : "text-green-600"
+                    }
+                  >
+                    {inventoryMonitor.monitoring.overselling.criticalIssues}{" "}
+                    critical
                   </span>
                 </div>
                 <div className="flex justify-between text-xs mt-1">
                   <span>Race Conditions:</span>
-                  <span className={
-                    inventoryMonitor.monitoring.raceConditions?.highSeverityPatterns > 0 
-                      ? 'text-orange-600 font-medium' 
-                      : 'text-green-600'
-                  }>
-                    {inventoryMonitor.monitoring.raceConditions?.highSeverityPatterns || 0} high severity
+                  <span
+                    className={
+                      inventoryMonitor.monitoring.raceConditions
+                        ?.highSeverityPatterns > 0
+                        ? "text-orange-600 font-medium"
+                        : "text-green-600"
+                    }
+                  >
+                    {inventoryMonitor.monitoring.raceConditions
+                      ?.highSeverityPatterns || 0}{" "}
+                    high severity
                   </span>
                 </div>
               </div>
@@ -188,19 +213,28 @@ export default async function AutonomousStatusPage() {
 
       {/* Autonomous Triggers */}
       <div className="mb-8">
-        <h3 className="text-xl font-semibold mb-4">🤖 Autonomous Response System</h3>
+        <h3 className="text-xl font-semibold mb-4">
+          🤖 Autonomous Response System
+        </h3>
         <div className="bg-gray-50 border rounded-lg p-4">
           <p className="text-sm text-gray-700 mb-4">
-            The system automatically responds to these events without manual intervention:
+            The system automatically responds to these events without manual
+            intervention:
           </p>
-          
+
           <div className="grid md:grid-cols-2 gap-4">
-            {Object.entries(autonomousStatus.triggers || {}).map(([trigger, description]) => (
-              <div key={trigger} className="bg-white p-3 rounded border">
-                <code className="text-xs bg-gray-100 px-2 py-1 rounded">{trigger}</code>
-                <p className="text-xs text-gray-600 mt-2">{description as string}</p>
-              </div>
-            ))}
+            {Object.entries(autonomousStatus.triggers || {}).map(
+              ([trigger, description]) => (
+                <div key={trigger} className="bg-white p-3 rounded border">
+                  <code className="text-xs bg-gray-100 px-2 py-1 rounded">
+                    {trigger}
+                  </code>
+                  <p className="text-xs text-gray-600 mt-2">
+                    {description as string}
+                  </p>
+                </div>
+              ),
+            )}
           </div>
         </div>
       </div>
@@ -214,7 +248,10 @@ export default async function AutonomousStatusPage() {
           This system is fully autonomous. Non-technical users can:
         </p>
         <ul className="text-sm text-green-700 space-y-1">
-          <li>• Update product stock in Sanity Studio - automatically syncs to frontend</li>
+          <li>
+            • Update product stock in Sanity Studio - automatically syncs to
+            frontend
+          </li>
           <li>• Process payments via Stripe - stock deducts automatically</li>
           <li>• Handle shipping - no inventory concerns</li>
           <li>• Monitor via this dashboard - all issues self-heal</li>
@@ -245,7 +282,7 @@ export default async function AutonomousStatusPage() {
         </div>
       </details>
     </div>
-  )
+  );
 }
 
 /*

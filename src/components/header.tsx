@@ -1,18 +1,17 @@
-'use client'
+"use client";
 
-import Link from 'next/link'
-import { Navigation } from './navigation'
-import { CartButton } from './cart-button'
-import type { SanityCategory } from '@/lib/sanity/types'
+import Link from "next/link";
+import { Navigation } from "./navigation";
+import { CartButton } from "./cart-button";
+import type { SanityCategory } from "@/lib/sanity/types";
 
 interface HeaderProps {
-  categories: SanityCategory[]
+  categories: SanityCategory[];
 }
 
 export function Header({ categories }: HeaderProps) {
   return (
     <div className="text-md sm:text-sm p-4 pb-12 xl:pb-24 uppercase">
-
       {/* Top row: Title and Cart inline on mobile, grid on desktop */}
       <div className="flex justify-between items-center sm:grid sm:grid-cols-12">
         <Link href="/" className="font-bold col-span-2">
@@ -34,6 +33,5 @@ export function Header({ categories }: HeaderProps) {
         <Navigation categories={categories} />
       </div>
     </div>
-  )
+  );
 }
-

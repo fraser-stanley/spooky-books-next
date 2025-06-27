@@ -1,12 +1,15 @@
 // components/add-to-cart.tsx
-"use client"
+"use client";
 
-import { useRouter } from "next/navigation"
-import { useCart } from "./cart-contex"
-import { toast } from "sonner"
-import { validateProductStock, getAvailableStock } from "@/lib/utils/stock-validation"
-import type { SanityProduct } from "@/lib/sanity/types"
-import styles from "./add-to-cart.module.css"
+import { useRouter } from "next/navigation";
+import { useCart } from "./cart-contex";
+import { toast } from "sonner";
+import {
+  validateProductStock,
+  getAvailableStock,
+} from "@/lib/utils/stock-validation";
+import type { SanityProduct } from "@/lib/sanity/types";
+import styles from "./add-to-cart.module.css";
 
 export function AddToCart({
   product,
@@ -19,47 +22,47 @@ export function AddToCart({
   ...props
 }: {
   product: {
-    id: string
-    title: string
-    price: number
-    image?: string
-  }
-  sanityProduct?: SanityProduct
-  variantId?: string
-  quantity?: number
-  available?: boolean
-  selectedSize?: string
-  hasSizes?: boolean
-  [key: string]: unknown
+    id: string;
+    title: string;
+    price: number;
+    image?: string;
+  };
+  sanityProduct?: SanityProduct;
+  variantId?: string;
+  quantity?: number;
+  available?: boolean;
+  selectedSize?: string;
+  hasSizes?: boolean;
+  [key: string]: unknown;
 }) {
-  const { addItem, getCartItemQuantity } = useCart()
-  const router = useRouter()
+  const { addItem, getCartItemQuantity } = useCart();
+  const router = useRouter();
 
   function handleAddToCart(e: React.MouseEvent) {
-    e.preventDefault()
-    
+    e.preventDefault();
+
     // If we have Sanity product data, validate stock
     if (sanityProduct) {
-      const currentInCart = getCartItemQuantity(product.id, selectedSize)
-      const totalRequestedQuantity = currentInCart + quantity
-      
+      const currentInCart = getCartItemQuantity(product.id, selectedSize);
+      const totalRequestedQuantity = currentInCart + quantity;
+
       const stockValidation = validateProductStock(
-        sanityProduct, 
-        totalRequestedQuantity, 
-        selectedSize
-      )
-      
+        sanityProduct,
+        totalRequestedQuantity,
+        selectedSize,
+      );
+
       if (!stockValidation.isValid) {
-        toast.error(stockValidation.message || 'Not enough stock available')
-        return
+        toast.error(stockValidation.message || "Not enough stock available");
+        return;
       }
     }
-    
+
     // Haptic feedback for mobile devices
-    if ('vibrate' in navigator) {
-      navigator.vibrate(50)
+    if ("vibrate" in navigator) {
+      navigator.vibrate(50);
     }
-    
+
     addItem({
       id: variantId || product.id,
       title: product.title,
@@ -67,30 +70,34 @@ export function AddToCart({
       quantity,
       image: product.image,
       size: selectedSize,
-    })
-    
-    const sizeText = selectedSize ? ` (${selectedSize.toUpperCase()})` : ''
+    });
+
+    const sizeText = selectedSize ? ` (${selectedSize.toUpperCase()})` : "";
     toast.success(`Added ${product.title}${sizeText} to cart`, {
       action: {
         label: "View Cart",
         onClick: () => router.push("/cart"),
       },
-    })
+    });
   }
 
   // Calculate available stock for display
-  const availableStock = sanityProduct 
+  const availableStock = sanityProduct
     ? getAvailableStock(sanityProduct, selectedSize)
-    : undefined
+    : undefined;
 
   // For sized products without size selection, just show disabled state
-  const needsSizeSelection = hasSizes && !selectedSize
-  
+  const needsSizeSelection = hasSizes && !selectedSize;
+
   // Determine if item is actually available
-  const isAvailable = available && (availableStock === undefined || availableStock > 0) && !needsSizeSelection
-  
+  const isAvailable =
+    available &&
+    (availableStock === undefined || availableStock > 0) &&
+    !needsSizeSelection;
+
   // Determine if item is sold out (has stock data but no stock)
-  const isSoldOut = availableStock !== undefined && availableStock <= 0 && !needsSizeSelection
+  const isSoldOut =
+    availableStock !== undefined && availableStock <= 0 && !needsSizeSelection;
 
   return (
     <button
@@ -98,10 +105,16 @@ export function AddToCart({
       className={styles.addToCart}
       onClick={isAvailable ? handleAddToCart : undefined}
       disabled={!isAvailable}
-      title={availableStock !== undefined ? `${availableStock} in stock` : undefined}
+      title={
+        availableStock !== undefined ? `${availableStock} in stock` : undefined
+      }
       {...props}
     >
-      {isSoldOut ? "SOLD OUT" : needsSizeSelection ? "Select a size" : "Add to Cart"}
+      {isSoldOut
+        ? "SOLD OUT"
+        : needsSizeSelection
+          ? "Select a size"
+          : "Add to Cart"}
     </button>
-  )
+  );
 }

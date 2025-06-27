@@ -1,5 +1,5 @@
-import { NextResponse } from 'next/server'
-import { sanityClient } from '@/lib/sanity/client'
+import { NextResponse } from "next/server";
+import { sanityClient } from "@/lib/sanity/client";
 
 // Optimized query with only essential fields for cart operations
 const optimizedProductQuery = `*[_type == "product"] {
@@ -16,43 +16,43 @@ const optimizedProductQuery = `*[_type == "product"] {
     stockQuantity,
     reservedQuantity
   }
-}`
+}`;
 
 export async function GET() {
   try {
-    const products = await sanityClient.fetch(optimizedProductQuery)
-    
+    const products = await sanityClient.fetch(optimizedProductQuery);
+
     return NextResponse.json(products, {
       headers: {
         // Cache for 30 seconds
-        'Cache-Control': 'public, s-maxage=30, stale-while-revalidate=60',
+        "Cache-Control": "public, s-maxage=30, stale-while-revalidate=60",
       },
-    })
+    });
   } catch (error) {
-    console.error('Failed to fetch optimized products:', error)
+    console.error("Failed to fetch optimized products:", error);
     return NextResponse.json(
-      { error: 'Failed to fetch products' },
-      { status: 500 }
-    )
+      { error: "Failed to fetch products" },
+      { status: 500 },
+    );
   }
 }
 
 // Revalidate cache on POST (for stock updates)
 export async function POST() {
   try {
-    const products = await sanityClient.fetch(optimizedProductQuery)
-    
+    const products = await sanityClient.fetch(optimizedProductQuery);
+
     return NextResponse.json(products, {
       headers: {
         // No cache for fresh data
-        'Cache-Control': 'no-cache',
+        "Cache-Control": "no-cache",
       },
-    })
+    });
   } catch (error) {
-    console.error('Failed to fetch fresh products:', error)
+    console.error("Failed to fetch fresh products:", error);
     return NextResponse.json(
-      { error: 'Failed to fetch products' },
-      { status: 500 }
-    )
+      { error: "Failed to fetch products" },
+      { status: 500 },
+    );
   }
 }

@@ -21,7 +21,7 @@ export const productQuery = `*[_type == "product" && slug.current == $slug][0]{
     reservedQuantity,
     stripePriceId
   }
-}`
+}`;
 
 export const productsQuery = `*[_type == "product"]{
   "id": slug.current,
@@ -45,7 +45,7 @@ export const productsQuery = `*[_type == "product"]{
     reservedQuantity,
     stripePriceId
   }
-}`
+}`;
 
 export const productsByCategoryQuery = `*[_type == "product" && category->slug.current == $categorySlug]{
   "id": slug.current,
@@ -69,14 +69,14 @@ export const productsByCategoryQuery = `*[_type == "product" && category->slug.c
     reservedQuantity,
     stripePriceId
   }
-}`
+}`;
 
 export const categoriesQuery = `*[_type == "category"] | order(sortOrder asc, title asc){
   title,
   "slug": slug.current,
   description,
   sortOrder
-}`
+}`;
 
 export const homepageQuery = `*[_type == "homepage"][0]{
   title,
@@ -166,4 +166,4 @@ export const homepageQuery = `*[_type == "homepage"][0]{
       }
     }
   }
-}`
+}`;

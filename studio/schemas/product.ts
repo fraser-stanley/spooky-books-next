@@ -1,252 +1,311 @@
-import { defineField, defineType } from 'sanity'
+import { defineField, defineType } from "sanity";
 
 export const product = defineType({
-  name: 'product',
-  title: 'Product',
-  type: 'document',
+  name: "product",
+  title: "Product",
+  type: "document",
   fields: [
-    defineField({ 
-      name: 'title', 
-      type: 'string', 
-      title: 'Title',
-      validation: Rule => Rule.required()
-    }),
-    defineField({ 
-      name: 'author', 
-      type: 'string', 
-      title: 'Author' 
-    }),
-    defineField({ 
-      name: 'slug', 
-      type: 'slug', 
-      title: 'Slug', 
-      options: { source: 'title', maxLength: 96 },
-      validation: Rule => Rule.required()
-    }),
-    defineField({ 
-      name: 'description', 
-      type: 'text', 
-      title: 'Description (Legacy - will be removed)',
-      description: 'Copy this text to Rich Description below, then delete this field content'
+    defineField({
+      name: "title",
+      type: "string",
+      title: "📖 Product Title",
+      validation: (Rule) => Rule.required().min(3).max(80),
+      description:
+        "The name of your product as it will appear on your website (3-80 characters)",
+      placeholder:
+        'e.g. "The Haunting of Hill House" or "Horror Stories T-Shirt"',
     }),
     defineField({
-      name: 'richDescription',
-      type: 'array',
-      title: 'Rich Description',
-      description: 'Rich text description with formatting support (bold, italics, paragraphs, etc.)',
+      name: "author",
+      type: "string",
+      title: "✍️ Author/Creator",
+      description: "Author name for books, or designer/brand for merchandise",
+      placeholder: 'e.g. "Stephen King" or "Spooky Books Design"',
+    }),
+    defineField({
+      name: "slug",
+      type: "slug",
+      title: "🔗 URL Slug (Auto-generated)",
+      description:
+        '🤖 This creates the web address for your product. Click "Generate" to create from title.',
+      options: {
+        source: "title",
+        maxLength: 96,
+        slugify: (input: string) =>
+          input
+            .toLowerCase()
+            .replace(/\s+/g, "-")
+            .replace(/[^\w\-]+/g, "")
+            .replace(/\-\-+/g, "-")
+            .replace(/^-+/, "")
+            .replace(/-+$/, ""),
+      },
+      validation: (Rule) => Rule.required(),
+    }),
+    defineField({
+      name: "description",
+      type: "text",
+      title: "Description (Legacy - will be removed)",
+      description:
+        "Copy this text to Rich Description below, then delete this field content",
+    }),
+    defineField({
+      name: "richDescription",
+      type: "array",
+      title: "Rich Description",
+      description:
+        "Rich text description with formatting support (bold, italics, paragraphs, etc.)",
       of: [
         {
-          type: 'block',
+          type: "block",
           styles: [
-            { title: 'Normal', value: 'normal' },
-            { title: 'Heading 4', value: 'h4' },
-            { title: 'Heading 5', value: 'h5' },
-            { title: 'Quote', value: 'blockquote' }
+            { title: "Normal", value: "normal" },
+            { title: "Heading 4", value: "h4" },
+            { title: "Heading 5", value: "h5" },
+            { title: "Quote", value: "blockquote" },
           ],
           marks: {
             decorators: [
-              { title: 'Strong', value: 'strong' },
-              { title: 'Emphasis', value: 'em' }
+              { title: "Strong", value: "strong" },
+              { title: "Emphasis", value: "em" },
             ],
             annotations: [
               {
-                title: 'URL',
-                name: 'link',
-                type: 'object',
+                title: "URL",
+                name: "link",
+                type: "object",
                 fields: [
                   {
-                    title: 'URL',
-                    name: 'href',
-                    type: 'url',
-                    validation: Rule => Rule.uri({
-                      scheme: ['http', 'https', 'mailto', 'tel']
-                    })
+                    title: "URL",
+                    name: "href",
+                    type: "url",
+                    validation: (Rule) =>
+                      Rule.uri({
+                        scheme: ["http", "https", "mailto", "tel"],
+                      }),
                   },
                   {
-                    title: 'Open in new tab',
-                    name: 'blank',
-                    type: 'boolean',
-                    initialValue: true
-                  }
-                ]
-              }
-            ]
-          }
-        }
-      ]
-    }),
-    defineField({ 
-      name: 'price', 
-      type: 'number', 
-      title: 'Price (in major units)',
-      validation: Rule => Rule.required().positive()
+                    title: "Open in new tab",
+                    name: "blank",
+                    type: "boolean",
+                    initialValue: true,
+                  },
+                ],
+              },
+            ],
+          },
+        },
+      ],
     }),
     defineField({
-      name: 'category',
-      type: 'reference',
-      title: 'Category',
-      to: [{ type: 'category' }],
-      validation: Rule => Rule.required()
+      name: "price",
+      type: "number",
+      title: "💰 Price",
+      description:
+        "💵 Enter the price in dollars (e.g. 29.99 for $29.99). Don't include currency symbol.",
+      validation: (Rule) => Rule.required().positive().precision(2),
+      placeholder: "29.99",
     }),
     defineField({
-      name: 'hasSizes',
-      type: 'boolean',
-      title: 'Has Sizes?',
-      description: 'Toggle ON for sized apparel (t-shirts, hoodies). Toggle OFF for non-sized items (tote bags, books, magazines).',
+      name: "category",
+      type: "reference",
+      title: "🏷️ Product Category",
+      description:
+        "📋 Choose Publications for books/magazines, or Apparel for clothing/merchandise",
+      to: [{ type: "category" }],
+      validation: (Rule) => Rule.required(),
+      options: {
+        filter: "defined(title)",
+        filterParams: {},
+      },
+    }),
+    // --- INVENTORY MANAGEMENT ---
+    defineField({
+      name: "hasSizes",
+      type: "boolean",
+      title: "👕 Does This Apparel Come in Different Sizes?",
+      description:
+        "✅ Turn ON for t-shirts, hoodies, etc. that have XS/S/M/L/XL sizing\n❌ Turn OFF for tote bags, stickers, or items without size variants",
       initialValue: false,
-      hidden: ({ document }: { document?: any }) => {
+      hidden: (context) => {
         // Only show this toggle for Apparel category
-        return document?.category?._ref !== 'f16b392c-4089-4e48-8d5e-7401efb17902' // Apparel category ID
-      }
+        const document = context.document as { category?: { _ref?: string } } | undefined;
+        return (
+          document?.category?._ref !== "f16b392c-4089-4e48-8d5e-7401efb17902"
+        ); // Apparel category ID
+      },
     }),
     defineField({
-      name: 'stockQuantity',
-      type: 'number',
-      title: 'Stock Quantity',
-      description: 'Available inventory. Use this field for: Publications (books, magazines) and Non-sized Apparel (tote bags, stickers). For sized apparel (t-shirts), use Size Variants below instead.',
-      validation: Rule => Rule.required().min(0).integer(),
-      initialValue: 0,
-      hidden: ({ document }: { document?: any }) => {
+      name: "stockQuantity",
+      type: "number",
+      title: "📦 How Many Do You Have in Stock?",
+      description: "📦 Enter the total quantity you have in stock. For publications (books, magazines) and non-sized apparel (tote bags, stickers), use this field. For sized apparel (t-shirts), use the Size Variants section below.",
+      validation: (Rule) => Rule.required().min(0).integer(),
+      initialValue: 10,
+      placeholder: "10",
+      hidden: (context) => {
         // Hide stock quantity only for apparel products that have sizes enabled
-        const isApparel = document?.category?._ref === 'f16b392c-4089-4e48-8d5e-7401efb17902'
-        const hasSizesEnabled = document?.hasSizes === true
-        return isApparel && hasSizesEnabled
-      }
+        const document = context.document as { category?: { _ref?: string }; hasSizes?: boolean } | undefined;
+        const isApparel =
+          document?.category?._ref === "f16b392c-4089-4e48-8d5e-7401efb17902";
+        const hasSizesEnabled = document?.hasSizes === true;
+        return isApparel && hasSizesEnabled;
+      },
     }),
     defineField({
-      name: 'reservedQuantity',
-      type: 'number',
-      title: 'Reserved Quantity',
-      description: 'Items temporarily reserved during checkout process. Managed automatically by the system.',
-      validation: Rule => Rule.min(0).integer(),
+      name: "reservedQuantity",
+      type: "number",
+      title: "Reserved Quantity",
+      description:
+        "Items temporarily reserved during checkout process. Managed automatically by the system.",
+      validation: (Rule) => Rule.min(0).integer(),
       initialValue: 0,
       readOnly: true,
-      hidden: true // Always hidden from Studio UI - system managed field
+      hidden: true, // Always hidden from Studio UI - system managed field
     }),
     defineField({
-      name: 'variants',
-      title: 'Size Variants',
-      type: 'array',
-      description: 'Add different sizes (XS, S, M, L, XL) with individual stock levels for each size.',
+      name: "variants",
+      title: "👕 Size Variants (Only for Sized Apparel)",
+      type: "array",
+      description:
+        '📏 Add each size you offer (XS, S, M, L, XL) and set how many you have in stock for each size. Click "Add item" to add a new size.',
       of: [
         {
-          type: 'object',
-          title: 'Size Variant',
+          type: "object",
+          title: "Size Variant",
+          icon: () => "👕",
           fields: [
             defineField({
-              name: 'size',
-              title: 'Size',
-              type: 'string',
+              name: "size",
+              title: "📏 Size",
+              type: "string",
               options: {
                 list: [
-                  { title: 'XS', value: 'xs' },
-                  { title: 'S', value: 's' },
-                  { title: 'M', value: 'm' },
-                  { title: 'L', value: 'l' },
-                  { title: 'XL', value: 'xl' },
-                  { title: 'XXL', value: 'xxl' },
-                  { title: 'XXXL', value: 'xxxl' }
-                ]
+                  { title: "XS (Extra Small)", value: "xs" },
+                  { title: "S (Small)", value: "s" },
+                  { title: "M (Medium)", value: "m" },
+                  { title: "L (Large)", value: "l" },
+                  { title: "XL (Extra Large)", value: "xl" },
+                  { title: "XXL (2X Large)", value: "xxl" },
+                  { title: "XXXL (3X Large)", value: "xxxl" },
+                ],
+                layout: "dropdown",
               },
-              validation: Rule => Rule.required()
+              validation: (Rule) => Rule.required(),
+              description: "Choose the size for this variant",
             }),
             defineField({
-              name: 'stockQuantity',
-              title: 'Stock for this size',
-              type: 'number',
-              validation: Rule => Rule.required().min(0).integer(),
-              initialValue: 0
+              name: "stockQuantity",
+              title: "📦 Stock for This Size",
+              type: "number",
+              validation: (Rule) => Rule.required().min(0).integer(),
+              initialValue: 5,
+              placeholder: "5",
+              description:
+                "How many of this specific size do you have in stock?",
             }),
             defineField({
-              name: 'reservedQuantity',
-              title: 'Reserved for this size',
-              type: 'number',
-              description: 'Items temporarily reserved during checkout. Managed automatically by the system.',
-              validation: Rule => Rule.min(0).integer(),
+              name: "reservedQuantity",
+              title: "Reserved for this size",
+              type: "number",
+              description:
+                "Items temporarily reserved during checkout. Managed automatically by the system.",
+              validation: (Rule) => Rule.min(0).integer(),
               initialValue: 0,
               readOnly: true,
-              hidden: true // Always hidden from Studio UI - system managed field
+              hidden: true, // Always hidden from Studio UI - system managed field
             }),
             defineField({
-              name: 'stripePriceId',
-              title: 'Stripe Price ID',
-              type: 'string',
+              name: "stripePriceId",
+              title: "Stripe Price ID",
+              type: "string",
               readOnly: true,
               hidden: true, // Always hidden - auto-managed by webhooks
-            })
+            }),
           ],
           preview: {
             select: {
-              size: 'size',
-              stock: 'stockQuantity'
+              size: "size",
+              stock: "stockQuantity",
             },
             prepare(selection) {
-              const { size, stock } = selection
+              const { size, stock } = selection;
               return {
                 title: `Size ${size?.toUpperCase()}`,
-                subtitle: `Stock: ${stock || 0}`
-              }
-            }
-          }
-        }
+                subtitle: `Stock: ${stock || 0}`,
+              };
+            },
+          },
+        },
       ],
-      hidden: ({ document }: { document?: any }) => {
+      hidden: (context) => {
         // Only show variants for Apparel category with sizes enabled
-        const isApparel = document?.category?._ref === 'f16b392c-4089-4e48-8d5e-7401efb17902'
-        const hasSizesEnabled = document?.hasSizes === true
-        return !(isApparel && hasSizesEnabled)
-      }
-    }),
-    defineField({ 
-      name: 'heroImage', 
-      type: 'image', 
-      title: 'Hero Image',
-      options: {
-        hotspot: true
+        const document = context.document as { category?: { _ref?: string }; hasSizes?: boolean } | undefined;
+        const isApparel =
+          document?.category?._ref === "f16b392c-4089-4e48-8d5e-7401efb17902";
+        const hasSizesEnabled = document?.hasSizes === true;
+        return !(isApparel && hasSizesEnabled);
       },
-      validation: Rule => Rule.required()
     }),
-    defineField({ 
-      name: 'secondaryImages', 
-      type: 'array', 
-      title: 'Secondary Images', 
-      of: [{ 
-        type: 'image',
-        options: {
-          hotspot: true
-        }
-      }] 
+    // --- PRODUCT IMAGES ---
+    defineField({
+      name: "heroImage",
+      type: "image",
+      title: "📸 Main Product Image",
+      description:
+        "🌟 This is the primary image that customers will see first. Make it high-quality and eye-catching!",
+      options: {
+        hotspot: true,
+        accept: "image/*",
+      },
+      validation: (Rule) => Rule.required(),
     }),
     defineField({
-      name: 'stripePriceId',
-      title: 'Stripe Price ID',
-      type: 'string',
+      name: "secondaryImages",
+      type: "array",
+      title: "🖼️ Additional Images (Optional)",
+      description:
+        "📚 Add more photos to showcase different angles, details, or related content. Customers can view these in a gallery.",
+      of: [
+        {
+          type: "image",
+          options: {
+            hotspot: true,
+            accept: "image/*",
+          },
+        },
+      ],
+    }),
+    defineField({
+      name: "stripePriceId",
+      title: "Stripe Price ID",
+      type: "string",
       readOnly: true,
       hidden: true, // Always hidden - auto-managed by webhooks
     }),
     defineField({
-      name: 'stripeProductId',
-      title: 'Stripe Product ID',
-      type: 'string',
+      name: "stripeProductId",
+      title: "Stripe Product ID",
+      type: "string",
       readOnly: true,
       hidden: true, // Always hidden - auto-managed by webhooks
     }),
   ],
   preview: {
     select: {
-      title: 'title',
-      author: 'author',
-      category: 'category.title',
-      media: 'heroImage'
+      title: "title",
+      author: "author",
+      category: "category.title",
+      media: "heroImage",
     },
     prepare(selection) {
-      const { title, author, category } = selection
+      const { title, author, category } = selection;
       return {
         title: title,
-        subtitle: author 
-          ? `by ${author} • ${category || 'No category'}`
-          : category || 'No category'
-      }
-    }
-  }
-})
+        subtitle: author
+          ? `by ${author} • ${category || "No category"}`
+          : category || "No category",
+      };
+    },
+  },
+});

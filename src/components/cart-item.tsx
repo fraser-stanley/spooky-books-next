@@ -1,64 +1,74 @@
-"use client"
+"use client";
 
-import { useEffect } from "react"
-import Image from "next/image"
-import { useCart } from "./cart-contex"
-import { CurrencyPrice } from "./currency-price"
-import { getAvailableStock } from "@/lib/utils/stock-validation"
-import { toast } from "sonner"
-import type { SanityProduct } from "@/lib/sanity/types"
+import { useEffect } from "react";
+import Image from "next/image";
+import { useCart } from "./cart-contex";
+import { CurrencyPrice } from "./currency-price";
+import { getAvailableStock } from "@/lib/utils/stock-validation";
+import { toast } from "sonner";
+import type { SanityProduct } from "@/lib/sanity/types";
 
 interface CartItemProps {
   item: {
-    id: string
-    title: string
-    price: number
-    quantity: number
-    image?: string
-    size?: string
-  }
-  sanityProduct?: SanityProduct
+    id: string;
+    title: string;
+    price: number;
+    quantity: number;
+    image?: string;
+    size?: string;
+  };
+  sanityProduct?: SanityProduct;
 }
 
 export function CartItem({ item, sanityProduct }: CartItemProps) {
-  const { removeItem } = useCart()
+  const { removeItem } = useCart();
 
   // Auto-adjust if item quantity exceeds available stock on mount
   useEffect(() => {
     if (sanityProduct) {
-      const availableStock = getAvailableStock(sanityProduct, item.size)
+      const availableStock = getAvailableStock(sanityProduct, item.size);
       if (item.quantity > availableStock) {
-        const sizeText = item.size ? ` (${item.size.toUpperCase()})` : ""
-        
+        const sizeText = item.size ? ` (${item.size.toUpperCase()})` : "";
+
         if (availableStock === 0) {
-          removeItem(item.id, item.size)
-          toast.warning(`${item.title}${sizeText} was removed – no longer in stock`)
+          removeItem(item.id, item.size);
+          toast.warning(
+            `${item.title}${sizeText} was removed – no longer in stock`,
+          );
         } else {
-          toast.info(`${item.title}${sizeText} quantity exceeds available stock. Please add items from the product page.`)
+          toast.info(
+            `${item.title}${sizeText} quantity exceeds available stock. Please add items from the product page.`,
+          );
         }
       }
     }
-  }, [sanityProduct, item.quantity, item.title, item.id, item.size, removeItem])
+  }, [
+    sanityProduct,
+    item.quantity,
+    item.title,
+    item.id,
+    item.size,
+    removeItem,
+  ]);
 
   return (
     <div className="flex flex-col sm:flex-row sm:items-start gap-4 sm:gap-6 w-full">
       {/* Image */}
       <div className="w-full sm:w-24 sm:h-32">
-  {item.image ? (
-    <Image
-      src={item.image}
-      alt={item.title}
-      width={600}
-      height={400}
-      className="w-full h-auto sm:h-32 sm:w-24 object-cover rounded"
-    />
-  ) : (
-    <div className="w-full sm:w-24 sm:h-32 bg-gray-200 flex items-center justify-center rounded">
-      <span className="text-gray-400 uppercase">No image</span>
-    </div>
-  )}
-</div>
-
+        {item.image ? (
+          <Image
+            src={item.image}
+            alt={item.title}
+            width={600}
+            height={400}
+            className="w-full h-auto sm:h-32 sm:w-24 object-cover rounded"
+          />
+        ) : (
+          <div className="w-full sm:w-24 sm:h-32 bg-gray-200 flex items-center justify-center rounded">
+            <span className="text-gray-400 uppercase">No image</span>
+          </div>
+        )}
+      </div>
 
       {/* Details */}
       <div className="flex-1 min-w-0">
@@ -72,9 +82,7 @@ export function CartItem({ item, sanityProduct }: CartItemProps) {
         </div>
 
         {sanityProduct?.author && (
-          <div className="mb-1">
-            {sanityProduct.author}
-          </div>
+          <div className="mb-1">{sanityProduct.author}</div>
         )}
 
         <div className="mb-2">
@@ -101,5 +109,5 @@ export function CartItem({ item, sanityProduct }: CartItemProps) {
         <CurrencyPrice price={item.price * item.quantity} />
       </div>
     </div>
-  )
+  );
 }

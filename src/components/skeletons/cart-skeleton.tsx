@@ -1,11 +1,9 @@
 interface SkeletonProps {
-  className?: string
+  className?: string;
 }
 
 function Skeleton({ className = "" }: SkeletonProps) {
-  return (
-    <div className={`animate-pulse bg-gray-200 rounded ${className}`} />
-  )
+  return <div className={`animate-pulse bg-gray-200 rounded ${className}`} />;
 }
 
 export function CartItemSkeleton() {
@@ -15,14 +13,14 @@ export function CartItemSkeleton() {
       <div className="w-full sm:w-24 sm:h-32">
         <Skeleton className="w-full h-auto sm:h-32 sm:w-24 rounded" />
       </div>
-      
+
       {/* Content skeleton */}
       <div className="flex-1 min-w-0">
         {/* Title */}
         <div className="mb-1">
           <Skeleton className="h-4 w-3/4" />
         </div>
-        
+
         {/* Price */}
         <div className="mb-2">
           <Skeleton className="h-4 w-16" />
@@ -34,17 +32,17 @@ export function CartItemSkeleton() {
             <Skeleton className="h-4 w-8" />
             <Skeleton className="h-8 w-24 rounded" />
           </div>
-          
+
           <Skeleton className="h-7 w-16 rounded" />
         </div>
       </div>
-      
+
       {/* Subtotal skeleton */}
       <div className="text-sm text-right sm:text-left sm:ml-auto mt-2 sm:mt-0 whitespace-nowrap">
         <Skeleton className="h-4 w-16" />
       </div>
     </div>
-  )
+  );
 }
 
 export function OrderSummarySkeleton() {
@@ -70,7 +68,7 @@ export function OrderSummarySkeleton() {
         <Skeleton className="h-4 w-16" />
       </div>
     </div>
-  )
+  );
 }
 
 export function CheckoutButtonSkeleton() {
@@ -78,7 +76,7 @@ export function CheckoutButtonSkeleton() {
     <div className="flex justify-end mt-8">
       <Skeleton className="h-9 w-48" />
     </div>
-  )
+  );
 }
 
 export function CartHeaderSkeleton() {
@@ -87,7 +85,7 @@ export function CartHeaderSkeleton() {
       <Skeleton className="h-6 w-20" />
       <Skeleton className="h-4 w-16" />
     </div>
-  )
+  );
 }
 
 export function CartPageSkeleton() {
@@ -107,13 +105,12 @@ export function CartPageSkeleton() {
           ))}
         </div>
 
-
         {/* Order summary skeleton */}
         <div className="mt-12">
           <div className="border-b border-gray-200 mb-6" />
           <OrderSummarySkeleton />
           <CheckoutButtonSkeleton />
-          
+
           {/* Continue shopping skeleton */}
           <div className="flex justify-center mt-6">
             <Skeleton className="h-4 w-24" />
@@ -121,5 +118,5 @@ export function CartPageSkeleton() {
         </div>
       </main>
     </div>
-  )
+  );
 }

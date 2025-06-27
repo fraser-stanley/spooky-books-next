@@ -1,13 +1,13 @@
-import { NextResponse } from 'next/server'
-import { createClient } from '@sanity/client'
+import { NextResponse } from "next/server";
+import { createClient } from "@sanity/client";
 
 const sanityClient = createClient({
-  projectId: process.env.NEXT_PUBLIC_SANITY_PROJECT_ID || '0gbx06x6',
-  dataset: process.env.NEXT_PUBLIC_SANITY_DATASET || 'production',
+  projectId: process.env.NEXT_PUBLIC_SANITY_PROJECT_ID || "0gbx06x6",
+  dataset: process.env.NEXT_PUBLIC_SANITY_DATASET || "production",
   token: process.env.SANITY_API_TOKEN!,
-  apiVersion: '2023-05-03',
+  apiVersion: "2023-05-03",
   useCdn: false,
-})
+});
 
 export async function POST() {
   try {
@@ -18,72 +18,73 @@ export async function POST() {
         title,
         slug
       }
-    `)
+    `);
 
-    console.log(`Found ${existingCategories.length} existing categories`)
+    console.log(`Found ${existingCategories.length} existing categories`);
 
-    const results = []
+    const results = [];
 
     // Define the two categories we need
     const requiredCategories = [
       {
-        title: 'Publications',
-        slug: { current: 'publications' },
-        description: 'Books, magazines, and other publications',
-        sortOrder: 1
+        title: "Publications",
+        slug: { current: "publications" },
+        description: "Books, magazines, and other publications",
+        sortOrder: 1,
       },
       {
-        title: 'Apparel',
-        slug: { current: 'apparel' },
-        description: 'T-shirts, hoodies, and clothing items',
-        sortOrder: 2
-      }
-    ]
+        title: "Apparel",
+        slug: { current: "apparel" },
+        description: "T-shirts, hoodies, and clothing items",
+        sortOrder: 2,
+      },
+    ];
 
     for (const category of requiredCategories) {
       // Check if category already exists
-      const existing = existingCategories.find((cat: {title: string}) => cat.title === category.title)
-      
+      const existing = existingCategories.find(
+        (cat: { title: string }) => cat.title === category.title,
+      );
+
       if (!existing) {
-        console.log(`Creating category: ${category.title}`)
-        
+        console.log(`Creating category: ${category.title}`);
+
         const newCategory = await sanityClient.create({
-          _type: 'category',
-          ...category
-        })
+          _type: "category",
+          ...category,
+        });
 
         results.push({
           title: category.title,
-          status: 'created',
-          id: newCategory._id
-        })
+          status: "created",
+          id: newCategory._id,
+        });
       } else {
-        console.log(`Category already exists: ${category.title}`)
+        console.log(`Category already exists: ${category.title}`);
         results.push({
           title: category.title,
-          status: 'exists',
-          id: existing._id
-        })
+          status: "exists",
+          id: existing._id,
+        });
       }
     }
 
     return NextResponse.json({
       success: true,
-      message: `Setup complete. ${results.filter(r => r.status === 'created').length} categories created.`,
+      message: `Setup complete. ${results.filter((r) => r.status === "created").length} categories created.`,
       categories: results,
-      existing: existingCategories
-    })
-
+      existing: existingCategories,
+    });
   } catch (error) {
-    console.error('Category setup error:', error)
-    
+    console.error("Category setup error:", error);
+
     return NextResponse.json(
-      { 
-        error: 'Failed to setup categories',
-        message: error instanceof Error ? error.message : 'Unknown error'
+      {
+        error: "Failed to setup categories",
+        message: error instanceof Error ? error.message : "Unknown error",
       },
-      { status: 500 }
-    )
+      { status: 500 },
+    );
   }
 }
 
@@ -97,16 +98,16 @@ export async function GET() {
         description,
         sortOrder
       }
-    `)
+    `);
 
     return NextResponse.json({
       categories,
-      count: categories.length
-    })
+      count: categories.length,
+    });
   } catch {
     return NextResponse.json(
-      { error: 'Failed to fetch categories' },
-      { status: 500 }
-    )
+      { error: "Failed to fetch categories" },
+      { status: 500 },
+    );
   }
 }

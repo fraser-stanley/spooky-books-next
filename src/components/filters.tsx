@@ -1,29 +1,29 @@
 // components/sort-options.tsx
-"use client"
+"use client";
 
-import { useState } from "react"
+import { useState } from "react";
 
 type SortOption =
   | "price-asc"
   | "price-desc"
   | "newest"
   | "alpha-asc"
-  | "alpha-desc"
+  | "alpha-desc";
 
 export function SortOptions({
   onChange,
   defaultValue = "newest",
 }: {
-  onChange: (value: SortOption) => void
-  defaultValue?: SortOption
+  onChange: (value: SortOption) => void;
+  defaultValue?: SortOption;
 }) {
-  const [sort, setSort] = useState<SortOption>(defaultValue)
+  const [sort, setSort] = useState<SortOption>(defaultValue);
 
   const handleChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    const selected = e.target.value as SortOption
-    setSort(selected)
-    onChange(selected)
-  }
+    const selected = e.target.value as SortOption;
+    setSort(selected);
+    onChange(selected);
+  };
 
   return (
     <div className="mb-4">
@@ -44,5 +44,5 @@ export function SortOptions({
         <option value="alpha-desc">Z–A</option>
       </select>
     </div>
-  )
+  );
 }
