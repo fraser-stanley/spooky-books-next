@@ -18,5 +18,7 @@ interface VisualEditingProviderProps {
 export function VisualEditingProvider({
   isEnabled,
 }: VisualEditingProviderProps) {
-  return <>{isEnabled && <VisualEditing />}</>;
+  if (!isEnabled) return null;
+  
+  return <VisualEditing />;
 }

@@ -9,6 +9,7 @@ export default defineConfig({
   title: "Spooky Books",
   projectId: "0gbx06x6",
   dataset: "production",
+  apiVersion: "2023-05-03",
   plugins: [
     structureTool({
       structure: (S) =>
@@ -48,7 +49,8 @@ export default defineConfig({
                           .title("Publications")
                           .filter(
                             '_type == "product" && category._ref == "f16b392c-4089-4e48-8d5e-7401efb17902"',
-                          ),
+                          )
+                          .apiVersion("2023-05-03"),
                       ),
                     S.listItem()
                       .title("👕 Apparel (T-shirts & Merchandise)")
@@ -57,7 +59,8 @@ export default defineConfig({
                           .title("Apparel")
                           .filter(
                             '_type == "product" && category._ref == "f16b392c-4089-4e48-8d5e-7401efb17902"',
-                          ),
+                          )
+                          .apiVersion("2023-05-03"),
                       ),
                   ]),
               ),
@@ -97,7 +100,6 @@ export default defineConfig({
           homepage: defineLocations({
             select: {
               title: "title",
-              slug: "slug.current",
             },
             resolve: (doc) => ({
               locations: [
@@ -114,7 +116,6 @@ export default defineConfig({
               slug: "slug.current",
               category: "category.title",
               author: "author",
-              heroImage: "heroImage",
             },
             resolve: (doc) => ({
               locations: [
@@ -126,18 +127,13 @@ export default defineConfig({
                     ? `by ${doc?.author} • ${doc?.category || "Product"}`
                     : doc?.category || "Product",
                 },
-                {
-                  title: `${doc?.title || "Product"} - Category View`,
-                  href: "/products",
-                  icon: "🏷️",
-                  description: `View in ${doc?.category || "All"} products listing`,
-                },
               ],
             }),
           }),
         },
       },
       previewUrl: {
+        origin: process.env.SANITY_STUDIO_PREVIEW_ORIGIN || "http://localhost:3000",
         previewMode: {
           enable: "/api/draft-mode/enable",
         },
