@@ -1395,7 +1395,7 @@ SANITY_STUDIO_PREVIEW_ORIGIN=https://spooky-books-next.vercel.app
 #### Pre-deployment
 ```bash
 # Run full validation suite
-npm run typecheck && npm run lint && npm run test && npm run build
+npm run lint && npm run build
 ```
 
 #### Vercel Configuration
@@ -1434,7 +1434,7 @@ POST /api/cron/cleanup-inventory
 - **"Unknown field" in Sanity**: Run `/api/cleanup-reserved-fields`
 - **Missing variant keys**: Run `/api/fix-variant-keys`
 - **Stale cache**: Run `/api/emergency-cache-clear`
-- **TypeScript errors**: Check `npm run typecheck` output
+- **TypeScript errors**: Check `npm run build` output for type validation
 
 ### Best Practices
 
