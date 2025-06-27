@@ -1387,3 +1387,70 @@ SANITY_STUDIO_PREVIEW_ORIGIN=https://spooky-books-next.vercel.app
 - **Screen Readers**: Descriptive text for cart quantities and product info
 - **Color Contrast**: Proper contrast ratios for light mode
 - **Semantic HTML**: Proper heading hierarchy and landmark elements
+
+## Quick Reference Guide
+
+### Deployment
+
+#### Pre-deployment
+```bash
+# Run full validation suite
+npm run typecheck && npm run lint && npm run test && npm run build
+```
+
+#### Vercel Configuration
+- Automatic deployments from main branch
+- Environment variables in Vercel dashboard
+- Webhooks configured for Sanity → Stripe sync
+- CORS enabled for visual editing
+
+#### Post-deployment
+- Test visual editing at `/studio`
+- Verify webhooks with test product
+- Check cart persistence across sessions
+- Monitor rate limiting at `/api/rate-limit-stats`
+
+### Common Tasks
+
+#### Add New Product Type
+1. Update Sanity schema with new fields
+2. Add TypeScript types to `lib/sanity/types.ts`
+3. Update product components for new logic
+4. Test inventory management for edge cases
+
+#### Debug Stock Issues
+```bash
+# Check inventory health
+GET /api/inventory-health
+
+# View autonomous system status
+Visit /autonomous-status
+
+# Manual cleanup if needed
+POST /api/cron/cleanup-inventory
+```
+
+#### Fix Common Issues
+- **"Unknown field" in Sanity**: Run `/api/cleanup-reserved-fields`
+- **Missing variant keys**: Run `/api/fix-variant-keys`
+- **Stale cache**: Run `/api/emergency-cache-clear`
+- **TypeScript errors**: Check `npm run typecheck` output
+
+### Best Practices
+
+#### Development Standards
+- **Always validate types**: Use TypeScript strict mode, no `any` types
+- **Test edge cases**: Empty cart, sold out items, concurrent checkouts
+- **Handle errors gracefully**: User-friendly messages, no technical jargon
+- **Optimize for mobile**: Test on real devices, not just browser DevTools
+
+#### Performance Guidelines
+- **Monitor performance**: Keep checkout under 2 seconds, minimize bundle size
+- **Use semantic HTML**: Proper ARIA labels, keyboard navigation
+- **Follow conventions**: Kebab-case files, named exports, consistent formatting
+
+#### Content Management
+- **Rich Text**: Use Portable Text for descriptions, metadata for technical specs
+- **Image Optimization**: Always include alt text, use Next.js Image component
+- **Stock Management**: Test variant-level stock, validate cart quantities
+- **Visual Editing**: Test presentation mode after schema changes
