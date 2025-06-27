@@ -13,12 +13,14 @@ export async function POST() {
   try {
     console.log("🧹 Starting legacy description cleanup...");
 
-    // Get all products that still have the legacy description field
+    // Get all products that still have any legacy fields
     const productsWithLegacyFields = await sanityClient.fetch(`
-      *[_type == "product" && defined(description)] {
+      *[_type == "product" && (defined(description) || defined(vendor) || defined(category.description))] {
         _id,
         title,
-        description
+        description,
+        vendor,
+        "categoryDescription": category.description
       }
     `);
 
@@ -39,17 +41,23 @@ export async function POST() {
       try {
         console.log(`Cleaning legacy fields from: ${product.title}`);
 
-        // Use unset to remove the description field
-        await sanityClient
-          .patch(product._id)
-          .unset(['description'])
-          .commit();
+        // Use unset to remove all legacy fields
+        const fieldsToRemove = [];
+        if (product.description) fieldsToRemove.push('description');
+        if (product.vendor) fieldsToRemove.push('vendor');
+        
+        if (fieldsToRemove.length > 0) {
+          await sanityClient
+            .patch(product._id)
+            .unset(fieldsToRemove)
+            .commit();
+        }
 
         results.push({
           id: product._id,
           title: product.title,
           status: "success",
-          removedFields: ["description"],
+          removedFields: fieldsToRemove,
         });
 
         console.log(`✅ Cleaned: ${product.title}`);
@@ -93,9 +101,11 @@ export async function GET() {
   try {
     // Check how many products still have legacy fields
     const productsWithLegacyFields = await sanityClient.fetch(`
-      *[_type == "product" && defined(description)] {
+      *[_type == "product" && (defined(description) || defined(vendor))] {
         _id,
-        title
+        title,
+        description,
+        vendor
       }
     `);
 
