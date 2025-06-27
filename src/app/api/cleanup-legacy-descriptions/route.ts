@@ -112,7 +112,7 @@ export async function GET() {
     return NextResponse.json({
       message: "Legacy description field cleanup endpoint",
       productsWithLegacyFields: productsWithLegacyFields.length,
-      products: productsWithLegacyFields.map(p => ({ id: p._id, title: p.title })),
+      products: productsWithLegacyFields.map((p: any) => ({ id: p._id, title: p.title })),
       instructions: "POST to this endpoint to clean up all legacy description fields",
     });
   } catch (error) {
