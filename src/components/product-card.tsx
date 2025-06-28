@@ -1,7 +1,7 @@
 "use client";
 
 // TODO: Replace with Sanity GROQ query
-import Image from "next/image";
+import { ProgressiveImageSimple } from "./progressive-image-simple";
 import Link from "next/link";
 import { CurrencyPrice } from "./currency-price";
 import { getAvailableStock } from "@/lib/utils/stock-validation";
@@ -56,7 +56,7 @@ export function ProductCard({
       >
         {image ? (
           <div data-name="product-image-box">
-            <Image
+            <ProgressiveImageSimple
               src={image.url}
               alt={image.alt}
               width={800}
