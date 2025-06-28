@@ -50,50 +50,56 @@ export function ImageWithSkeleton({
 
   return (
     <div className="relative w-full" style={style}>
-      {/* Container with proper aspect ratio to prevent layout shift */}
-      <div
-        className="w-full"
-        style={{
-          aspectRatio: aspectRatio ? `${width} / ${height}` : "1 / 1",
-        }}
-      >
-        {/* Skeleton - shows until image loads */}
-        {!isLoaded && (
-          <div
-            className={`absolute inset-0 w-full h-full ${skeletonClassName}`}
-          />
-        )}
-
-        {/* Actual image with Next.js 15 optimizations */}
-        <Image
-          src={src}
-          alt={alt}
-          width={width}
-          height={height}
-          sizes={sizes}
-          quality={quality}
-          className={`w-full h-full object-cover transition-opacity duration-300 ${
-            isLoaded ? "opacity-100" : "opacity-0"
-          } ${className}`}
-          priority={priority}
-          loading={loading}
-          onLoad={handleLoad}
-          onError={handleError}
-          // Enable automatic format optimization (WebP/AVIF)
-          unoptimized={false}
+      {/* Skeleton with proper aspect ratio - shows until image loads */}
+      {!isLoaded && (
+        <div
+          className={`w-full ${skeletonClassName}`}
+          style={{
+            aspectRatio: aspectRatio ? `${width} / ${height}` : "1 / 1",
+          }}
         />
+      )}
 
-        {/* Error state fallback with better accessibility */}
-        {hasError && (
-          <div
-            className="absolute inset-0 w-full h-full bg-gray-100 flex items-center justify-center text-gray-400 text-sm"
-            role="img"
-            aria-label={`Image not available: ${alt}`}
-          >
-            <span>Image unavailable</span>
-          </div>
-        )}
-      </div>
+      {/* Actual image with Next.js 15 optimizations - always fills width, maintains aspect ratio */}
+      <Image
+        src={src}
+        alt={alt}
+        width={width}
+        height={height}
+        sizes={sizes}
+        quality={quality}
+        className={`w-full h-auto transition-opacity duration-300 ${
+          isLoaded ? "opacity-100" : "opacity-0"
+        } ${className}`}
+        priority={priority}
+        loading={loading}
+        onLoad={handleLoad}
+        onError={handleError}
+        // Enable automatic format optimization (WebP/AVIF)
+        unoptimized={false}
+        style={{
+          position: isLoaded ? "static" : "absolute",
+          top: isLoaded ? "auto" : 0,
+          left: isLoaded ? "auto" : 0,
+          // Ensure the image always fills the width while maintaining aspect ratio
+          width: "100%",
+          height: "auto",
+        }}
+      />
+
+      {/* Error state fallback with better accessibility */}
+      {hasError && (
+        <div
+          className="w-full bg-gray-100 flex items-center justify-center text-gray-400 text-sm"
+          style={{ 
+            aspectRatio: aspectRatio ? `${width} / ${height}` : "1 / 1",
+          }}
+          role="img"
+          aria-label={`Image not available: ${alt}`}
+        >
+          <span>Image unavailable</span>
+        </div>
+      )}
     </div>
   );
 }
