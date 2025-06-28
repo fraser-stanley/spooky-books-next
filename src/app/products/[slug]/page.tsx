@@ -120,16 +120,17 @@ export default async function ProductPage({ params }: ProductPageProps) {
         {/* Product Images */}
         <div className="col-span-12 md:col-span-6">
           {product.images.map((image, index) => (
-            <div key={index} className="mb-4">
+            <div key={index} className="mb-6">
               <Image
                 src={image.url}
                 alt={image.alt}
                 width={1200}
-                height={1200}
+                height={800}
                 sizes="(max-width: 768px) 100vw, 50vw"
                 quality={95}
-                className="w-full"
+                className="w-full h-auto"
                 priority={index === 0}
+                style={{ objectFit: 'cover' }}
               />
             </div>
           ))}
