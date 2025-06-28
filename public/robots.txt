@@ -1,0 +1,23 @@
+# robots.txt for Spooky Books
+# Allow all search engines to crawl the site
+
+User-agent: *
+Allow: /
+
+# Sitemap location
+Sitemap: https://spooky-books-next.vercel.app/sitemap.xml
+
+# Disallow common technical directories (if they exist)
+Disallow: /api/
+Disallow: /_next/
+Disallow: /admin/
+Disallow: /debug/
+
+# Allow search engines to crawl important content
+Allow: /products/
+Allow: /products/category/
+Allow: /cart/
+Allow: /studio/
+
+# Crawl delay (optional, helps with server load)
+Crawl-delay: 1

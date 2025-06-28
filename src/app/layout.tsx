@@ -5,6 +5,11 @@ import { Toaster } from "sonner";
 import { draftMode } from "next/headers";
 import { VisualEditingProvider } from "@/components/visual-editing-provider";
 import { SanityLive } from "@/lib/sanity/live";
+import { defaultMetadata, structuredDataConfig } from "@/lib/seo/config";
+import { generateStructuredDataScript } from "@/lib/seo/utils";
+import type { Metadata } from "next";
+
+export const metadata: Metadata = defaultMetadata;
 
 export default async function RootLayout({
   children,
@@ -22,6 +27,9 @@ export default async function RootLayout({
           as="font"
           type="font/woff2"
           crossOrigin=""
+        />
+        <script
+          {...generateStructuredDataScript(structuredDataConfig.organization)}
         />
       </head>
       <body className="antialiased  text-black">

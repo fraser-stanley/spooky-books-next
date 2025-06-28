@@ -97,22 +97,48 @@ export function AddToCart({
     !needsSizeSelection &&
     ((availableStock !== undefined && availableStock <= 0) || !available);
 
+  const getAriaLabel = () => {
+    if (isSoldOut) return `${product.title} is sold out`;
+    if (needsSizeSelection) return `Select a size for ${product.title} before adding to cart`;
+    return `Add ${product.title}${selectedSize ? ` in size ${selectedSize}` : ""} to cart`;
+  };
+
+  const getAriaDescribedBy = () => {
+    if (availableStock !== undefined && availableStock > 0) {
+      return `stock-${product.id}`;
+    }
+    return undefined;
+  };
+
   return (
-    <button
-      type="button"
-      className={styles.addToCart}
-      onClick={isAvailable ? handleAddToCart : undefined}
-      disabled={!isAvailable}
-      title={
-        availableStock !== undefined ? `${availableStock} in stock` : undefined
-      }
-      {...props}
-    >
-      {isSoldOut
-        ? "SOLD OUT"
-        : needsSizeSelection
-          ? "Select a size"
-          : "Add to Cart"}
-    </button>
+    <>
+      <button
+        type="button"
+        className={styles.addToCart}
+        onClick={isAvailable ? handleAddToCart : undefined}
+        disabled={!isAvailable}
+        aria-label={getAriaLabel()}
+        aria-describedby={getAriaDescribedBy()}
+        title={
+          availableStock !== undefined ? `${availableStock} in stock` : undefined
+        }
+        {...props}
+      >
+        {isSoldOut
+          ? "SOLD OUT"
+          : needsSizeSelection
+            ? "Select a size"
+            : "Add to Cart"}
+      </button>
+      {availableStock !== undefined && availableStock > 0 && (
+        <div 
+          id={`stock-${product.id}`} 
+          className="sr-only"
+          aria-live="polite"
+        >
+          {availableStock} items in stock
+        </div>
+      )}
+    </>
   );
 }

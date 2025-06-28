@@ -171,7 +171,7 @@ export default function CartPage() {
     return (
       <div className="min-h-screen">
         <div className="flex flex-col items-center justify-center text-center min-h-screen">
-          <span className="text-lg mb-4 uppercase">Your cart is empty</span>
+          <h1 className="text-lg mb-4 uppercase">Your cart is empty</h1>
           <p className="text-sm text-black mb-8">
             Looks like you haven&apos;t added anything to your cart yet.
           </p>
@@ -191,7 +191,7 @@ export default function CartPage() {
       <main className="max-w-4xl mx-auto sm:p-6">
         {/* Cart Header */}
         <div className="flex items-center justify-between mb-8">
-          <span className="uppercase">Your Cart</span>
+          <h1 className="uppercase">Your Cart</h1>
           <span className="uppercase">Total {totalItems} items</span>
         </div>
 

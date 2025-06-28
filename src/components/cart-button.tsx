@@ -10,7 +10,7 @@ export function CartButton() {
 
   return (
     <Link
-      aria-label={`Shopping Bag with ${quantity} items`}
+      aria-label={`Cart${quantity > 0 ? ` with ${quantity} items` : ''}`}
       href="/cart"
       className={styles.cartButton}
     >

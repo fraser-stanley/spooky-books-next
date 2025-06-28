@@ -6,6 +6,16 @@ import { getCategories } from "@/lib/sanity/queries";
 import { sanityFetch } from "@/lib/sanity/live";
 import { homepageQuery } from "@/lib/sanity/groq";
 import type { SanityContentBlock } from "@/lib/sanity/types";
+import { generateSEOMetadata } from "@/lib/seo/utils";
+import { siteConfig } from "@/lib/seo/config";
+import type { Metadata } from "next";
+
+export const metadata: Metadata = generateSEOMetadata({
+  title: siteConfig.title,
+  description: siteConfig.description,
+  canonical: siteConfig.url,
+  ogType: 'website',
+});
 
 // Force dynamic rendering to ensure fresh data
 export const dynamic = "force-dynamic";
@@ -19,6 +29,8 @@ export default async function HomePage() {
 
   return (
     <Layout categories={categories}>
+      {/* SEO: Main page heading - visually hidden but accessible to screen readers and search engines */}
+      <h1 className="sr-only">Spooky Books - Independent Art Book Publisher</h1>
       <section className="text-md sm:text-sm grid grid-cols-12 gap-2 mb-12 xl:mb-24 mt-8 sm:mt-24">
         {!homepage ? (
           <div className="col-span-12 text-center py-12">

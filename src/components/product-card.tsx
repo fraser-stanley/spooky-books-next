@@ -5,6 +5,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { CurrencyPrice } from "./currency-price";
 import { getAvailableStock } from "@/lib/utils/stock-validation";
+import { generateProductLinkText } from "@/lib/seo/internal-links";
 import type { Product } from "@/data/products";
 import type { SanityProduct } from "@/lib/sanity/types";
 
@@ -50,7 +51,8 @@ export function ProductCard({
       <Link
         className="capitalize inline-block"
         href={`/products/${slug}`}
-        aria-label={`View ${title} product page`}
+        aria-label={`View ${sanityProduct ? generateProductLinkText(sanityProduct, 'grid') : title} product page`}
+        title={sanityProduct ? `Shop ${generateProductLinkText(sanityProduct, 'grid')} - Independent Art Book` : title}
       >
         {image ? (
           <div data-name="product-image-box">

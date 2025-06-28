@@ -17,11 +17,11 @@ export function adaptSanityProduct(sanityProduct: SanityProduct): Product {
     images: [
       {
         url: sanityProduct.heroImage,
-        alt: `Cover of ${sanityProduct.title}${sanityProduct.author ? ` by ${sanityProduct.author}` : ""}`,
+        alt: `Cover of ${sanityProduct.title}${sanityProduct.author ? ` by ${sanityProduct.author}` : ""} - ${sanityProduct.category.title} from Spooky Books`,
       },
       ...(sanityProduct.secondaryImages?.map((url, index) => ({
         url,
-        alt: `Image ${index + 2} from ${sanityProduct.title}`,
+        alt: `${sanityProduct.title}${sanityProduct.author ? ` by ${sanityProduct.author}` : ""} - Interior view ${index + 1}`,
       })) || []),
     ],
     variants: sanityProduct.variants, // Pass through variants array

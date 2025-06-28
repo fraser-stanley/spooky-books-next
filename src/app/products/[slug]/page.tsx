@@ -5,9 +5,58 @@ import { getProduct, getCategories } from "@/lib/sanity/queries";
 import { adaptSanityProduct } from "@/lib/sanity/adapters";
 import { ProductPageClient } from "./product-page-client";
 import { ProductDescription } from "@/components/portable-text";
+import { generateProductMetadata, generateProductSchema, generateBreadcrumbSchema, generateStructuredDataScript } from "@/lib/seo/utils";
+import { siteConfig } from "@/lib/seo/config";
+import type { Metadata } from "next";
+import type { ProductMetadata } from "@/lib/seo/types";
 
 interface ProductPageProps {
   params: Promise<{ slug: string }>;
+}
+
+export async function generateMetadata({ params }: ProductPageProps): Promise<Metadata> {
+  const { slug } = await params;
+  const sanityProduct = await getProduct(slug);
+
+  if (!sanityProduct) {
+    return generateProductMetadata({
+      title: 'Product Not Found',
+      description: 'The requested product could not be found.',
+      price: 0,
+      currency: 'USD',
+      availability: 'OutOfStock',
+      category: 'Unknown',
+      images: [],
+      publisher: siteConfig.name,
+    });
+  }
+
+  // Convert rich description to plain text for meta description
+  const plainDescription = sanityProduct.richDescription
+    ? sanityProduct.richDescription
+        .filter((block: any) => block._type === 'block')
+        .map((block: any) => 
+          block.children
+            ?.filter((child: any) => child._type === 'span')
+            .map((span: any) => span.text)
+            .join('')
+        )
+        .join(' ')
+    : '';
+
+  const productMetadata: ProductMetadata = {
+    title: sanityProduct.title,
+    description: plainDescription || `${sanityProduct.title} - A unique publication from ${siteConfig.name}`,
+    author: sanityProduct.author,
+    price: sanityProduct.price,
+    currency: 'USD',
+    availability: sanityProduct.stockQuantity > 0 ? 'InStock' : 'OutOfStock',
+    category: sanityProduct.category.title,
+    images: [sanityProduct.heroImage, ...(sanityProduct.secondaryImages || [])].filter(Boolean),
+    publisher: siteConfig.name,
+  };
+
+  return generateProductMetadata(productMetadata);
 }
 
 export default async function ProductPage({ params }: ProductPageProps) {
@@ -25,8 +74,48 @@ export default async function ProductPage({ params }: ProductPageProps) {
 
   const product = adaptSanityProduct(sanityProduct);
 
+  // Generate structured data for the product
+  const productUrl = `${siteConfig.url}/products/${slug}`;
+  const plainDescription = sanityProduct.richDescription
+    ? sanityProduct.richDescription
+        .filter((block: any) => block._type === 'block')
+        .map((block: any) => 
+          block.children
+            ?.filter((child: any) => child._type === 'span')
+            .map((span: any) => span.text)
+            .join('')
+        )
+        .join(' ')
+    : '';
+
+  const productMetadata: ProductMetadata = {
+    title: sanityProduct.title,
+    description: plainDescription || `${sanityProduct.title} - A unique publication from ${siteConfig.name}`,
+    author: sanityProduct.author,
+    price: sanityProduct.price,
+    currency: 'USD',
+    availability: sanityProduct.stockQuantity > 0 ? 'InStock' : 'OutOfStock',
+    category: sanityProduct.category.title,
+    images: [sanityProduct.heroImage, ...(sanityProduct.secondaryImages || [])].filter(Boolean),
+    publisher: siteConfig.name,
+  };
+
+  const productSchema = generateProductSchema(productMetadata, productUrl);
+
+  // Generate breadcrumb structured data
+  const breadcrumbItems = [
+    { name: 'Home', url: siteConfig.url },
+    { name: 'Products', url: `${siteConfig.url}/products` },
+    { name: sanityProduct.category.title, url: `${siteConfig.url}/products/category/${sanityProduct.category.slug}` },
+    { name: sanityProduct.title, url: productUrl },
+  ];
+  const breadcrumbSchema = generateBreadcrumbSchema(breadcrumbItems);
+
   return (
     <Layout categories={categories}>
+      <script
+        {...generateStructuredDataScript([productSchema, breadcrumbSchema])}
+      />
       <div className="grid grid-cols-12 gap-4 pt-24 md:min-h-screen pb-32 md:pb-0">
         {/* Product Images */}
         <div className="col-span-12 md:col-span-6">

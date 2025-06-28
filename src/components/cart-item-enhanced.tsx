@@ -99,7 +99,7 @@ export function CartItemEnhanced({
         {item.image ? (
           <Image
             src={item.image}
-            alt={item.title}
+            alt={`Cover of ${item.title}`}
             width={96}
             height={128}
             className="w-24 h-32 object-cover"

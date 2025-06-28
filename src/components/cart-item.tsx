@@ -52,13 +52,16 @@ export function CartItem({ item, sanityProduct }: CartItemProps) {
   ]);
 
   return (
-    <div className="flex flex-col sm:flex-row sm:items-start gap-4 sm:gap-6 w-full">
+    <article 
+      className="flex flex-col sm:flex-row sm:items-start gap-4 sm:gap-6 w-full"
+      aria-label={`${item.title}${item.size ? ` in size ${item.size}` : ""} - cart item`}
+    >
       {/* Image */}
       <div className="w-full sm:w-24 sm:h-32">
         {item.image ? (
           <Image
             src={item.image}
-            alt={item.title}
+            alt={`Cover of ${item.title}${sanityProduct?.author ? ` by ${sanityProduct.author}` : ""}`}
             width={600}
             height={400}
             className="w-full h-auto sm:h-32 sm:w-24 object-cover rounded"
@@ -86,7 +89,9 @@ export function CartItem({ item, sanityProduct }: CartItemProps) {
         )}
 
         <div className="mb-2">
-          <CurrencyPrice price={item.price} />
+          <span aria-label={`Unit price`}>
+            <CurrencyPrice price={item.price} />
+          </span>
         </div>
 
         {/* Quantity & Remove */}
@@ -98,6 +103,7 @@ export function CartItem({ item, sanityProduct }: CartItemProps) {
           <button
             onClick={() => removeItem(item.id, item.size)}
             className="px-4 py-1 border border-gray-300 hover:bg-gray-100 uppercase rounded cursor-pointer"
+            aria-label={`Remove ${item.title}${item.size ? ` in size ${item.size}` : ""} from cart`}
           >
             Remove
           </button>
@@ -106,8 +112,10 @@ export function CartItem({ item, sanityProduct }: CartItemProps) {
 
       {/* Subtotal */}
       <div className="text-sm text-right sm:text-left sm:ml-auto mt-2 sm:mt-0 whitespace-nowrap">
-        <CurrencyPrice price={item.price * item.quantity} />
+        <span aria-label={`Subtotal for ${item.quantity} items`}>
+          <CurrencyPrice price={item.price * item.quantity} />
+        </span>
       </div>
-    </div>
+    </article>
   );
 }
