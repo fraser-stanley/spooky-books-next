@@ -63,7 +63,7 @@ export function ProductCard({
               height={800}
               sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
               quality={85}
-              className="w-full h-auto transition-brightness duration-200 hover:brightness-90 cursor-pointer"
+              className="transition-brightness duration-200 hover:brightness-90 cursor-pointer"
               loading={eager ? "eager" : "lazy"}
               priority={eager}
             />

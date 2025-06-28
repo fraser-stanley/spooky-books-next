@@ -50,58 +50,50 @@ export function ImageWithSkeleton({
 
   return (
     <div className="relative w-full" style={style}>
-      {/* Skeleton - shows until image loads */}
-      {!isLoaded && (
-        <div
-          className={`w-full ${skeletonClassName}`}
-          style={{
-            aspectRatio: aspectRatio ? `${width} / ${height}` : "1 / 1",
-          }}
-        />
-      )}
-
-      {/* Actual image with Next.js 15 optimizations */}
-      <Image
-        src={src}
-        alt={alt}
-        width={width}
-        height={height}
-        sizes={sizes}
-        quality={quality}
-        className={`${className} transition-opacity duration-300 ${
-          isLoaded ? "opacity-100" : "opacity-0"
-        }`}
-        priority={priority}
-        loading={loading}
-        onLoad={handleLoad}
-        onError={handleError}
-        // Next.js 15 automatically handles layout optimization
+      {/* Container with proper aspect ratio to prevent layout shift */}
+      <div
+        className="w-full"
         style={{
-          position: isLoaded ? "static" : "absolute",
-          top: isLoaded ? "auto" : 0,
-          left: isLoaded ? "auto" : 0,
-          // Prevent layout shift with explicit dimensions
-          width: "100%",
-          height: "auto",
-          objectFit: "cover",
+          aspectRatio: aspectRatio ? `${width} / ${height}` : "1 / 1",
         }}
-        // Enable automatic format optimization (WebP/AVIF)
-        unoptimized={false}
-      />
+      >
+        {/* Skeleton - shows until image loads */}
+        {!isLoaded && (
+          <div
+            className={`absolute inset-0 w-full h-full ${skeletonClassName}`}
+          />
+        )}
 
-      {/* Error state fallback with better accessibility */}
-      {hasError && (
-        <div
-          className="w-full bg-gray-100 flex items-center justify-center text-gray-400 text-sm"
-          style={{ 
-            aspectRatio: aspectRatio ? `${width} / ${height}` : "1 / 1",
-          }}
-          role="img"
-          aria-label={`Image not available: ${alt}`}
-        >
-          <span>Image unavailable</span>
-        </div>
-      )}
+        {/* Actual image with Next.js 15 optimizations */}
+        <Image
+          src={src}
+          alt={alt}
+          width={width}
+          height={height}
+          sizes={sizes}
+          quality={quality}
+          className={`w-full h-full object-cover transition-opacity duration-300 ${
+            isLoaded ? "opacity-100" : "opacity-0"
+          } ${className}`}
+          priority={priority}
+          loading={loading}
+          onLoad={handleLoad}
+          onError={handleError}
+          // Enable automatic format optimization (WebP/AVIF)
+          unoptimized={false}
+        />
+
+        {/* Error state fallback with better accessibility */}
+        {hasError && (
+          <div
+            className="absolute inset-0 w-full h-full bg-gray-100 flex items-center justify-center text-gray-400 text-sm"
+            role="img"
+            aria-label={`Image not available: ${alt}`}
+          >
+            <span>Image unavailable</span>
+          </div>
+        )}
+      </div>
     </div>
   );
 }
