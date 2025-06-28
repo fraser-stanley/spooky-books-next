@@ -1,7 +1,7 @@
 "use client";
 
 // TODO: Replace with Sanity GROQ query
-import { ProgressiveImageSimple } from "./progressive-image-simple";
+import { ImageWithSkeleton } from "./image-with-skeleton";
 import Link from "next/link";
 import { CurrencyPrice } from "./currency-price";
 import { getAvailableStock } from "@/lib/utils/stock-validation";
@@ -55,21 +55,21 @@ export function ProductCard({
         title={sanityProduct ? `Shop ${generateProductLinkText(sanityProduct, 'grid')} - Independent Art Book` : title}
       >
         {image ? (
-          <div data-name="product-image-box">
-            <ProgressiveImageSimple
+          <div data-name="product-image-box" className="w-full">
+            <ImageWithSkeleton
               src={image.url}
               alt={image.alt}
               width={800}
               height={800}
               sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
-              quality={95}
-              className="w-full transition-brightness duration-200 hover:brightness-90 cursor-pointer"
+              quality={85}
+              className="w-full h-auto transition-brightness duration-200 hover:brightness-90 cursor-pointer"
               loading={eager ? "eager" : "lazy"}
               priority={eager}
             />
           </div>
         ) : (
-          <div style={{ height: 400, width: 400 }} className="bg-gray-100" />
+          <div className="w-full aspect-square bg-gray-100" />
         )}
         <div className="mb-12 sm:mb-8 pt-2">
           <h2>

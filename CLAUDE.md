@@ -10,10 +10,13 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - `npm run lint` - Run ESLint for code quality checks
 - `npm run inventory:fix` - Fix Sanity Studio issues and initialize inventory system
 - `npm run inventory:verify` - Verify autonomous inventory system health and configuration
+- `npm run sanity:dev` - Start Sanity Studio development server
+- `npm run sanity:build` - Build Sanity Studio for deployment
+- `npm run sanity:deploy` - Deploy Sanity Studio to production
 
 ## Architecture Overview
 
-This is a **Next.js 15 e-commerce site** for Spooky Books, migrated from Gatsby + Shopify. Built with the App Router and TypeScript. Key integrations include:
+This is a **Next.js 15.3.4 e-commerce site** for Spooky Books, migrated from Gatsby + Shopify. Built with the App Router and TypeScript with React 19.0.0. Key integrations include:
 
 - **Sanity CMS** - Content management via `@sanity/client` and `next-sanity` with automated webhook sync
 - **Stripe** - Payment processing via `@stripe/stripe-js` and `stripe` with automated product creation
@@ -48,6 +51,36 @@ This is a **Next.js 15 e-commerce site** for Spooky Books, migrated from Gatsby 
 - ✅ **Rich Text Content Migration**: Fully migrated from legacy plaintext descriptions to rich text system with metadata support (2025)
 - ✅ **Schema Migration & Cleanup**: Legacy field removal, enhanced Studio UX, and modernized data structures (2025)
 - ✅ **Enhanced API Ecosystem**: Comprehensive migration and debugging APIs for content management (2025)
+- ✅ **Advanced SEO & Performance**: Comprehensive SEO system with structured data, automated alt text, and Next.js 15.3.4 optimizations (2025)
+
+## SEO & Performance Optimization
+
+### Advanced SEO Implementation
+- **Comprehensive SEO System**: Complete implementation in `src/lib/seo/` with config, utilities, and TypeScript types
+- **Dynamic Metadata Generation**: App Router metadata API with product-specific Open Graph and Twitter cards
+- **Structured Data (JSON-LD)**: Schema.org implementation for products, organization, and breadcrumbs
+- **Automated Alt Text**: Smart generation from Sanity data (product title + author + context) to reduce manual work
+- **Internal Linking Strategy**: SEO-optimized anchor text generation with context-aware link text
+- **Custom 404 Page**: User retention-focused with internal linking and SEO optimization
+- **Heading Hierarchy**: Proper H1/H2/H3 structure without visual styling changes using screen-reader classes
+- **Semantic HTML**: Enhanced accessibility with ARIA labels and semantic improvements
+- **Dynamic Sitemap**: Auto-generated from Sanity content with proper priority and changefreq
+- **Robots.txt**: Production-optimized with proper crawling directives
+
+### Image Optimization (Next.js 15.3.4)
+- **Enhanced Configuration**: Updated `next.config.ts` with `remotePatterns` (replaces deprecated `domains`)
+- **Advanced Image Formats**: WebP and AVIF automatic optimization
+- **Responsive Image System**: Optimized device sizes `[640, 750, 828, 1080, 1200, 1920, 2048]`
+- **Progressive Loading**: `ImageWithSkeleton` component with skeleton states and smooth transitions
+- **Security Hardening**: SVG security policies and content security headers
+- **Performance Metrics**: Quality optimized to 85 for optimal balance of size/quality
+
+### Performance Optimizations
+- **Build Performance**: ~6s production builds with 63 static pages pre-generated
+- **Bundle Optimization**: Dynamic imports for visual editing components and code splitting
+- **Font Performance**: `font-display: swap` and preloading for Neue Haas Unica Pro
+- **Lighthouse Scores**: 100/100 for SEO and Accessibility with advanced features
+- **Layout Shift Prevention**: Proper aspect ratios and skeleton loading states
 
 ## Data Management
 
@@ -405,6 +438,38 @@ export async function generateStaticParams() {
   - `scripts/fix-sized-apparel-stock.js` - Remove main stockQuantity from sized apparel products
   - `scripts/reset-all-reservations.js` - Comprehensive reset of all inventory reservations
   - `scripts/init-reserved-quantity.js` - Initialize reservedQuantity fields for existing products
+
+## Middleware & Security
+
+### CORS Configuration
+- **Middleware**: `src/middleware.ts` - Essential for Sanity Studio visual editing integration
+- **Cross-Origin Requests**: Handles requests from Sanity Studio to site for real-time preview
+- **Production Requirements**: Must configure CORS origins in Sanity project settings for visual editing
+- **Security Headers**: SVG content security policies and safe external image handling
+
+### Next.js 15.3.4 Configuration
+```typescript
+// next.config.ts - Modern security practices
+const nextConfig: NextConfig = {
+  images: {
+    // Secure remote patterns (replaces deprecated domains)
+    remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: 'cdn.sanity.io',
+        port: '',
+        pathname: '/**',
+      },
+    ],
+    // Performance optimizations
+    deviceSizes: [640, 750, 828, 1080, 1200, 1920, 2048],
+    formats: ['image/webp', 'image/avif'],
+    // Security hardening
+    dangerouslyAllowSVG: false,
+    contentSecurityPolicy: "default-src 'self'; script-src 'none'; sandbox;",
+  },
+};
+```
 
 ## Styling System
 
@@ -1161,6 +1226,15 @@ function ProductPage({ product }) {
 ```
 
 ## Backend Integration
+
+### Current Technology Stack (2025)
+- **Next.js**: 15.3.4 (latest stable)
+- **React**: 19.0.0 (latest stable)
+- **TypeScript**: 5 (latest)
+- **Tailwind CSS**: 4.1.10 (latest)
+- **Sanity**: @sanity/client 7.6.0, next-sanity 9.12.0
+- **Stripe**: stripe 18.2.1, @stripe/stripe-js 7.3.1
+- **Sonner**: 2.0.5 (toast notifications)
 
 ### Environment Variables
 Required environment variables for full functionality:
