@@ -1,0 +1,114 @@
+/* Product Card Skeleton Styles */
+.container {
+  width: 100%;
+  margin-bottom: 3rem;
+}
+
+@media (min-width: 640px) {
+  .container {
+    margin-bottom: 2rem;
+  }
+}
+
+/* Image skeleton with pixelated aesthetic */
+.imageSkeleton {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 1;
+  background-color: #f3f4f6;
+  border-radius: 0;
+  overflow: hidden;
+  margin-bottom: 0.5rem;
+}
+
+/* Pixelated grid overlay */
+.pixelGrid {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  grid-template-rows: repeat(4, 1fr);
+  gap: 1px;
+}
+
+/* Individual pixel elements */
+.pixel {
+  background-color: #e5e7eb;
+  opacity: 0.3;
+  animation: pixelPulse 2s ease-in-out infinite;
+}
+
+/* Staggered pixel animation */
+@keyframes pixelPulse {
+  0%, 100% {
+    opacity: 0.3;
+    background-color: #e5e7eb;
+  }
+  50% {
+    opacity: 0.6;
+    background-color: #d1d5db;
+  }
+}
+
+/* Content skeleton */
+.content {
+  padding-top: 0.5rem;
+}
+
+/* Title skeleton */
+.titleSkeleton {
+  height: 1.25rem;
+  background-color: #e5e7eb;
+  border-radius: 0;
+  margin-bottom: 0.5rem;
+  width: 85%;
+  animation: shimmer 1.5s ease-in-out infinite;
+}
+
+/* Author skeleton */
+.authorSkeleton {
+  height: 1rem;
+  background-color: #e5e7eb;
+  border-radius: 0;
+  margin-bottom: 0.5rem;
+  width: 60%;
+  animation: shimmer 1.5s ease-in-out infinite;
+  animation-delay: 0.2s;
+}
+
+/* Price skeleton */
+.priceSkeleton {
+  height: 1rem;
+  background-color: #e5e7eb;
+  border-radius: 0;
+  width: 40%;
+  animation: shimmer 1.5s ease-in-out infinite;
+  animation-delay: 0.4s;
+}
+
+/* Shimmer animation for text elements */
+@keyframes shimmer {
+  0% {
+    opacity: 0.6;
+  }
+  50% {
+    opacity: 0.8;
+  }
+  100% {
+    opacity: 0.6;
+  }
+}
+
+/* Respect reduced motion preferences */
+@media (prefers-reduced-motion: reduce) {
+  .pixel,
+  .titleSkeleton,
+  .authorSkeleton,
+  .priceSkeleton {
+    animation: none;
+    opacity: 0.6;
+  }
+}

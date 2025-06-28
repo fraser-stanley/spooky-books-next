@@ -1,5 +1,5 @@
 // app/page.tsx
-import Image from "next/image";
+import { ProgressiveImage } from "@/components/progressive-image";
 import Link from "next/link";
 import { Layout } from "@/components/layout";
 import { getCategories } from "@/lib/sanity/queries";
@@ -140,7 +140,7 @@ function ContentBlockFullWidth({
       {/* Full-width image */}
       <div className="col-span-12">
         {block.leftImage?.asset?.url ? (
-          <Image
+          <ProgressiveImage
             src={block.leftImage.asset.url}
             alt={block.leftImage.alt || block.title}
             width={1920}
@@ -199,7 +199,7 @@ function ContentBlockTwoColumn({
       {/* Left Image */}
       <div className="col-span-12 sm:col-span-6">
         {block.leftImage?.asset?.url ? (
-          <Image
+          <ProgressiveImage
             src={block.leftImage.asset.url}
             alt={block.leftImage.alt || block.title}
             width={800}
@@ -219,7 +219,7 @@ function ContentBlockTwoColumn({
       {/* Right Image */}
       <div className="col-span-12 sm:col-span-6">
         {block.rightImage?.asset?.url ? (
-          <Image
+          <ProgressiveImage
             src={block.rightImage.asset.url}
             alt={block.rightImage.alt || block.title}
             width={800}
@@ -285,7 +285,7 @@ function ContentBlockThreeColumn({
       {/* Column 2: Left Image */}
       <div className="col-span-6 lg:col-span-4">
         {block.leftImage?.asset?.url ? (
-          <Image
+          <ProgressiveImage
             src={block.leftImage.asset.url}
             alt={block.leftImage.alt || block.title}
             width={600}
@@ -305,7 +305,7 @@ function ContentBlockThreeColumn({
       {/* Column 3: Right Image */}
       <div className="col-span-6 lg:col-span-4">
         {block.rightImage?.asset?.url ? (
-          <Image
+          <ProgressiveImage
             src={block.rightImage.asset.url}
             alt={block.rightImage.alt || block.title}
             width={600}

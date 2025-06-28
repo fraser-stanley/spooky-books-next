@@ -1,5 +1,5 @@
 import { notFound } from "next/navigation";
-import Image from "next/image";
+import { ProgressiveImage } from "@/components/progressive-image";
 import { Layout } from "@/components/layout";
 import { getProduct, getCategories } from "@/lib/sanity/queries";
 import { adaptSanityProduct } from "@/lib/sanity/adapters";
@@ -121,7 +121,7 @@ export default async function ProductPage({ params }: ProductPageProps) {
         <div className="col-span-12 md:col-span-6">
           {product.images.map((image, index) => (
             <div key={index} className="mb-4">
-              <Image
+              <ProgressiveImage
                 src={image.url}
                 alt={image.alt}
                 width={1200}

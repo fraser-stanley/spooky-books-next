@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect } from "react";
-import Image from "next/image";
+import { ProgressiveImage } from "./progressive-image";
 import { useCart } from "./cart-contex";
 import { CurrencyPrice } from "./currency-price";
 import { getAvailableStock } from "@/lib/utils/stock-validation";
@@ -59,7 +59,7 @@ export function CartItem({ item, sanityProduct }: CartItemProps) {
       {/* Image */}
       <div className="w-full sm:w-24 sm:h-32">
         {item.image ? (
-          <Image
+          <ProgressiveImage
             src={item.image}
             alt={`Cover of ${item.title}${sanityProduct?.author ? ` by ${sanityProduct.author}` : ""}`}
             width={400}
