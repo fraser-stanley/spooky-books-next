@@ -6,7 +6,7 @@
   align-items: center;
   overflow-x: auto;
   white-space: nowrap;
-  font-weight: 500;
+  font-weight: 400;
   gap: 0.5rem;
   scrollbar-width: none; /* Firefox */
   -ms-overflow-style: none; /* IE 10+ */

@@ -75,7 +75,7 @@ export function CartItem({ item, sanityProduct }: CartItemProps) {
         <div className="mb-1">
           {item.title}
           {item.size && (
-            <span className="text-black ml-2 font-normal">
+            <span className="ml-2">
               Size: {item.size.toUpperCase()}
             </span>
           )}
@@ -91,13 +91,13 @@ export function CartItem({ item, sanityProduct }: CartItemProps) {
 
         {/* Quantity & Remove */}
         <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4 mb-2">
-          <span className="text-sm text-black uppercase">
+          <span className="uppercase">
             Qty: {item.quantity}
           </span>
 
           <button
             onClick={() => removeItem(item.id, item.size)}
-            className="px-4 py-1 border border-gray-300 hover:bg-gray-100 font-normal uppercase tracking-wide rounded"
+            className="px-4 py-1 border border-gray-300 hover:bg-gray-100 uppercase rounded"
           >
             Remove
           </button>

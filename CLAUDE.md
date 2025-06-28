@@ -46,19 +46,24 @@ This is a **Next.js 15 e-commerce site** for Spooky Books, migrated from Gatsby 
 - ✅ **Homepage Layout Options**: Three responsive layout options with Sanity CMS control and visual editing support
 - ✅ **Unified Content System**: Modern contentBlocks system with backward compatibility and draggable reordering (2025)
 - ✅ **Rich Text Content Migration**: Fully migrated from legacy plaintext descriptions to rich text system with metadata support (2025)
+- ✅ **Schema Migration & Cleanup**: Legacy field removal, enhanced Studio UX, and modernized data structures (2025)
+- ✅ **Enhanced API Ecosystem**: Comprehensive migration and debugging APIs for content management (2025)
 
 ## Data Management
 
 ### Sanity CMS Integration
 - **Studio**: `/studio/` - Sanity Studio configuration with custom schemas and visual editing
-- **Product Schema**: Enhanced with variants for apparel sizing and Stripe integration fields
-- **Category Schema**: Simplified to Publications vs Apparel binary system
+- **Product Schema**: Enhanced with rich text descriptions, metadata fields, variants for apparel sizing, and Stripe integration fields
+- **Category Schema**: Simplified to Publications vs Apparel binary system with proper ID references
 - **Homepage Schema**: Unified content block system with three responsive layout options (2-column, 3-column, full-width) and optional product/custom linking
+- **Schema Migration**: Complete removal of legacy description fields and heroSections with safe migration paths
+- **Field Validation**: Comprehensive validation rules and user-friendly error messages
 - **Webhook System**: Auto-creates Stripe products when Sanity content is published
 - **API Routes**: Complete CRUD operations and sync utilities
 - **Visual Editing**: Secure draft mode API using `@sanity/preview-url-secret`, enhanced presentation tool with location resolvers, and Live Content API
 - **Real-time Updates**: Instant content synchronization between draft and published states
 - **CORS Configuration**: Middleware for cross-origin requests from Sanity Studio
+- **Studio Performance**: Optimized caching and deployment strategies for immediate schema updates
 
 ### Product Data Structure
 - **Source**: Sanity CMS via GROQ queries (replaces mock data)
@@ -303,6 +308,12 @@ export interface SanityContentBlock {
 - **Inventory Monitor**: `/api/inventory-monitor` - Advanced monitoring with overselling detection
 - **Products Optimized**: `/api/products-optimized` - Cached, essential-fields-only product endpoint
 
+#### Content Migration & Schema Management APIs (2025)
+- **Homepage Content Migration**: `/api/migrate-homepage-content` - Safe migration from heroSections to contentBlocks with validation and rollback protection
+- **Remove Legacy Heroes**: `/api/remove-hero-sections` - Clean removal of legacy heroSections field after migration
+- **Cleanup Legacy Descriptions**: `/api/cleanup-legacy-descriptions` - Remove old plaintext description and vendor fields from products
+- **Homepage Migration (Legacy)**: `/api/migrate-homepage` - Basic homepage content migration utility
+
 #### System Administration APIs
 - **Init Reserved Quantity**: `/api/init-reserved-quantity` - Initialize reservedQuantity fields for existing products
 - **Cleanup Products**: `/api/cleanup-products` - Remove legacy fields from product documents
@@ -332,6 +343,8 @@ export interface SanityContentBlock {
 - **Homepage Debug Page**: `/debug-homepage` - Visual debugging interface for content block migration
 - **Content Inspection**: Real-time comparison between new contentBlocks and legacy heroSections
 - **Migration Validation**: Automated analysis of content structure and GROQ query results
+- **Schema Validation**: Real-time testing of GROQ queries and data structure integrity
+- **Rich Text Testing**: Debug interface for Portable Text rendering and metadata display
 
 #### Background Process APIs (Manual Trigger Only - Hobby Plan)
 - **Cleanup Inventory**: `/api/cron/cleanup-inventory` - Manual cleanup of expired reservations and stale data
@@ -1242,6 +1255,8 @@ SANITY_STUDIO_PREVIEW_ORIGIN=https://your-domain.com
 - **Array Key Management**: UUID-based `_key` generation for Sanity array compliance  
 - **Webhook Optimization**: Selective page revalidation for Vercel free tier efficiency
 - **Error Recovery**: Comprehensive cleanup APIs for production data maintenance
+- **Legacy Cleanup**: Safe removal of deprecated fields with migration validation
+- **Content Migration**: Automated conversion between content formats with rollback protection
 
 #### Maintenance API Usage
 ```bash

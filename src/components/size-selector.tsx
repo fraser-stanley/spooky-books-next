@@ -47,7 +47,7 @@ export function SizeSelector({
               }
               disabled={isOutOfStock}
               className={`
-                border px-3 py-2 text-sm font-medium rounded
+                border px-3 py-2 text-sm rounded
                 ${
                   isSelected
                     ? "border-black bg-black text-white"

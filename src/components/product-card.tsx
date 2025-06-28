@@ -69,8 +69,8 @@ export function ProductCard({
         ) : (
           <div style={{ height: 400, width: 400 }} className="bg-gray-100" />
         )}
-        <div className="text-md sm:text-sm mb-12 sm:mb-8 pt-2">
-          <h2 className="min-h-[1.5rem] leading-6">
+        <div className="mb-12 sm:mb-8 pt-2">
+          <h2>
             {title}
             {isOutOfStock && " (SOLD OUT)"}
             {!isOutOfStock &&
@@ -106,9 +106,9 @@ export function ProductCard({
               })()}
           </h2>
           {sanityProduct?.author && (
-            <div className="min-h-[1.2rem]">{sanityProduct.author}</div>
+            <div>{sanityProduct.author}</div>
           )}
-          <div className="">
+          <div>
             <CurrencyPrice price={price} />
           </div>
         </div>

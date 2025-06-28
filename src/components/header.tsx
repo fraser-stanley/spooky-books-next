@@ -14,7 +14,7 @@ export function Header({ categories }: HeaderProps) {
     <div className="text-md sm:text-sm p-4 pb-12 xl:pb-24 uppercase">
       {/* Top row: Title and Cart inline on mobile, grid on desktop */}
       <div className="flex justify-between items-center sm:grid sm:grid-cols-12">
-        <Link href="/" className="font-bold col-span-2">
+        <Link href="/" className="col-span-2">
           Spooky Books
         </Link>
 

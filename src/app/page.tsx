@@ -150,11 +150,11 @@ function ContentBlockFullWidth({
       {/* Title section */}
       <div className="col-span-12">
         <div className="inline-block normal-case mb-12 sm:mb-8">
-          <h2 className="text-lg text-black font-normal leading-tight mb-2">
+          <h2 className="mb-2">
             {block.title}
           </h2>
           {block.caption && (
-            <p className="text-lg text-black font-normal leading-relaxed">
+            <p className="mb-2">
               {block.caption}
             </p>
           )}
@@ -226,9 +226,9 @@ function ContentBlockTwoColumn({
       {/* Text Content Below Images */}
       <div className="col-span-12">
         <div className="inline-block mb-4 normal-case">
-          <h2 className="text-black font-normal">{block.title}</h2>
+          <h2>{block.title}</h2>
           {block.caption && (
-            <p className="text-black font-normal">{block.caption}</p>
+            <p>{block.caption}</p>
           )}
         </div>
       </div>
@@ -257,13 +257,13 @@ function ContentBlockThreeColumn({
   const content = (
     <>
       {/* Column 1: Text Content */}
-      <div className="col-span-12 lg:col-span-4 mb-6 lg:mb-0">
+      <div className="col-span-12 lg:col-span-4">
         <div className="inline-block normal-case">
-          <h2 className="text-lg text-black font-normal leading-tight mb-2">
+          <h2 className="mb-2">
             {block.title}
           </h2>
           {block.caption && (
-            <p className="text-lg text-black font-normal leading-relaxed">
+            <p>
               {block.caption}
             </p>
           )}
