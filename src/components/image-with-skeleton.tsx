@@ -49,13 +49,14 @@ export function ImageWithSkeleton({
   const aspectRatio = width && height ? width / height : undefined;
 
   return (
-    <div className="relative w-full" style={style}>
+    <div className="w-full" style={style}>
       {/* Skeleton with proper aspect ratio - shows until image loads */}
       {!isLoaded && (
         <div
           className={`w-full ${skeletonClassName}`}
           style={{
             aspectRatio: aspectRatio ? `${width} / ${height}` : "1 / 1",
+            width: "100%",
           }}
         />
       )}
@@ -81,10 +82,12 @@ export function ImageWithSkeleton({
           position: isLoaded ? "static" : "absolute",
           top: isLoaded ? "auto" : 0,
           left: isLoaded ? "auto" : 0,
-          // Ensure the image always fills the width while maintaining aspect ratio
+          // Force full width regardless of original image size
           width: "100%",
           height: "auto",
+          display: "block",
         }}
+        fill={false}
       />
 
       {/* Error state fallback with better accessibility */}
@@ -93,6 +96,7 @@ export function ImageWithSkeleton({
           className="w-full bg-gray-100 flex items-center justify-center text-gray-400 text-sm"
           style={{ 
             aspectRatio: aspectRatio ? `${width} / ${height}` : "1 / 1",
+            width: "100%",
           }}
           role="img"
           aria-label={`Image not available: ${alt}`}
