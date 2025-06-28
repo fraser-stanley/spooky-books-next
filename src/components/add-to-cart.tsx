@@ -81,7 +81,7 @@ export function AddToCart({
     });
   }
 
-  // Calculate available stock for display
+  // Calculate available stock for display (raw stock, not considering cart)
   const availableStock = sanityProduct
     ? getAvailableStock(sanityProduct, selectedSize)
     : undefined;
@@ -89,15 +89,13 @@ export function AddToCart({
   // For sized products without size selection, just show disabled state
   const needsSizeSelection = hasSizes && !selectedSize;
 
-  // Determine if item is actually available
-  const isAvailable =
-    available &&
-    (availableStock === undefined || availableStock > 0) &&
-    !needsSizeSelection;
+  // Determine if item is actually available (this considers cart contents via `available` prop)
+  const isAvailable = available && !needsSizeSelection;
 
-  // Determine if item is sold out (has stock data but no stock)
+  // Determine if item is sold out - either no raw stock OR available prop says no stock
   const isSoldOut =
-    availableStock !== undefined && availableStock <= 0 && !needsSizeSelection;
+    !needsSizeSelection &&
+    ((availableStock !== undefined && availableStock <= 0) || !available);
 
   return (
     <button
