@@ -12,6 +12,7 @@ import type { SanityProduct } from "@/lib/sanity/types";
 import { CartPageSkeleton } from "@/components/skeletons/cart-skeleton";
 import { useLocaleCurrency } from "@/lib/hooks/use-locale-currency";
 import type { Stripe } from "@stripe/stripe-js";
+import styles from "@/components/add-to-cart.module.css";
 
 // Force dynamic rendering for this page
 export const dynamic = "force-dynamic";
@@ -177,9 +178,9 @@ export default function CartPage() {
           </p>
           <Link
             href="/products"
-            className="px-8 py-2 bg-black text-white hover:bg-gray-800 font-normal text-xs uppercase rounded"
+            className={`${styles.addToCart} inline-block text-center font-normal text-xs uppercase tracking-wide`}
           >
-            Continue Shopping
+            CONTINUE SHOPPING
           </Link>
         </div>
       </div>
@@ -306,9 +307,9 @@ export default function CartPage() {
           <div className="flex justify-center mt-6">
             <Link
               href="/products"
-              className="text-black hover:underline uppercase"
+              className={`${styles.addToCart} inline-block text-center font-normal text-xs uppercase tracking-wide`}
             >
-              Return to store
+              CONTINUE SHOPPING
             </Link>
           </div>
         </div>
