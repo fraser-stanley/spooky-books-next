@@ -62,8 +62,10 @@ export function CartItem({ item, sanityProduct }: CartItemProps) {
           <Image
             src={item.image}
             alt={`Cover of ${item.title}${sanityProduct?.author ? ` by ${sanityProduct.author}` : ""}`}
-            width={600}
+            width={400}
             height={400}
+            sizes="(max-width: 640px) 100vw, 96px"
+            quality={95}
             className="w-full h-auto sm:h-32 sm:w-24 object-cover rounded"
           />
         ) : (

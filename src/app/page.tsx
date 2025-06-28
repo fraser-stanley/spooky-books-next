@@ -143,10 +143,10 @@ function ContentBlockFullWidth({
           <Image
             src={block.leftImage.asset.url}
             alt={block.leftImage.alt || block.title}
-            width={1200}
-            height={800}
+            width={1920}
+            height={1280}
             sizes="100vw"
-            quality={85}
+            quality={95}
             className="w-full"
             priority
           />
@@ -205,7 +205,7 @@ function ContentBlockTwoColumn({
             width={800}
             height={600}
             sizes="(max-width: 640px) 100vw, 50vw"
-            quality={85}
+            quality={95}
             className="w-full"
             priority
           />
@@ -225,7 +225,7 @@ function ContentBlockTwoColumn({
             width={800}
             height={600}
             sizes="(max-width: 640px) 100vw, 50vw"
-            quality={85}
+            quality={95}
             className="w-full"
           />
         ) : (
@@ -291,7 +291,7 @@ function ContentBlockThreeColumn({
             width={600}
             height={800}
             sizes="(max-width: 1024px) 50vw, 33vw"
-            quality={85}
+            quality={95}
             className="w-full"
             priority
           />
@@ -311,7 +311,7 @@ function ContentBlockThreeColumn({
             width={600}
             height={800}
             sizes="(max-width: 1024px) 50vw, 33vw"
-            quality={85}
+            quality={95}
             className="w-full"
           />
         ) : (

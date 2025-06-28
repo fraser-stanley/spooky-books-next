@@ -59,10 +59,10 @@ export function ProductCard({
             <Image
               src={image.url}
               alt={image.alt}
-              width={400}
-              height={400}
+              width={800}
+              height={800}
               sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
-              quality={80}
+              quality={95}
               className="w-full transition-brightness duration-200 hover:brightness-90 cursor-pointer"
               loading={eager ? "eager" : "lazy"}
               priority={eager}

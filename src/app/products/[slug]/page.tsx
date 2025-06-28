@@ -124,8 +124,10 @@ export default async function ProductPage({ params }: ProductPageProps) {
               <Image
                 src={image.url}
                 alt={image.alt}
-                width={600}
-                height={600}
+                width={1200}
+                height={1200}
+                sizes="(max-width: 768px) 100vw, 50vw"
+                quality={95}
                 className="w-full"
                 priority={index === 0}
               />
