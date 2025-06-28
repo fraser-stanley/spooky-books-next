@@ -15,21 +15,23 @@ export interface SanityImageOptions {
  * Extract the base URL and asset ID from a Sanity image URL
  */
 function parseSanityImageUrl(imageUrl: string) {
-  // Handle both CDN URLs and asset references
-  if (imageUrl.includes('cdn.sanity.io')) {
-    const urlParts = imageUrl.split('/');
+  // Remove any existing query parameters first
+  const cleanUrl = imageUrl.split('?')[0];
+  
+  // Handle Sanity CDN URLs
+  if (cleanUrl.includes('cdn.sanity.io')) {
+    const urlParts = cleanUrl.split('/');
     const filename = urlParts[urlParts.length - 1];
     const baseUrl = urlParts.slice(0, -1).join('/');
     return { baseUrl, filename };
   }
   
-  // If it's already a transformed URL, extract the base
-  const baseUrl = imageUrl.split('?')[0];
-  const urlParts = baseUrl.split('/');
+  // Fallback for other URLs
+  const urlParts = cleanUrl.split('/');
   const filename = urlParts[urlParts.length - 1];
-  const baseUrlWithoutFilename = urlParts.slice(0, -1).join('/');
+  const baseUrl = urlParts.slice(0, -1).join('/');
   
-  return { baseUrl: baseUrlWithoutFilename, filename };
+  return { baseUrl, filename };
 }
 
 /**

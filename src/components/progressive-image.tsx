@@ -3,7 +3,6 @@
 import { useState, useCallback } from "react";
 import Image from "next/image";
 import { generatePixelatedPlaceholder } from "@/lib/utils/sanity-image-urls";
-import styles from "./progressive-image.module.css";
 
 export interface ProgressiveImageProps {
   src: string;
@@ -47,27 +46,9 @@ export function ProgressiveImage({
     setPlaceholderError(true);
   }, []);
 
-  return (
-    <div 
-      className={`${styles.container} ${className}`}
-      style={style}
-    >
-      {/* Pixelated placeholder image - loads instantly */}
-      {!placeholderError && (
-        <Image
-          src={placeholderSrc}
-          alt=""
-          width={width}
-          height={height}
-          className={`${styles.placeholder} ${isLoaded ? styles.fadeOut : ""}`}
-          onError={handlePlaceholderError}
-          priority={priority}
-          quality={10}
-          unoptimized={true} // Skip Next.js optimization for tiny placeholder
-        />
-      )}
-
-      {/* High-quality main image */}
+  // If placeholder fails or main image is loaded, just show the main image
+  if (placeholderError || isLoaded) {
+    return (
       <Image
         src={src}
         alt={alt}
@@ -75,10 +56,53 @@ export function ProgressiveImage({
         height={height}
         sizes={sizes}
         quality={quality}
-        className={`${styles.mainImage} ${isLoaded ? styles.fadeIn : ""}`}
+        className={className}
         onLoad={handleLoad}
         priority={priority}
         loading={loading}
+        style={style}
+      />
+    );
+  }
+
+  // Show pixelated placeholder while main image loads
+  return (
+    <div style={{ position: 'relative', ...style }}>
+      {/* Pixelated placeholder - maintains layout */}
+      <Image
+        src={placeholderSrc}
+        alt=""
+        width={width}
+        height={height}
+        className={className}
+        onError={handlePlaceholderError}
+        priority={priority}
+        quality={10}
+        unoptimized={true}
+        style={{
+          imageRendering: 'pixelated',
+          filter: 'brightness(1.1) contrast(1.2)',
+        }}
+      />
+      
+      {/* High-quality main image - hidden but loading */}
+      <Image
+        src={src}
+        alt={alt}
+        width={width}
+        height={height}
+        sizes={sizes}
+        quality={quality}
+        onLoad={handleLoad}
+        priority={priority}
+        loading={loading}
+        style={{
+          position: 'absolute',
+          top: 0,
+          left: 0,
+          opacity: 0,
+          pointerEvents: 'none',
+        }}
       />
     </div>
   );
