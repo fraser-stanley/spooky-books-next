@@ -271,7 +271,7 @@ function ContentBlockThreeColumn({
       </div>
 
       {/* Column 2: Left Image */}
-      <div className="col-span-6 lg:col-span-4 pr-0.5">
+      <div className="col-span-6 lg:col-span-4">
         {block.leftImage?.asset?.url ? (
           <Image
             src={block.leftImage.asset.url}
@@ -291,7 +291,7 @@ function ContentBlockThreeColumn({
       </div>
 
       {/* Column 3: Right Image */}
-      <div className="col-span-6 lg:col-span-4 pl-0.5">
+      <div className="col-span-6 lg:col-span-4">
         {block.rightImage?.asset?.url ? (
           <Image
             src={block.rightImage.asset.url}

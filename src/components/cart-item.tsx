@@ -97,7 +97,7 @@ export function CartItem({ item, sanityProduct }: CartItemProps) {
 
           <button
             onClick={() => removeItem(item.id, item.size)}
-            className="px-4 py-1 border border-gray-300 hover:bg-gray-100 uppercase rounded"
+            className="px-4 py-1 border border-gray-300 hover:bg-gray-100 uppercase rounded cursor-pointer"
           >
             Remove
           </button>

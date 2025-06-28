@@ -278,6 +278,7 @@ export default function CartPage() {
                   transition-all duration-300 ease-in-out
                   hover:bg-[rgb(32,32,32)]
                   active:scale-95
+                  cursor-pointer
                   disabled:opacity-50 disabled:cursor-not-allowed disabled:bg-gray-300 disabled:text-gray-500
                 "
             >
