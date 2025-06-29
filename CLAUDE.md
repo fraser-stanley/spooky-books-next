@@ -67,20 +67,34 @@ This is a **Next.js 15.3.4 e-commerce site** for Spooky Books, migrated from Gat
 - **Dynamic Sitemap**: Auto-generated from Sanity content with proper priority and changefreq
 - **Robots.txt**: Production-optimized with proper crawling directives
 
-### Image Optimization (Next.js 15.3.4)
+### Image Optimization & Layout Stability (Next.js 15.3.4)
 - **Enhanced Configuration**: Updated `next.config.ts` with `remotePatterns` (replaces deprecated `domains`)
-- **Advanced Image Formats**: WebP and AVIF automatic optimization
+- **Advanced Image Formats**: WebP and AVIF automatic optimization with Sanity CDN integration
 - **Responsive Image System**: Optimized device sizes `[640, 750, 828, 1080, 1200, 1920, 2048]`
-- **Progressive Loading**: `ImageWithSkeleton` component with skeleton states and smooth transitions
+- **Zero Layout Shift**: CSS `aspect-ratio` containers prevent Cumulative Layout Shift (CLS)
+- **ImageWithSkeleton Component**: Production-ready component following Next.js 15 best practices
+- **Progressive Loading System**: Multiple variants (full progressive, simple blur, skeleton states)
+- **Pixelated Placeholders**: 20x20px instant-loading previews for slow connections
+- **Sanity Image Optimization**: Dynamic URL generation with format, quality, and size transformations
 - **Security Hardening**: SVG security policies and content security headers
 - **Performance Metrics**: Quality optimized to 85 for optimal balance of size/quality
+
+#### Advanced Loading Components
+- **ProgressiveImage**: Full progressive loading with pixelated placeholders from Sanity URLs
+- **ProgressiveImageSimple**: Simplified version using Next.js blur placeholders
+- **ImageWithSkeleton**: Production component with aspect ratio containers and absolute positioned overlays
+- **Skeleton Components**: Comprehensive loading states (ProductCard, Cart, Checkout) matching mobile-first design
 
 ### Performance Optimizations
 - **Build Performance**: ~6s production builds with 63 static pages pre-generated
 - **Bundle Optimization**: Dynamic imports for visual editing components and code splitting
 - **Font Performance**: `font-display: swap` and preloading for Neue Haas Unica Pro
 - **Lighthouse Scores**: 100/100 for SEO and Accessibility with advanced features
-- **Layout Shift Prevention**: Proper aspect ratios and skeleton loading states
+- **Zero Layout Shift**: CSS aspect-ratio containers eliminate Cumulative Layout Shift (CLS)
+- **Progressive Loading**: Pixelated placeholders provide instant feedback on slow connections
+- **Image Quality Balance**: 85 quality default optimized for Next.js 15 performance
+- **Skeleton Matching**: Loading states match actual component layouts exactly to prevent visual jumps
+- **Hardware Acceleration**: CSS-only animations with transform3d for smooth skeleton states
 
 ## Data Management
 
@@ -241,6 +255,14 @@ Materials: 100% organic cotton`,
 - **CartPage**: Optimized checkout with 1-2 second flow, Stripe.js preloading, author display in cart items, and mobile-first responsive design
 - **CartItem**: Cart-specific stock calculation with sophisticated quantity validation, author display, and responsive layout with proper mobile image sizing
 - **SkeletonLoaders**: Responsive loading states matching mobile-first cart layout with full-width image skeletons
+
+### Button Standardization System (2025)
+- **Unified CTA Styling**: All primary buttons use `add-to-cart.module.css` for consistent behavior
+- **Continue Shopping Buttons**: Standardized across empty cart, cart page, and success pages
+- **Custom Easing Curve**: 100-point linear transition function (581.71ms duration) for premium feel
+- **Interactive States**: Consistent hover (`rgb(32,32,32)`), active (`scale(0.95)`), and disabled states
+- **Responsive Width**: Full width on mobile (`w-full`), auto width on desktop (`sm:w-auto`)
+- **Accessibility**: Proper ARIA labels and disabled state handling with cursor management
 
 ### Stock Management Components
 - **Stock Validation**: Real-time available stock calculation (stockQuantity - reservedQuantity)
@@ -596,6 +618,64 @@ hidden: ({ document }) => {
   const hasVariants = document?.variants && document.variants.length > 0
   return isApparel && hasVariants // Only hide if apparel AND has variants
 }
+```
+
+### Next.js 15.3.4 Image Loading Patterns (2025)
+**Production-Ready Image Implementation:**
+```tsx
+import { ImageWithSkeleton } from '@/components/image-with-skeleton'
+
+// Standard image with skeleton loading (recommended)
+<ImageWithSkeleton
+  src={imageUrl}
+  alt={altText}
+  width={800}
+  height={600}
+  quality={85} // Optimal balance for Next.js 15
+  className="rounded" // Optional styling
+  sizes="(max-width: 768px) 100vw, 50vw" // Responsive sizing
+  priority={false} // Set true for above-fold images
+/>
+```
+
+**Progressive Loading for Slow Connections:**
+```tsx
+import { ProgressiveImage } from '@/components/progressive-image'
+
+// Advanced progressive loading with pixelated placeholders
+<ProgressiveImage
+  src={imageUrl}
+  alt={altText}
+  width={800}
+  height={600}
+  quality={95} // Higher quality for progressive loading
+/>
+```
+
+**Skeleton Loading States:**
+```tsx
+import { CartPageSkeleton } from '@/components/skeletons/cart-skeleton'
+
+// Show skeleton while data loads
+{loading ? <CartPageSkeleton /> : <ActualCartContent />}
+```
+
+**Button Standardization Pattern:**
+```tsx
+import styles from "@/components/add-to-cart.module.css"
+
+// Consistent CTA styling across all primary buttons
+<button className={`${styles.addToCart} additional-classes`}>
+  BUTTON TEXT
+</button>
+
+// Link as button (for Continue Shopping, etc.)
+<Link
+  href="/products"
+  className={`${styles.addToCart} inline-block text-center font-normal text-xs uppercase tracking-wide`}
+>
+  CONTINUE SHOPPING
+</Link>
 ```
 
 ### Rich Text Content Implementation (2025)
