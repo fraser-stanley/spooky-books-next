@@ -1,7 +1,7 @@
 export function CheckoutLoadingSkeleton() {
   return (
     <div className="flex justify-end mt-8">
-      <div className="px-8 py-2 bg-gray-100 text-gray-400 font-normal text-xs uppercase tracking-wide flex items-center gap-2">
+      <div className="px-8 py-2 bg-gray-100 text-gray-400 font-normal text-xs uppercase flex items-center gap-2">
         <div className="animate-spin rounded-full h-3 w-3 border border-gray-400 border-t-transparent"></div>
         VALIDATING STOCK...
       </div>
@@ -12,7 +12,7 @@ export function CheckoutLoadingSkeleton() {
 export function CheckoutProcessingSkeleton() {
   return (
     <div className="flex justify-end mt-8">
-      <div className="px-8 py-2 bg-gray-100 text-gray-400 font-normal text-xs uppercase tracking-wide flex items-center gap-2">
+      <div className="px-8 py-2 bg-gray-100 text-gray-400 font-normal text-xs uppercase flex items-center gap-2">
         <div className="animate-spin rounded-full h-3 w-3 border border-gray-400 border-t-transparent"></div>
         CREATING CHECKOUT...
       </div>

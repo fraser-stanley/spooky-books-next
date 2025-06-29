@@ -172,7 +172,7 @@ export function CartItemEnhanced({
         <button
           onClick={() => removeItem(item.id, item.size)}
           disabled={isUpdating}
-          className="text-xs px-4 py-1 border border-gray-300 hover:bg-gray-100 font-normal uppercase tracking-wide disabled:opacity-50 disabled:cursor-not-allowed"
+          className="text-xs px-4 py-1 border border-gray-300 hover:bg-gray-100 font-normal uppercase disabled:opacity-50 disabled:cursor-not-allowed"
         >
           {isUpdating ? "REMOVING..." : "REMOVE"}
         </button>

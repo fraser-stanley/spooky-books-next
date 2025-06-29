@@ -54,7 +54,7 @@ function SuccessContent() {
         <div className="space-y-4">
           <Link
             href="/products"
-            className={`${styles.addToCart} inline-block text-center font-normal text-xs uppercase tracking-wide`}
+            className={`${styles.addToCart} inline-block text-center font-normal text-xs uppercase`}
           >
             CONTINUE SHOPPING
           </Link>

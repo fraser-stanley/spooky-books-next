@@ -178,7 +178,7 @@ export default function CartPage() {
           </p>
           <Link
             href="/products"
-            className={`${styles.addToCart} inline-block text-center font-normal text-xs uppercase tracking-wide`}
+            className={`${styles.addToCart} inline-block text-center font-normal text-xs uppercase`}
           >
             CONTINUE SHOPPING
           </Link>
@@ -307,7 +307,7 @@ export default function CartPage() {
           <div className="flex justify-center mt-6">
             <Link
               href="/products"
-              className={`${styles.addToCart} inline-block text-center font-normal text-xs uppercase tracking-wide`}
+              className={`${styles.addToCart} inline-block text-center font-normal text-xs uppercase`}
             >
               CONTINUE SHOPPING
             </Link>

@@ -24,7 +24,7 @@ export function ImageWithSkeleton({
   width,
   height,
   sizes,
-  quality = 85, // Optimal balance for Next.js 15
+  quality = 90, // Optimized for Next.js 15.3.4
   className = "",
   skeletonClassName = "bg-gray-200 animate-pulse",
   priority = false,
@@ -61,6 +61,10 @@ export function ImageWithSkeleton({
         {!isLoaded && (
           <div
             className={`absolute inset-0 w-full h-full ${skeletonClassName}`}
+            style={{
+              backgroundColor: '#e5e7eb',
+              minHeight: '200px', // Ensure minimum visible height
+            }}
           />
         )}
 

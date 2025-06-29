@@ -142,7 +142,7 @@ export default function OptimizedCartPage() {
           </p>
           <Link
             href="/products"
-            className="px-8 py-2 bg-black text-white hover:bg-gray-800 font-normal text-xs uppercase tracking-wide"
+            className="px-8 py-2 bg-black text-white hover:bg-gray-800 font-normal text-xs uppercase"
           >
             Continue Shopping
           </Link>
@@ -234,7 +234,7 @@ export default function OptimizedCartPage() {
               <button
                 onClick={handleCheckout}
                 disabled={checkoutLoading}
-                className="px-8 py-2 bg-black text-white hover:bg-gray-800 font-normal text-xs uppercase tracking-wide disabled:opacity-50 disabled:cursor-not-allowed"
+                className="px-8 py-2 bg-black text-white hover:bg-gray-800 font-normal text-xs uppercase disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 PROCEED TO CHECKOUT
               </button>
