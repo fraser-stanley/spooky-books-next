@@ -1,6 +1,45 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
+  // Performance optimizations
+  experimental: {
+    webpackBuildWorker: true,
+  },
+  
+  // Webpack optimizations
+  webpack: (config, { dev, isServer }) => {
+    if (!dev && !isServer) {
+      // Enable tree shaking
+      config.optimization.usedExports = true
+      config.optimization.sideEffects = false
+      
+      // Split vendor chunks for better caching
+      config.optimization.splitChunks.cacheGroups = {
+        ...config.optimization.splitChunks.cacheGroups,
+        sanity: {
+          name: 'sanity',
+          test: /[\\/]node_modules[\\/](@sanity|next-sanity|groq)[\\/]/,
+          chunks: 'all',
+          priority: 30,
+        },
+        stripe: {
+          name: 'stripe',
+          test: /[\\/]node_modules[\\/]@stripe[\\/]/,
+          chunks: 'all',
+          priority: 30,
+        },
+        // Separate styled-components if used
+        styledComponents: {
+          name: 'styled-components',
+          test: /[\\/]node_modules[\\/]styled-components[\\/]/,
+          chunks: 'all',
+          priority: 20,
+        },
+      }
+    }
+    return config
+  },
+
   images: {
     // Use remotePatterns instead of domains (Next.js 15 best practice)
     remotePatterns: [

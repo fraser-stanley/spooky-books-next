@@ -14,6 +14,12 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - `npm run sanity:build` - Build Sanity Studio for deployment
 - `npm run sanity:deploy` - Deploy Sanity Studio to production
 
+### Additional Maintenance Commands
+- `scripts/create-homepage.js` - Create homepage content from scratch
+- `scripts/create-simple-homepage.js` - Create basic homepage structure
+- `scripts/test-homepage-query.js` - Test GROQ homepage queries
+- `scripts/migrate-homepage-content.js` - Migrate homepage content structure
+
 ## Architecture Overview
 
 This is a **Next.js 15.3.4 e-commerce site** for Spooky Books, migrated from Gatsby + Shopify. Built with the App Router and TypeScript with React 19.0.0. Key integrations include:
@@ -52,6 +58,9 @@ This is a **Next.js 15.3.4 e-commerce site** for Spooky Books, migrated from Gat
 - ✅ **Schema Migration & Cleanup**: Legacy field removal, enhanced Studio UX, and modernized data structures (2025)
 - ✅ **Enhanced API Ecosystem**: Comprehensive migration and debugging APIs for content management (2025)
 - ✅ **Advanced SEO & Performance**: Comprehensive SEO system with structured data, automated alt text, and Next.js 15.3.4 optimizations (2025)
+- ✅ **Screensaver System**: Feature-flagged accessibility-compliant screensaver with lazy loading and performance optimization (2025)
+- ✅ **Enterprise Monitoring**: Idempotency system, error logging schema, and advanced debugging infrastructure (2025)
+- ✅ **Autonomous Operations**: Zero-intervention inventory system with intelligent response triggers and self-healing capabilities (2025)
 
 ## SEO & Performance Optimization
 
@@ -96,6 +105,13 @@ This is a **Next.js 15.3.4 e-commerce site** for Spooky Books, migrated from Gat
 - **Skeleton Matching**: Loading states match actual component layouts exactly to prevent visual jumps
 - **Hardware Acceleration**: CSS-only animations with transform3d for smooth skeleton states
 
+#### Advanced Bundle Optimizations (Next.js 15.3.4)
+- **Webpack Build Worker**: Multi-threaded compilation for faster builds
+- **Tree Shaking**: Dead code elimination with advanced module analysis
+- **Vendor Chunk Splitting**: Separate chunks for Sanity, Stripe, and styled-components
+- **Performance Caching**: `useOptimizedStock` hook with TTL-based cache management
+- **Debounced API Calls**: `createDebouncedFetch` utility for optimized network requests
+
 ## Data Management
 
 ### Sanity CMS Integration
@@ -111,6 +127,12 @@ This is a **Next.js 15.3.4 e-commerce site** for Spooky Books, migrated from Gat
 - **Real-time Updates**: Instant content synchronization between draft and published states
 - **CORS Configuration**: Middleware for cross-origin requests from Sanity Studio
 - **Studio Performance**: Optimized caching and deployment strategies for immediate schema updates
+
+#### Enterprise System Monitoring Schemas (2025)
+- **Error Logging**: `errorLog` schema for system monitoring with severity levels and automatic cleanup
+- **Idempotency Records**: `idempotencyRecord` schema for webhook deduplication and operation tracking
+- **Stock Reservations**: Enhanced `stockReservation` schema with automated expiration and cleanup
+- **System Health**: Advanced monitoring capabilities with real-time health status tracking
 
 ### Product Data Structure
 - **Source**: Sanity CMS via GROQ queries (replaces mock data)
@@ -245,6 +267,18 @@ Materials: 100% organic cotton`,
 - **Dynamic Imports**: Uses `next/dynamic` with `ssr: false` for proper server/client separation
 - **Bundle Optimization**: Non-critical visual editing components load only when needed
 - **Compatibility**: Resolves Next.js 15 server component restrictions with dynamic imports
+
+### Screensaver System (2025)
+- **Location**: `src/components/screensaver/` - Complete screensaver module
+- **FloatingScreensaver**: Main component with animated GIF spawning after user inactivity
+- **ScreensaverProvider**: Global provider component for app-wide screensaver management
+- **useIdleTimer**: Custom hook for activity detection with configurable timeout
+- **Features**: 
+  - Lazy-loaded with environment variable feature flag
+  - Accessibility-compliant with screen reader support
+  - Performance optimized with RAF-based rendering
+  - SSR compatible with proper client-side hydration
+- **Configuration**: Environment variables control activation and behavior
 
 ### E-commerce Components
 - **ProductCard**: Grid-compatible with Next.js Image optimization, author display, and intelligent stock status messaging showing lowest size stock for apparel
@@ -394,6 +428,11 @@ export interface SanityContentBlock {
 - **Test Revalidate**: `/api/test-revalidate` - Manual trigger for testing revalidation system
 - **Debug Homepage**: `/api/debug-homepage` - Content migration debugging and GROQ query validation
 
+#### Advanced Debugging & Diagnostic APIs (2025)
+- **Debug Webhooks**: `/api/debug-webhooks` - Webhook diagnostic tool with manual stock deduction testing  
+- **Backfill Inventory**: `/api/backfill-inventory` - Comprehensive inventory backfill system fixing multiple issues in one operation
+- **Visual Editing**: `/api/visual-editing` - Simple visual editing connection endpoint for Studio integration
+
 #### Development Debugging Tools
 - **Homepage Debug Page**: `/debug-homepage` - Visual debugging interface for content block migration
 - **Content Inspection**: Real-time comparison between new contentBlocks and legacy heroSections
@@ -443,11 +482,13 @@ export async function generateStaticParams() {
   - `src/app/api/` - API routes for Sanity-Stripe integration and optimized checkout flow
 - `src/components/` - Reusable React components with CSS modules
   - `src/components/portable-text.tsx` - Rich text rendering components for Sanity Portable Text
+  - `src/components/screensaver/` - Complete screensaver system with provider, component, and hooks
 - `src/data/` - Type definitions and interfaces (mock data replaced by Sanity)
 - `src/lib/` - Utilities, hooks, and shared logic
-  - `src/lib/hooks/` - Custom React hooks (useLocaleCurrency)
-  - `src/lib/utils/` - Utility functions (formatPrice)
+  - `src/lib/hooks/` - Custom React hooks (useLocaleCurrency, useIdleTimer, useOptimizedStock)
+  - `src/lib/utils/` - Utility functions (formatPrice, error-handling, idempotency, createDebouncedFetch)
   - `src/lib/sanity/` - Sanity client, queries, type definitions, and Live Content API
+  - `src/lib/seo/` - Complete SEO system with config, utils, types, and internal linking strategy
 - `src/styles/` - Global CSS styles  
 - `studio/` - Sanity Studio configuration and schemas
   - `studio/schemas/` - Product, category, and unified homepage content block schema definitions
@@ -1335,6 +1376,10 @@ NEXT_PUBLIC_SANITY_STUDIO_URL=https://your-domain.com/studio
 
 # Visual Editing (Production)
 SANITY_STUDIO_PREVIEW_ORIGIN=https://your-domain.com
+
+# Feature Flags (Optional)
+NEXT_PUBLIC_ENABLE_SCREENSAVER=true  # Enable screensaver system
+SCREENSAVER_IDLE_TIMEOUT=300000      # Screensaver activation delay (ms)
 ```
 
 ### Vercel Configuration (Hobby Plan Optimized)
@@ -1557,6 +1602,83 @@ SANITY_STUDIO_PREVIEW_ORIGIN=https://spooky-books-next.vercel.app
 - **Color Contrast**: Proper contrast ratios for light mode
 - **Semantic HTML**: Proper heading hierarchy and landmark elements
 
+## Advanced System Features (2025)
+
+### Enterprise Error Handling & Monitoring
+- **Idempotency System**: Webhook deduplication using `src/lib/utils/idempotency.ts`
+  - Prevents duplicate operations with unique operation IDs
+  - Sanity schema: `idempotencyRecord` for operation tracking
+  - Automatic cleanup of expired records
+- **Error Logging Schema**: Comprehensive error tracking in Sanity
+  - Severity levels: info, warning, error, critical
+  - Automatic categorization and cleanup policies
+  - Real-time error monitoring and alerting capabilities
+- **Advanced Error Handling**: `src/lib/utils/error-handling.ts`
+  - Structured error types with context preservation
+  - User-friendly error message generation
+  - Technical logging with privacy protection
+
+### Autonomous Inventory System
+- **Zero Manual Intervention**: Enterprise-grade self-healing inventory management
+- **Intelligent Response Triggers**: Automated responses to various system events
+  - Stock threshold warnings with automatic reordering suggestions
+  - Race condition detection and automatic resolution
+  - Overselling prevention with real-time validation
+- **Self-Healing Capabilities**: Automatic issue detection and resolution
+  - Orphaned reservation cleanup
+  - Stock consistency verification and correction
+  - Performance optimization through automated cache management
+- **Advanced Monitoring**: `/autonomous-status` dashboard with real-time health metrics
+  - System automation status and schedule tracking
+  - Performance metrics and trend analysis
+  - Proactive issue detection and prevention
+
+### Performance Monitoring & Caching
+- **Stock Cache System**: `StockCache` class with TTL and automatic cleanup
+  - In-memory caching with configurable expiration
+  - Performance metrics and hit rate tracking
+  - Memory-efficient cleanup routines
+- **Optimized Stock Fetching**: `useOptimizedStock` hook
+  - Debounced API calls with intelligent batching
+  - Cache-first strategy with background refresh
+  - Error boundary integration for graceful fallbacks
+- **Debounced API Utilities**: `createDebouncedFetch` for network optimization
+  - Configurable debounce timing and batch sizes
+  - Request deduplication and cancellation
+  - Performance monitoring and analytics integration
+
+### Screensaver System Implementation
+- **Component Architecture**: `src/components/screensaver/`
+  - `FloatingScreensaver`: Main screensaver component with animated GIF spawning
+  - `ScreensaverProvider`: Global provider for app-wide screensaver management
+  - `useIdleTimer`: Activity detection hook with configurable timeout
+- **Performance Features**:
+  - Lazy loading with environment variable feature flags
+  - RAF-based rendering for smooth animations
+  - SSR compatibility with proper client-side hydration
+  - Memory-efficient GIF management and cleanup
+- **Accessibility Compliance**:
+  - Screen reader compatibility with proper ARIA labels
+  - Keyboard navigation and focus management
+  - Reduced motion support for accessibility preferences
+  - User preference persistence and override capabilities
+
+### SEO Infrastructure
+- **Complete SEO System**: `src/lib/seo/` directory
+  - `config.ts`: Centralized SEO configuration and defaults
+  - `utils.ts`: SEO utility functions and metadata generation
+  - `types.ts`: TypeScript interfaces for SEO data structures
+  - `internal-links.ts`: Intelligent internal linking strategy
+- **Dynamic Content Generation**:
+  - Automated sitemap generation from Sanity content (`src/app/sitemap.ts`)
+  - Robots.txt with intelligent crawling directives
+  - JSON-LD structured data for enhanced search visibility
+  - Automated alt text generation from product metadata
+- **Performance Integration**:
+  - Lazy loading with SEO compatibility
+  - Progressive enhancement for search engine optimization
+  - Core Web Vitals optimization with SEO impact analysis
+
 ## Quick Reference Guide
 
 ### Deployment
@@ -1595,8 +1717,17 @@ GET /api/inventory-health
 # View autonomous system status
 Visit /autonomous-status
 
+# Advanced inventory monitoring
+GET /api/inventory-monitor
+
 # Manual cleanup if needed
 POST /api/cron/cleanup-inventory
+
+# Comprehensive inventory backfill
+POST /api/backfill-inventory
+
+# Test webhook functionality
+POST /api/debug-webhooks
 ```
 
 #### Fix Common Issues
@@ -1604,6 +1735,9 @@ POST /api/cron/cleanup-inventory
 - **Missing variant keys**: Run `/api/fix-variant-keys`
 - **Stale cache**: Run `/api/emergency-cache-clear`
 - **TypeScript errors**: Check `npm run build` output for type validation
+- **Visual editing issues**: Check `/api/visual-editing` endpoint
+- **Homepage content migration**: Use `/debug-homepage` for migration analysis
+- **Performance issues**: Check `/autonomous-status` for system health
 
 ### Best Practices
 
@@ -1623,3 +1757,12 @@ POST /api/cron/cleanup-inventory
 - **Image Optimization**: Always include alt text, use Next.js Image component
 - **Stock Management**: Test variant-level stock, validate cart quantities
 - **Visual Editing**: Test presentation mode after schema changes
+- **SEO Optimization**: Use automated alt text generation and internal linking strategy
+- **Error Monitoring**: Leverage idempotency system for webhook reliability
+- **Performance**: Utilize caching systems and debounced API calls for optimal performance
+
+#### Feature Flags & Optional Systems
+- **Screensaver**: Enable via `NEXT_PUBLIC_ENABLE_SCREENSAVER=true`
+- **Advanced Monitoring**: Autonomous inventory system runs automatically
+- **Debug Tools**: Available in development and staging environments
+- **SEO Features**: Automatic sitemap and structured data generation

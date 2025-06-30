@@ -28,6 +28,9 @@ export default async function RootLayout({
           type="font/woff2"
           crossOrigin=""
         />
+        <link rel="preconnect" href="https://cdn.sanity.io" />
+        <link rel="preconnect" href="https://0gbx06x6.api.sanity.io" />
+        <link rel="preconnect" href="https://js.stripe.com" />
         <script
           {...generateStructuredDataScript(structuredDataConfig.organization)}
         />

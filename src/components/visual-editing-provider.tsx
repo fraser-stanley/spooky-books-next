@@ -2,7 +2,7 @@
 
 import dynamic from "next/dynamic";
 
-// Dynamic imports for visual editing components (client-side only)
+// Dynamic import for VisualEditing (client-side only)
 const VisualEditing = dynamic(
   () => import("next-sanity").then((mod) => ({ default: mod.VisualEditing })),
   {
@@ -18,7 +18,5 @@ interface VisualEditingProviderProps {
 export function VisualEditingProvider({
   isEnabled,
 }: VisualEditingProviderProps) {
-  if (!isEnabled) return null;
-  
-  return <VisualEditing />;
+  return <>{isEnabled && <VisualEditing />}</>;
 }
