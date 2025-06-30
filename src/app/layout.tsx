@@ -4,6 +4,7 @@ import { CartProvider } from "@/components/cart-contex";
 import { Toaster } from "sonner";
 import { draftMode } from "next/headers";
 import { VisualEditingProvider } from "@/components/visual-editing-provider";
+import { ScreensaverProvider } from "@/components/screensaver";
 import { SanityLive } from "@/lib/sanity/live";
 import { defaultMetadata, structuredDataConfig } from "@/lib/seo/config";
 import { generateStructuredDataScript } from "@/lib/seo/utils";
@@ -40,6 +41,7 @@ export default async function RootLayout({
           {children}
           <Toaster position="bottom-right" />
           <VisualEditingProvider isEnabled={isEnabled} />
+          <ScreensaverProvider />
           <SanityLive />
         </CartProvider>
       </body>
